@@ -81,7 +81,7 @@ const CreateRaffle = () => {
   };
   const createNewRaffle = async (raffle: FormData) => {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createRaffle`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createRaffle`,
       {
         method: "POST",
         body: JSON.stringify(raffle),

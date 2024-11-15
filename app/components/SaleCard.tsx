@@ -32,7 +32,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
     raffleId?: string;
   }) => {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/confirmSale`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/confirmSale`,
       {
         method: "POST",
         headers: {
@@ -55,7 +55,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   }) => {
     console.log("Rejecting payment", sale);
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/reject`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/reject`,
       {
         method: "POST",
         headers: {

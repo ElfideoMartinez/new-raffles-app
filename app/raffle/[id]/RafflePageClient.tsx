@@ -33,7 +33,7 @@ const RafflePageClient = ({
             <TicketButton
               raffleId={raffleId}
               ticketNumber={ticket.number}
-              key={ticket.id}
+              key={`${ticket.id}#${index}`}
               isUnavailable={ticket.sold}
             />
           ))}

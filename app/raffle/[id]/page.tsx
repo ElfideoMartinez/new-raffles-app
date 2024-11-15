@@ -16,7 +16,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`
     );
     const responseData = await fetch(
-      `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getRaffleData`,
       {
         cache: "no-store",
         method: "POST",

@@ -16,7 +16,7 @@ const SuccessPage = () => {
   }, []);
   const markAsSold = async () => {
     const promises = raffles.map((raffle) =>
-      fetch(`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/success`, {
+      fetch(`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/success`, {
         cache: "default",
         method: "POST",
         body: JSON.stringify({

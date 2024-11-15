@@ -26,7 +26,7 @@ const Page = () => {
   const fetchData = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSales`
+        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`
       );
       const data = await res.json();
       console.log(data);
