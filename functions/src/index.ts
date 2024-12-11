@@ -6,6 +6,9 @@ admin.initializeApp();
 const db = admin.firestore();
 
 export const getRaffleData = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -55,6 +58,9 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
 });
 
 export const markTicketsAsSold = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -112,6 +118,9 @@ const setTicketsAsSold = async (raffleId: string, ticketNumbers: number[]) => {
   }
 };
 export const createSale = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -143,9 +152,73 @@ export const createSale = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+export const success = functions.https.onRequest(async (req, res) => {
+  // Handle preflight OPTIONS request for CORS
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send(""); // Respond with no content
+    return;
+  }
+
+  // Set CORS headers
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Validate method
+  if (req.method !== "POST") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  try {
+    const { raffleId, ticketNumbers } = req.body;
+
+    if (!raffleId || !ticketNumbers || !Array.isArray(ticketNumbers)) {
+      res.status(400).json({
+        status: 400,
+        message: "Invalid request body. Expected raffleId and ticketNumbers.",
+      });
+      return;
+    }
+
+    // Call the function to update tickets
+    await setTicketsAsSold(raffleId, ticketNumbers);
+
+    res.status(200).json({
+      status: 200,
+      message: "Tickets marked as sold",
+    });
+  } catch (error: any) {
+    console.error("Error marking tickets as sold:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Failed to mark tickets as sold",
+      error: error.message,
+    });
+  }
+});
 
 export const createCheckoutSession = functions.https.onRequest(
   async (req, res) => {
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      res.set("Access-Control-Allow-Headers", "Content-Type");
+      res.status(204).send(""); // Respond with no content
+      return;
+    }
+
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
     if (req.method !== "POST") {
       res.status(405).json({
         status: 405,
@@ -174,6 +247,7 @@ export const createCheckoutSession = functions.https.onRequest(
       // Create a checkout session
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
+        ui_mode: "embedded",
         line_items: [
           {
             price: newPrice.id,
@@ -183,6 +257,7 @@ export const createCheckoutSession = functions.https.onRequest(
         phone_number_collection: {
           enabled: true,
         },
+        return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
       });
 
       // Add sale details to Firestore
@@ -212,7 +287,11 @@ export const createCheckoutSession = functions.https.onRequest(
     }
   }
 );
+
 export const getAllRaffles = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
   if (req.method !== "GET") {
     res.status(405).json({
       status: 405,
@@ -246,6 +325,15 @@ export const getAllRaffles = functions.https.onRequest(async (req, res) => {
 });
 
 export const getSales = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    // Handle preflight requests
+    res.status(204).send("");
+    return;
+  }
   if (req.method !== "GET") {
     res.status(405).json({
       status: 405,
@@ -253,7 +341,6 @@ export const getSales = functions.https.onRequest(async (req, res) => {
     });
     return;
   }
-
   try {
     const allSales = db.collection("sales");
     const salesSnapshot = await allSales.get();
@@ -261,7 +348,6 @@ export const getSales = functions.https.onRequest(async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
-
     res.status(200).json({
       sales,
     });
@@ -275,7 +361,60 @@ export const getSales = functions.https.onRequest(async (req, res) => {
   }
 });
 
+export const rejectSale = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method !== "POST") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  try {
+    const data = req.body;
+    console.log("Data from reject:", data);
+
+    const ticketsCollection = db.collection("tickets");
+    const ticketQuery = ticketsCollection
+      .where("raffle_id", "==", data.raffle_id)
+      .where("number", "in", data.ticketNumbers);
+
+    const ticketQuerySnapshot = await ticketQuery.get();
+
+    ticketQuerySnapshot.docs.forEach((ticketDoc) => {
+      console.log("Ticket:", ticketDoc.data());
+    });
+
+    const updatePromises = ticketQuerySnapshot.docs.map((ticketDoc) =>
+      ticketDoc.ref.update({ sold: false })
+    );
+
+    const salesDocRef = db.collection("sales").doc(data.id);
+    const saleUpdatePromise = salesDocRef.update({ verified: false });
+
+    await Promise.all([...updatePromises, saleUpdatePromise]);
+
+    res.status(200).json({
+      status: 200,
+      message: "Sale rejected successfully",
+    });
+  } catch (err) {
+    console.error("Error rejecting sale:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Error rejecting sale",
+      error: err,
+    });
+  }
+});
+
 export const confirmSale = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -321,7 +460,9 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
 });
 
 export const createRaffle = functions.https.onRequest(async (req, res) => {
-  console.log("Function called");
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests are allowed" });

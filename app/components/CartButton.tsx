@@ -6,6 +6,7 @@ const CartButton = () => {
   const selectedTicketCount = useTicketStore((state) =>
     state.getItemsFromCart()
   );
+  console.log("selectedTicketCount", selectedTicketCount);
   //got through the cart elements and sum all the ticket numbers
   const totalTickets = selectedTicketCount.reduce(
     (acc, item) => acc + item.ticketNumbers.length,

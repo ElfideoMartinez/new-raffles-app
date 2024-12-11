@@ -49,9 +49,14 @@ const CardCheckoutPage = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch checkout session");
         }
-
+        console.log("response", response);
         const result = await response.json();
+        console.log("result", result);
         const { client_secret } = result.body.session;
+        if (!client_secret) {
+          throw new Error("Failed to fetch client secret");
+          alert;
+        }
         setClientSecret(client_secret);
         setLoading(false);
       } catch (err) {

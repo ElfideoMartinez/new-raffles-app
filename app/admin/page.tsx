@@ -18,7 +18,7 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       router.push("/admin/dashboard"); // Redirect to the admin dashboard
     } catch (err) {
       setError("Invalid email or password. Please try again.");

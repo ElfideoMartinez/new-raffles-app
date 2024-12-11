@@ -26,13 +26,18 @@ const Page = () => {
   const fetchData = async () => {
     try {
       const res = await fetch(
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`
+        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`,
+        {
+          method: "GET",
+          mode: "cors", // Important for cross-origin requests
+        }
       );
       const data = await res.json();
       console.log(data);
       setSales(data.sales);
     } catch (error) {
       console.error("Error fetching sales data:", error);
+      setSales([]);
     }
   };
 

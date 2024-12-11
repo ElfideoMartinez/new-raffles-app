@@ -19,7 +19,10 @@ const AddToCartButton = ({ raffleId, rafflePrice }: IAddToCartButtonprops) => {
     <button
       onClick={() => {
         addTicketsToCart(raffleId, rafflePrice);
-        router.push("/user/cart");
+        // Redirect to the cart page without reloading the page
+        router.push("/user/cart", {
+          scroll: false,
+        });
       }}
       disabled={selectedTicketCount.length < 1}
       className='disabled:bg-gray-500 flex items-center justify-center w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
