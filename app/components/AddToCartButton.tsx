@@ -27,7 +27,7 @@ const AddToCartButton = ({ raffleId, rafflePrice }: IAddToCartButtonprops) => {
       disabled={selectedTicketCount.length < 1}
       className='disabled:bg-gray-500 flex items-center justify-center w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
     >
-      Add to Cart ({selectedTicketCount.length})
+      Agregar al carrito ({selectedTicketCount.length})
     </button>
   );
 };

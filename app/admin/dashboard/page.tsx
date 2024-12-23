@@ -47,25 +47,25 @@ const Page = () => {
 
   return (
     <div className='flex flex-col w-full items-center'>
-      <h1>Sales</h1>
+      <h1 className="my-1">Ventas</h1>
       <div className='flex space-x-4 mb-4'>
         <button
           className={`p-2 ${
-            activeTab === "verified" ? "bg-blue-500 text-white" : "bg-gray-300"
+            activeTab === "verified" ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600"
           }`}
           onClick={() => setActiveTab("verified")}
         >
-          Verified Sales
+          Ventas verificadas
         </button>
         <button
           className={`p-2 ${
             activeTab === "non-verified"
               ? "bg-blue-500 text-white"
-              : "bg-gray-300"
+              : "bg-gray-300 text-gray-600"
           }`}
           onClick={() => setActiveTab("non-verified")}
         >
-          Non-Verified Sales
+          Ventas no verificadas
         </button>
       </div>
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
@@ -87,8 +87,8 @@ const Page = () => {
               />
             ))}
       </div>
-      <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4'>
-        Back to Home
+      <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4 mb-1 '>
+        Volver al inicio
       </Link>
     </div>
   );

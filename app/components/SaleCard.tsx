@@ -97,7 +97,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   return (
     <div className='bg-slate-600 p-4 rounded-md'>
       {sale.paymentImage && (
-        <img src={sale.paymentImage} alt='payment' className='w-20 h-20' />
+        <img src={sale.paymentImage} alt='payment' className='w-20 h-20 mb-1' />
       )}
       <div>Cliente: {sale.phone}</div>
       {sale.email && <div>Email: {sale.email}</div>}
@@ -106,7 +106,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       <div>
         Boletos vendidos:
         {sale.ticketNumbers.map((tn) => (
-          <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1'>
+          <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1 ml-1'>
             {tn}
           </span>
         ))}
@@ -121,7 +121,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
           onClick={handleAction}
           className={`${
             isVerified ? "bg-red-500" : "bg-green-500"
-          } text-white p-2 rounded-md`}
+          } text-white p-2 rounded-md my-2`}
         >
           {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
         </button>

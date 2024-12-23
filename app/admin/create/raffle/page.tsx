@@ -98,7 +98,7 @@ const CreateRaffle = () => {
   return (
     <div className='max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-5'>
       <h2 className='text-black text-2xl font-bold mb-6 text-center'>
-        Create New Raffle
+        Crear nueva rifa
       </h2>
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
@@ -117,7 +117,7 @@ const CreateRaffle = () => {
 
         <div>
           <label className='text-black block text-sm font-medium mb-1'>
-            Numero de Tickets(Boletos):
+            Numero de Tickets (Boletos):
           </label>
           <input
             type='number'

@@ -12,9 +12,9 @@ const RaffleDetailsButton = ({ id, price }: IRaffeDetailsButtonProps) => {
   return (
     <Link
       href={`/raffle/${id}`}
-      className='bg-blue-500 text-white block text-center p-2'
+      className='bg-blue-500 text-white block text-center p-2 mx-3 rounded-lg' style={{ backgroundColor: '#355b6eff'}}
     >
-      View Raffle
+      Ver Rifa
     </Link>
   );
 };
