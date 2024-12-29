@@ -25,6 +25,7 @@ interface TicketStoreState {
   cleanCart: () => void;
   removeItemFromCart: (raffleId: string) => void;
   clearSelectedTickets: () => void;
+  getTicketsInCartByRaffleId: (raffleId: string) => number[];
 }
 
 const useTicketStore = create<TicketStoreState>((set, get) => ({
@@ -67,6 +68,7 @@ const useTicketStore = create<TicketStoreState>((set, get) => ({
         ...state.userCartStore,
         { raffleId, ticketNumbers, raffleTotalPrice },
       ],
+      tickets:{}
     }));
   },
 
@@ -85,6 +87,16 @@ const useTicketStore = create<TicketStoreState>((set, get) => ({
     get().tickets[raffleId]?.ticketNumbers || [],
 
   clearSelectedTickets: () => set({ tickets: {} }),
+
+  getTicketsInCartByRaffleId: (raffleId: string) => {
+    const cartItems = get().userCartStore;
+    const ticketsForRaffle = cartItems.filter(
+      (item) => item.raffleId === raffleId
+    );
+    const ticketNumbers = ticketsForRaffle.flatMap((item) => item.ticketNumbers);
+    return ticketNumbers;
+  },
+
 }));
 
 export default useTicketStore;
