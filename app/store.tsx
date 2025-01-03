@@ -134,6 +134,16 @@ const useTicketStore = create<TicketState>()(
         get().tickets[raffleId]?.ticketNumbers || [],
 
       clearSelectedTickets: () => set({ tickets: {} }),
+      getTicketsInCartByRaffleId: (raffleId: string) => {
+        const cartItems = get().userCartStore;
+        const ticketsForRaffle = cartItems.filter(
+          (item) => item.raffleId === raffleId
+        );
+        const ticketNumbers = ticketsForRaffle.flatMap(
+          (item) => item.ticketNumbers
+        );
+        return ticketNumbers;
+      },
     }),
     {
       name: "ticket-store",
