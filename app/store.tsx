@@ -26,7 +26,6 @@ interface TicketStoreState {
   cleanCart: () => void;
   removeItemFromCart: (raffleId: string) => void;
   clearSelectedTickets: () => void;
-  getTicketsInCartByRaffleId: (raffleId: string) => number[];
 }
 
 // Define the state type
@@ -49,6 +48,7 @@ interface TicketState {
   removeItemFromCart: (raffleId: string) => void;
   getSelectedTickets: (raffleId: string) => number[];
   clearSelectedTickets: () => void;
+  getTicketsInCartByRaffleId: (raffleId: string) => number[];
 }
 
 // Create the store with proper typing
@@ -120,17 +120,7 @@ const useTicketStore = create<TicketState>()(
         });
       },
 
-  addTicketsToCart: (raffleId, price) => {
-    const ticketNumbers = get().tickets[raffleId]?.ticketNumbers || [];
-    const raffleTotalPrice = ticketNumbers.length * price;
-    set((state) => ({
-      userCartStore: [
-        ...state.userCartStore,
-        { raffleId, ticketNumbers, raffleTotalPrice },
-      ],
-      tickets:{}
-    }));
-  },
+      cleanCart: () => set({ userCartStore: [] }),
 
       getItemsFromCart: () => get().userCartStore,
 
@@ -144,20 +134,23 @@ const useTicketStore = create<TicketState>()(
       getSelectedTickets: (raffleId) =>
         get().tickets[raffleId]?.ticketNumbers || [],
 
-  getSelectedTickets: (raffleId) =>
-    get().tickets[raffleId]?.ticketNumbers || [],
-
-  clearSelectedTickets: () => set({ tickets: {} }),
-
-  getTicketsInCartByRaffleId: (raffleId: string) => {
-    const cartItems = get().userCartStore;
-    const ticketsForRaffle = cartItems.filter(
-      (item) => item.raffleId === raffleId
-    );
-    const ticketNumbers = ticketsForRaffle.flatMap((item) => item.ticketNumbers);
-    return ticketNumbers;
-  },
-
-}));
+      clearSelectedTickets: () => set({ tickets: {} }),
+      getTicketsInCartByRaffleId: (raffleId: string) => {
+        const cartItems = get().userCartStore;
+        const ticketsForRaffle = cartItems.filter(
+          (item) => item.raffleId === raffleId
+        );
+        const ticketNumbers = ticketsForRaffle.flatMap(
+          (item) => item.ticketNumbers
+        );
+        return ticketNumbers;
+      },
+    }),
+    {
+      name: "ticket-store",
+      getStorage: () => localStorage,
+    }
+  )
+);
 
 export default useTicketStore;
