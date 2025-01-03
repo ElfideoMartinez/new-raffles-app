@@ -18,12 +18,12 @@ const CardCheckoutPage = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasFetchedSession = useRef(false); // Add a ref to track if the API call was made
-  const card = useTicketStore((state) => state.getItemsFromCart());
+  const card = useTicketStore((state: any) => state.getItemsFromCart());
   const totalRafflePrice = card.reduce(
-    (total, raffle) => total + (raffle.raffleTotalPrice || 0),
+    (total: any, raffle: any) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-  const allTickets = card.flatMap((raffle) => raffle.ticketNumbers);
+  const allTickets = card.flatMap((raffle: any) => raffle.ticketNumbers);
   //get raffle id from the first raffle in the cart
   const raffleId = card[0]?.raffleId;
 
