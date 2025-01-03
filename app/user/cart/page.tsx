@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import useTicketStore from "@/app/store";
 import Link from "next/link";
 
@@ -27,6 +27,10 @@ const UserCartPage = () => {
   // Convert the grouped tickets object back to an array
   const groupedTicketsArray = Object.values(groupedTickets);
   console.log("Grouped Tickets", groupedTicketsArray);
+
+  useEffect(() => {
+    alert("Componente renderizado")
+  },[])
 
   return (
     <div>
