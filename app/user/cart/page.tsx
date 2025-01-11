@@ -28,10 +28,6 @@ const UserCartPage = () => {
   const groupedTicketsArray = Object.values(groupedTickets);
   console.log("Grouped Tickets", groupedTicketsArray);
 
-  useEffect(() => {
-    alert("Componente renderizado")
-  },[])
-
   return (
     <div>
       <header className="flex justify-center mt-2">
@@ -75,10 +71,11 @@ const UserCartPage = () => {
         <div className='flex justify-between mx-2 mt-1'>
           <Link
             locale='fr'
-            href={{
-              pathname: "/checkout/card",
-              query: { cartTotal: totalRafflePrice },
-            }}
+            // href={{
+            //   pathname: "/checkout/card",
+            //   query: { cartTotal: totalRafflePrice },
+            // }}
+            href="/checkout/card"
             className='bg-blue-500 text-center text-white p-2 rounded-lg w-1/2'
           >
             Pago con tarjeta

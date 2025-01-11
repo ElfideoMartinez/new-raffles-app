@@ -53,7 +53,7 @@ interface TicketState {
 
 // Create the store with proper typing
 const useTicketStore = create<TicketState>()(
-  persist(
+  persist<TicketState>(
     (set, get) => ({
       tickets: {},
       userCartStore: [],
@@ -108,7 +108,14 @@ const useTicketStore = create<TicketState>()(
               raffleTotalPrice:
                 updatedCart[existingCartIndex].ticketNumbers.length * price,
             };
-            return { userCartStore: updatedCart };
+            return { 
+              userCartStore: updatedCart,
+              tickets: {
+                ...state.tickets,
+                [raffleId]: { ticketNumbers: [] }, // Limpia los tickets seleccionados
+              }, 
+            };
+            
           }
 
           return {
@@ -116,6 +123,10 @@ const useTicketStore = create<TicketState>()(
               ...state.userCartStore,
               { raffleId, ticketNumbers, raffleTotalPrice },
             ],
+            tickets: {
+              ...state.tickets,
+              [raffleId]: { ticketNumbers: [] }, // Limpia los tickets seleccionados
+            },
           };
         });
       },
@@ -135,6 +146,7 @@ const useTicketStore = create<TicketState>()(
         get().tickets[raffleId]?.ticketNumbers || [],
 
       clearSelectedTickets: () => set({ tickets: {} }),
+
       getTicketsInCartByRaffleId: (raffleId: string) => {
         const cartItems = get().userCartStore;
         const ticketsForRaffle = cartItems.filter(

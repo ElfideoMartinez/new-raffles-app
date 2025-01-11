@@ -461,9 +461,15 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
 
 export const createRaffle = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    return;
+  }
+  
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests are allowed" });
     return;
