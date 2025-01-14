@@ -44,7 +44,7 @@ const UserCartPage = () => {
               <li className='flex w-full justify-between'>
                 <ul className='flex gap-2'>
                   {ticket.ticketNumbers.map((number: number, index: number) => (
-                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2'>
+                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2'>
                       {number}
                     </li>
                   ))}

@@ -34,9 +34,9 @@ const SuccessPage = () => {
   return (
     <div className='flex flex-col w-full items-center'>
       <h1>Success</h1>
-      <div>Thank you for your purchase!</div>
+      <div>Gracias por su compra!</div>
       <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4'>
-        Back to Home
+        Ir a inicio
       </Link>
     </div>
   );

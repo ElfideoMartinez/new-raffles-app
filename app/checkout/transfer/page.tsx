@@ -41,7 +41,7 @@ const CheckoutTransferPage = () => {
   return (
     <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-lg'>
       <h2 className='text-black text-2xl font-bold'>
-        Checkout por Transferencia
+        Pago por Transferencia
       </h2>
 
       {/* General Explanation */}
@@ -57,7 +57,7 @@ const CheckoutTransferPage = () => {
         >
           1232392019203219
         </button>
-        <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+        <span className='text-sm text-gray-500 ml-2'>(Toca para copiar)</span>
       </div>
 
       {/* Conditional Verification Message */}

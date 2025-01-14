@@ -25,11 +25,15 @@ const RafflePageClient = ({
   raffleId: string;
 }) => {
 
-  const { getTicketsInCartByRaffleId } = useTicketStore();
+  const { getTicketsInCartByRaffleId, clearSelectedTickets } = useTicketStore();
   const selectedTickets = getTicketsInCartByRaffleId(raffleId);
   //console.log(SelectedTickets);
 
   const verifyInTheCart = (ticketNumber: IticketNumber) => selectedTickets.includes(ticketNumber as any);
+
+  useEffect(() => {
+    clearSelectedTickets();
+  },[])
 
   return (
     

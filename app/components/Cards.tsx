@@ -4,6 +4,7 @@ import RaffleDetailsButton from "./RaffleDetailsButton";
 
 interface ICardsProps {
   id: string;
+  title: string;
   name: string;
   numberOfTickets: number;
   tickets_left: number;
@@ -14,6 +15,7 @@ interface ICardsProps {
 const Cards = ({
   id,
   name,
+  title,
   numberOfTickets,
   tickets_left,
   pricePerTicket,
@@ -22,10 +24,10 @@ const Cards = ({
 }: ICardsProps) => {
   return (
     <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
-      <img src={awardImage} alt='raffle' className='object-fill self-center' />
+      <img src={awardImage} alt='raffle' className='object-fill self-center'/>
       <div className='p-4'>
         <h2 className='text-xl font-bold mb-2 text-slate-500'>
-          {name || "Event"}
+          {title || name || "Event"}
         </h2>
         <p className='text-gray-600'>
           Boletos totales: <span className='font-semibold'>{numberOfTickets}</span>
