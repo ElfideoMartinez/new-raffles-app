@@ -55,7 +55,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   }) => {
     console.log("Rejecting payment", sale);
     const res = await fetch(
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/reject`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/rejectSale`,
       {
         method: "POST",
         headers: {

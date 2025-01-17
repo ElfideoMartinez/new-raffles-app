@@ -78,7 +78,7 @@ const CheckoutTransferPage = () => {
         </p>
         <button
           onClick={() => copyToClipboard(paymentConceptKey)}
-          className='mt-2 text-xl font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          className='mt-2 text-xl text-black font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
         >
           {paymentConceptKey}
         </button>
@@ -95,7 +95,7 @@ const CheckoutTransferPage = () => {
           type='tel'
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
           placeholder='Ingrese su número de teléfono'
         />
       </div>
@@ -110,7 +110,7 @@ const CheckoutTransferPage = () => {
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 text-black px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           placeholder='Ingrese su correo electrónico (opcional)'
         />
       </div>
@@ -151,7 +151,7 @@ const CheckoutTransferPage = () => {
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
               const data = await fetch(
-                `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkout`,
+                `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,
                 {
                   method: "POST",
                   headers: {

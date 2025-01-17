@@ -363,8 +363,14 @@ export const getSales = functions.https.onRequest(async (req, res) => {
 
 export const rejectSale = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS"){
+    res.status(204).send('');
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -413,8 +419,14 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
 
 export const confirmSale = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS"){
+    res.status(204).send('');
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -514,3 +526,44 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+
+export const checkTransfer = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    return;
+  }
+  
+  if (req.method !== "POST") {
+    res.status(405).send({ message: "Only POST requests are allowed" });
+    return;
+  }
+
+  try {
+    console.log("Processing sale by tranfer");
+    const body = req.body;
+
+    const salesCollection = db.collection("sales");
+    await salesCollection.add(body);
+
+    
+    res.status(200).json({
+      status: 200,
+      message: "Sale created successfully",
+    })
+
+  } catch(err){
+    console.error("Error creating sale: ", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error creating sale",
+    })
+  }
+
+})
