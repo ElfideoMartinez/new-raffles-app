@@ -38,13 +38,13 @@ const UserCartPage = () => {
           <li key={ticket.raffleId}>
             <div className="ml-2">
               <h2>Raffle ID: {ticket.raffleId}</h2>
-              <p>Precio de boleto: ${ticket.raffleTotalPrice}</p>
+              <p className="pb-1">Precio de boleto: ${ticket.raffleTotalPrice}</p>
             </div>
             <ul>
               <li className='flex w-full justify-between'>
-                <ul className='flex gap-2'>
+                <ul className='flex flex-wrap gap-2'>
                   {ticket.ticketNumbers.map((number: number, index: number) => (
-                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2'>
+                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center'>
                       {number}
                     </li>
                   ))}

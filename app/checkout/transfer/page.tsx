@@ -22,7 +22,7 @@ const CheckoutTransferPage = () => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
-  const ticketCount = 10;
+  const ticketCount = 1;
 
   const copyToClipboard = (text: any) => {
     navigator.clipboard
@@ -33,8 +33,25 @@ const CheckoutTransferPage = () => {
 
   const isPhoneValid = phone.length === 10 && /^\d+$/.test(phone);
   const isImageValid = image !== null;
+  
+  const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+  const isEmailValid = emailRegex.test(email);
 
   const handleImageChange = (e: any) => {
+
+    const file = e.target.files[0];
+    if(!file) return;
+
+    // validate file extension
+    const fileName = file.name;
+    const fileExtension = fileName.split('.').pop()?.toLowerCase ();
+    const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp"];
+
+    if (!fileExtension || !validExtension.includes(fileExtension)){
+      alert('El archivo seleccionado no es valido');
+      return;
+    }
+
     setImage(e.target.files[0]);
   };
 
@@ -187,9 +204,9 @@ const CheckoutTransferPage = () => {
           }
         }}
         className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 ${
-          !(isPhoneValid && isImageValid) && "opacity-50 cursor-not-allowed"
+          !(isPhoneValid && isImageValid && isEmailValid) && "opacity-50 cursor-not-allowed"
         }`}
-        disabled={!(isPhoneValid && isImageValid)}
+        disabled={!(isPhoneValid && isImageValid && isEmailValid)}
       >
         {isLoading ? "Procesando..." : "Completar Compra"}
       </button>
