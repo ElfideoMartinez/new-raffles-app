@@ -244,6 +244,9 @@ export const createCheckoutSession = functions.https.onRequest(
         },
       });
 
+      const isProduction = process.env.NODE_ENV === "production";
+      console.log(process.env.NODE_ENV);
+
       // Create a checkout session
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
@@ -257,7 +260,8 @@ export const createCheckoutSession = functions.https.onRequest(
         phone_number_collection: {
           enabled: true,
         },
-        return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
+        return_url: isProduction ? "https://raffleapp-dbc1b.web.app/checkout/success" : "http://localhost:3000/checkout/success"
+        //return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
       });
 
       // Add sale details to Firestore

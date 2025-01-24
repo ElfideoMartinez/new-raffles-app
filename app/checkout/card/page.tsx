@@ -31,7 +31,8 @@ const CardCheckoutPage = () => {
     const iniStripe = async () => {
       try {
         const response = await fetch(
-          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
+          `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
+          //`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
           {
             method: "POST",
             headers: {
@@ -86,7 +87,8 @@ const CardCheckoutPage = () => {
         options={{
           clientSecret,
           onComplete: async () => {
-            router.push("./success");
+            // const successPath = "/checkout/success";
+            // router.push(successPath);
           },
         }}
       >
