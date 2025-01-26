@@ -6,10 +6,14 @@ const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
+  const paymentMethod = useTicketStore((state) => state.paymentMethod);
 
   console.log("Tickets", raffles);
   useEffect(() => {
-    markAsSold();
+    alert(paymentMethod);
+    if(paymentMethod !== "transfer"){
+      markAsSold();
+    }
     cleanCart();
     console.log("cleaning cart from outside");
     cleanSelected();

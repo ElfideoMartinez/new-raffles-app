@@ -36,6 +36,7 @@ interface TicketState {
     ticketNumbers: number[];
     raffleTotalPrice: number;
   }>;
+  paymentMethod: string;
   addTicket: (ticketNumber: number, raffleId: string) => void;
   removeTicket: (ticketNumber: number, raffleId: string) => void;
   addTicketsToCart: (raffleId: string, price: number) => void;
@@ -49,6 +50,7 @@ interface TicketState {
   getSelectedTickets: (raffleId: string) => number[];
   clearSelectedTickets: () => void;
   getTicketsInCartByRaffleId: (raffleId: string) => number[];
+  setPaymentMethod: (method: string) => void;
 }
 
 // Create the store with proper typing
@@ -57,6 +59,7 @@ const useTicketStore = create<TicketState>()(
     (set, get) => ({
       tickets: {},
       userCartStore: [],
+      paymentMethod: "",
 
       addTicket: (ticketNumber, raffleId) =>
         set((state) => {
@@ -157,6 +160,8 @@ const useTicketStore = create<TicketState>()(
         );
         return ticketNumbers;
       },
+      setPaymentMethod: (method) => set({ paymentMethod: method }),
+      
     }),
     {
       name: "ticket-store",

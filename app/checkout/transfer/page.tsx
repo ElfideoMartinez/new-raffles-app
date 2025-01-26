@@ -24,6 +24,9 @@ const CheckoutTransferPage = () => {
   const [image, setImage] = useState<any>(null);
   const ticketCount = 1;
 
+  // function to set the type of payment
+  const setPaymentMethod = useTicketStore((state) => state.setPaymentMethod);
+
   const copyToClipboard = (text: any) => {
     navigator.clipboard
       .writeText(text)
@@ -188,6 +191,8 @@ const CheckoutTransferPage = () => {
               );
               const result = await data.json();
               setIsLoading(false);
+              setPaymentMethod("transfer");
+
               //got to success page
               router.push("/checkout/success");
             } catch (error) {
