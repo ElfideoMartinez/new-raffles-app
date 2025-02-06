@@ -171,6 +171,7 @@ const CheckoutTransferPage = () => {
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
               const data = await fetch(
+                //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
                 `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,
                 {
                   method: "POST",

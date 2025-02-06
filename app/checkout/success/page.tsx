@@ -10,7 +10,7 @@ const SuccessPage = () => {
 
   console.log("Tickets", raffles);
   useEffect(() => {
-    alert(paymentMethod);
+    
     if(paymentMethod !== "transfer"){
       markAsSold();
     }
@@ -18,6 +18,7 @@ const SuccessPage = () => {
     console.log("cleaning cart from outside");
     cleanSelected();
   }, []);
+
   const markAsSold = async () => {
     const promises = raffles.map((raffle) =>
       fetch(`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/success`, {

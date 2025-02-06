@@ -246,7 +246,7 @@ export const createCheckoutSession = functions.https.onRequest(
         unit_amount: data.total * 100, // converting to cents
         currency: "mxn",
         product_data: {
-          name: "Raffle Ticket",
+          name: "Monto total",
         },
       });
 
@@ -266,21 +266,14 @@ export const createCheckoutSession = functions.https.onRequest(
         phone_number_collection: {
           enabled: true,
         },
-        return_url: isProduction ? "https://raffleapp-dbc1b.web.app/checkout/success" : "http://localhost:3000/checkout/success"
+        metadata: {
+          totalSalePrice: data.totalSalePrice,
+          ticketCount: data.ticketCount,
+          ticketNumbers: JSON.stringify(data.ticketNumbers || []),
+          raffle_id: data.raffle_id,
+        },
+        return_url: isProduction ? "https://raffleapp-dbc1b--testwebhook-xl2cpz8j.web.app/checkout/success" : "http://localhost:3000/checkout/success"
         //return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
-      });
-
-      // Add sale details to Firestore
-      const salesCollection = db.collection("sales");
-      await salesCollection.add({
-        phone: data.phone || "",
-        email: data.email || "",
-        ticketCount: data.ticketCount || 0,
-        ticketNumbers: data.ticketNumbers || [],
-        totalSalePrice: data.totalSalePrice || 0,
-        raffle_id: data.raffle_id || "",
-        paymentMethod: "card",
-        verified: true,
       });
 
       res.status(200).json({
@@ -575,5 +568,87 @@ export const checkTransfer = functions.https.onRequest( async (req, res) => {
       message: "Error creating sale",
     })
   }
+
+})
+
+export const stripeWebHook = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    return;
+  }
+  
+  if (req.method !== "POST") {
+    res.status(405).send({ message: "Only POST requests are allowed" });
+    return;
+  } 
+
+  const stripe = new Stripe(
+      "sk_test_51OhNGHFa61udd4SXwmS44glXYRaTibPKX7W3oRfejoQ7NTddDQw0MSjAFXBsGv8wdCBQoa1GDvFfjQMyLztjIpDH00Ohkhas7m"
+  );
+
+  const endpointSecret = "whsec_1OCiXXvAIORBNAWJ6xQiljGQE5vmBZD6";
+
+  try{
+
+    const body = req.body;
+    console.log(body);
+
+    const infoRaffle = body.data.object.metadata;
+    const infoCustomer = body.data.object.customer_details;
+    const paymentIntent = body.data.object.payment_intent;
+    console.log("PaymentIntent: ",paymentIntent);
+
+    const sig = req.headers["stripe-signature"] as string;
+
+    let event: Stripe.Event;
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret,)
+
+    if(event.type==="checkout.session.completed"){
+
+      let ticketNumbers: number[] = [];
+      
+      try{
+        ticketNumbers = JSON.parse(infoRaffle.ticketNumbers);
+      }catch(err){
+        console.error("Error parsing ticketNumbers:", err);
+      }
+
+      // add to sales collection
+      const salesCollection = db.collection("sales");
+      await salesCollection.add({
+        payment_intent: paymentIntent|| "",
+        name: infoCustomer.name || "",
+        phone: infoCustomer.phone || "",
+        email: infoCustomer.email || "",
+        ticketCount: infoRaffle.ticketCount || 0,
+        ticketNumbers: ticketNumbers || [],
+        totalSalePrice: infoRaffle.totalSalePrice || 0,
+        raffle_id: infoRaffle.raffle_id || "",
+        paymentMethod: "card",
+        verified: true,
+      });
+
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "Webook working correctly",
+    })
+
+  }catch(err){
+    console.error("Error in webhook:", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error in webhook:",
+    })
+  }
+  
 
 })

@@ -24,15 +24,18 @@ const CardCheckoutPage = () => {
     0
   );
   const allTickets = card.flatMap((raffle: any) => raffle.ticketNumbers);
+  const numberOfTickets = allTickets.length;
   //get raffle id from the first raffle in the cart
   const raffleId = card[0]?.raffleId;
+  // function to set the type of payment
+  const setPaymentMethod = useTicketStore((state) => state.setPaymentMethod);
 
   useEffect(() => {
     const iniStripe = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
-          //`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
+          //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
+          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
           {
             method: "POST",
             headers: {
@@ -40,6 +43,7 @@ const CardCheckoutPage = () => {
             },
             body: JSON.stringify({
               total: totalRafflePrice,
+              ticketCount: numberOfTickets,
               ticketNumbers: allTickets,
               totalSalePrice: totalRafflePrice,
               raffle_id: raffleId,
@@ -59,6 +63,7 @@ const CardCheckoutPage = () => {
           alert;
         }
         setClientSecret(client_secret);
+        setPaymentMethod("card");
         setLoading(false);
       } catch (err) {
         console.error("Error fetching Stripe session:", err);
