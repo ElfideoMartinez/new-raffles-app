@@ -4,12 +4,14 @@ import { FadeLoader } from "react-spinners";
 interface Sale {
   id: string;
   phone: string;
+  name: string;
   email?: string;
   raffle_id: string;
   raffle_name: string;
   totalSalePrice: number;
   ticketNumbers: number[];
   paymentImage?: string;
+  payment_intent: string;
   verified: boolean;
 }
 
@@ -99,11 +101,12 @@ const SaleCard: React.FC<SaleCardProps> = ({
       {sale.paymentImage && (
         <img src={sale.paymentImage} alt='payment' className='w-20 h-20 mb-1' />
       )}
-      <div>Cliente: {sale.phone}</div>
-      {sale.email && <div>Email: {sale.email}</div>}
-      <div>Rifa: {sale.raffle_name}</div>
-      <div>Total de venta: {sale.totalSalePrice}</div>
-      <div>
+      {sale.name && <div>Cliente: {sale.name}</div>}
+      <div>Email: {sale.email}</div>
+      <div>Telefono: {sale.phone.replace("+52", "")}</div>
+      <div>Rifa: {sale.raffle_id || sale.raffle_name}</div>
+      <div>Total de venta: ${sale.totalSalePrice}</div>
+      <div className="flex flex-wrap">
         Boletos vendidos:
         {sale.ticketNumbers.map((tn) => (
           <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1 ml-1'>
@@ -112,6 +115,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
         ))}
       </div>
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
+      {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
         <button className='bg-gray-400 text-white rounded-md p-2' disabled>
           <FadeLoader color='#ffffff' />

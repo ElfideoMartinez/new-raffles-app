@@ -38,7 +38,8 @@ const UserCartPage = () => {
           <li key={ticket.raffleId}>
             <div className="ml-2">
               <h2>Raffle ID: {ticket.raffleId}</h2>
-              <p className="pb-1">Precio de boleto: ${ticket.raffleTotalPrice}</p>
+              <p className="">Precio de boleto: ${ticket.raffleTotalPrice/ticket.ticketNumbers.length}</p>
+              <p className="pb-1">Precio total: ${ticket.raffleTotalPrice}</p>
             </div>
             <ul>
               <li className='flex w-full justify-between'>
