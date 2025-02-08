@@ -91,49 +91,43 @@ const useTicketStore = create<TicketState>()(
 
       addTicketsToCart: (raffleId, price) => {
         const ticketNumbers = get().tickets[raffleId]?.ticketNumbers || [];
-        const raffleTotalPrice = ticketNumbers.length * price;
-
         set((state) => {
           const existingCartIndex = state.userCartStore.findIndex(
             (item) => item.raffleId === raffleId
           );
-
+      
           if (existingCartIndex !== -1) {
             const updatedCart = [...state.userCartStore];
+            const combinedTickets = [
+              ...new Set([...updatedCart[existingCartIndex].ticketNumbers, ...ticketNumbers]),
+            ];
             updatedCart[existingCartIndex] = {
               ...updatedCart[existingCartIndex],
-              ticketNumbers: [
-                ...new Set([
-                  ...updatedCart[existingCartIndex].ticketNumbers,
-                  ...ticketNumbers,
-                ]),
-              ],
-              raffleTotalPrice:
-                updatedCart[existingCartIndex].ticketNumbers.length * price,
+              ticketNumbers: combinedTickets,
+              raffleTotalPrice: combinedTickets.length * price,
             };
-            return { 
+            return {
               userCartStore: updatedCart,
               tickets: {
                 ...state.tickets,
-                [raffleId]: { ticketNumbers: [] }, // Limpia los tickets seleccionados
-              }, 
+                [raffleId]: { ticketNumbers: [] },
+              },
             };
-            
           }
-
+      
           return {
             userCartStore: [
               ...state.userCartStore,
-              { raffleId, ticketNumbers, raffleTotalPrice },
+              { raffleId, ticketNumbers, raffleTotalPrice: ticketNumbers.length * price },
             ],
             tickets: {
               ...state.tickets,
-              [raffleId]: { ticketNumbers: [] }, // Limpia los tickets seleccionados
+              [raffleId]: { ticketNumbers: [] },
             },
           };
         });
       },
-
+        
       cleanCart: () => set({ userCartStore: [] }),
 
       getItemsFromCart: () => get().userCartStore,

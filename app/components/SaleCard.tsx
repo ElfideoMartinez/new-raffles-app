@@ -99,7 +99,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   return (
     <div className='bg-slate-600 p-4 rounded-md'>
       {sale.paymentImage && (
-        <img src={sale.paymentImage} alt='payment' className='w-20 h-20 mb-1' />
+        <img src={sale.paymentImage} alt='payment' className='w-20 h-20 mb-2' />
       )}
       {sale.name && <div>Cliente: {sale.name}</div>}
       <div>Email: {sale.email}</div>
