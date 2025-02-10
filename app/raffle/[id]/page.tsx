@@ -8,6 +8,7 @@ interface IRaffleDataResponse {
   data: { number: number; sold: boolean; id: string }[];
   price: string;
   raffleImage: string;
+  raffleName: string;
 }
 
 async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
@@ -36,6 +37,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       data: result.data,
       price: result.raffleData.pricePerTicket,
       raffleImage: result.raffleData.awardImage,
+      raffleName: result.raffleData.title,
     };
   } catch (error) {
     console.error(error);
@@ -43,6 +45,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       data: [],
       price: "",
       raffleImage: "",
+      raffleName: "",
     };
   }
 }

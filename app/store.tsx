@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 
 interface IUserCartStore {
   raffleId: string;
+  raffleName: string;
   ticketNumbers: number[];
   raffleTotalPrice?: number;
 }
@@ -33,16 +34,18 @@ interface TicketState {
   tickets: Record<string, { ticketNumbers: number[] }>;
   userCartStore: Array<{
     raffleId: string;
+    raffleName: string;
     ticketNumbers: number[];
     raffleTotalPrice: number;
   }>;
   paymentMethod: string;
   addTicket: (ticketNumber: number, raffleId: string) => void;
   removeTicket: (ticketNumber: number, raffleId: string) => void;
-  addTicketsToCart: (raffleId: string, price: number) => void;
+  addTicketsToCart: (raffleId: string, price: number, raffleName: string) => void;
   cleanCart: () => void;
   getItemsFromCart: () => Array<{
     raffleId: string;
+    raffleName: string;
     ticketNumbers: number[];
     raffleTotalPrice: number;
   }>;
@@ -89,7 +92,7 @@ const useTicketStore = create<TicketState>()(
           },
         })),
 
-      addTicketsToCart: (raffleId, price) => {
+      addTicketsToCart: (raffleId, price, raffleName) => {
         const ticketNumbers = get().tickets[raffleId]?.ticketNumbers || [];
         set((state) => {
           const existingCartIndex = state.userCartStore.findIndex(
@@ -105,6 +108,7 @@ const useTicketStore = create<TicketState>()(
               ...updatedCart[existingCartIndex],
               ticketNumbers: combinedTickets,
               raffleTotalPrice: combinedTickets.length * price,
+              raffleName: updatedCart[existingCartIndex].raffleName || raffleName, 
             };
             return {
               userCartStore: updatedCart,
@@ -118,7 +122,7 @@ const useTicketStore = create<TicketState>()(
           return {
             userCartStore: [
               ...state.userCartStore,
-              { raffleId, ticketNumbers, raffleTotalPrice: ticketNumbers.length * price },
+              { raffleId, raffleName ,ticketNumbers, raffleTotalPrice: ticketNumbers.length * price },
             ],
             tickets: {
               ...state.tickets,

@@ -6,10 +6,11 @@ import Link from "next/link";
 
 interface IAddToCartButtonprops {
   raffleId: string;
+  raffleName: string;
   rafflePrice: number;
 }
 
-const AddToCartButton = ({ raffleId, rafflePrice }: IAddToCartButtonprops) => {
+const AddToCartButton = ({ raffleId, raffleName ,rafflePrice }: IAddToCartButtonprops) => {
   const selectedTicketCount = useTicketStore((state) =>
     state.getSelectedTickets(raffleId)
   );
@@ -34,7 +35,7 @@ const AddToCartButton = ({ raffleId, rafflePrice }: IAddToCartButtonprops) => {
 
     <button
       onClick={() => {
-        addTicketsToCart(raffleId, rafflePrice);
+        addTicketsToCart(raffleId, rafflePrice, raffleName);
         // Redirect to the cart page without reloading the page
         router.push("/user/cart", {
           scroll: false,

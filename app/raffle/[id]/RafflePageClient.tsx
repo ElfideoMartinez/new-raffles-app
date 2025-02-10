@@ -15,6 +15,7 @@ interface IRaffleData {
   data: { number: number; sold: boolean; id: string }[];
   price: string;
   raffleImage: string;
+  raffleName: string;
 }
 
 const RafflePageClient = ({
@@ -58,6 +59,7 @@ const RafflePageClient = ({
       </div>
       <AddToCartButton
         raffleId={raffleId}
+        raffleName={raffleData.raffleName}
         rafflePrice={parseInt(raffleData.price)}
       />
     </div>

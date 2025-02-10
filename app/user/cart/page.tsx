@@ -37,7 +37,7 @@ const UserCartPage = () => {
         {tickets.map((ticket: any) => (
           <li key={ticket.raffleId}>
             <div className="ml-2">
-              <h2>Raffle ID: {ticket.raffleId}</h2>
+              <h2>Rifa: {ticket.raffleName}</h2>
               <p className="">Precio de boleto: ${ticket.raffleTotalPrice/ticket.ticketNumbers.length}</p>
               <p className="pb-1">Precio total: ${ticket.raffleTotalPrice}</p>
             </div>
