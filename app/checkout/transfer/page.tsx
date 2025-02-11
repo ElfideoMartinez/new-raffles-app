@@ -11,18 +11,19 @@ const CheckoutTransferPage = () => {
   const [paymentConceptKey] = useState(() =>
     Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join("")
   );
-  const card = useTicketStore((state) => state.getItemsFromCart());
+  const raffles = useTicketStore((state) => state.getItemsFromCart());
   //get first raffle id from the first raffle in the cart
-  const raffleId = card[0]?.raffleId;
-  const totalRafflePrice = card.reduce(
+  const raffleId = raffles[0]?.raffleId;
+  const totalRafflePrice = raffles.reduce(
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-  const allTickets = card.flatMap((raffle) => raffle.ticketNumbers);
+
+  const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
-  const ticketCount = 1;
+  const ticketCount = allTickets.length; 
 
   // function to set the type of payment
   const setPaymentMethod = useTicketStore((state) => state.setPaymentMethod);
@@ -183,9 +184,8 @@ const CheckoutTransferPage = () => {
                     email,
                     paymentConceptKey,
                     ticketCount,
-                    raffle_id: raffleId,
-                    totalSalePrice: totalRafflePrice,
-                    ticketNumbers: allTickets,
+                    raffles,
+                    totalSalePrice: totalRafflePrice,                    
                     paymentImage: downloadURL,
                   }),
                 }

@@ -7,8 +7,13 @@ interface Sale {
   id: string;
   phone: string;
   email?: string;
-  raffle_id: string;
-  raffle_name: string;
+  raffles: {
+    raffleId: string;
+    raffleName: string;
+    ticketNumbers: number[];
+    raffleTotalPrice: number;
+  }[];
+  ticketCount: string;
   totalSalePrice: number;
   ticketNumbers: number[];
   paymentImage?: string;

@@ -443,16 +443,19 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
     console.log("Data:", data);
 
     const ticketsCollection = db.collection("tickets");
-    const ticketQuerySnapshot = await ticketsCollection
-      .where("raffle_id", "==", data.raffle_id)
-      .where("number", "in", data.ticketNumbers)
-      .get();
-
     const batch = db.batch();
-    ticketQuerySnapshot.docs.forEach((ticketDoc) => {
-      const ticketRef = ticketsCollection.doc(ticketDoc.id);
-      batch.update(ticketRef, { sold: true });
-    });
+
+    for (const raffle of data.raffles) {
+      const ticketQuerySnapshot = await ticketsCollection
+        .where("raffle_id", "==", raffle.raffleId) // Usar raffle.raffle_id
+        .where("number", "in", raffle.ticketNumbers) // Usar raffle.ticketNumbers para los boletos de esa rifa
+        .get();
+
+      ticketQuerySnapshot.docs.forEach((ticketDoc) => {
+        const ticketRef = ticketsCollection.doc(ticketDoc.id);
+        batch.update(ticketRef, { sold: true });
+      });
+    }
 
     // Update sale document to mark it as verified
     const saleRef = db.collection("sales").doc(data.id);
