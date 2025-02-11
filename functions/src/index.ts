@@ -269,8 +269,7 @@ export const createCheckoutSession = functions.https.onRequest(
         metadata: {
           totalSalePrice: data.totalSalePrice,
           ticketCount: data.ticketCount,
-          ticketNumbers: JSON.stringify(data.ticketNumbers || []),
-          raffle_id: data.raffle_id,
+          raffles: JSON.stringify(data.raffles),
         },
         return_url: isProduction ? "https://raffleapp-dbc1b--testwebhook-xl2cpz8j.web.app/checkout/success" : "http://localhost:3000/checkout/success"
         //return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
@@ -387,19 +386,24 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
     console.log("Data from reject:", data);
 
     const ticketsCollection = db.collection("tickets");
-    const ticketQuery = ticketsCollection
-      .where("raffle_id", "==", data.raffle_id)
-      .where("number", "in", data.ticketNumbers);
+    let updatePromises: Promise<FirebaseFirestore.WriteResult>[] = [];
 
-    const ticketQuerySnapshot = await ticketQuery.get();
+    for(const raffle of data.raffles){
+      const ticketQuery = ticketsCollection
+        .where("raffle_id", "==", raffle.raffleId)
+        .where("number", "in", raffle.ticketNumbers);
 
-    ticketQuerySnapshot.docs.forEach((ticketDoc) => {
-      console.log("Ticket:", ticketDoc.data());
-    });
+      const ticketQuerySnapshot = await ticketQuery.get();
 
-    const updatePromises = ticketQuerySnapshot.docs.map((ticketDoc) =>
-      ticketDoc.ref.update({ sold: false })
-    );
+      ticketQuerySnapshot.docs.forEach((ticketDoc) => {
+        console.log("Ticket:", ticketDoc.data());
+      });
+
+      updatePromises = ticketQuerySnapshot.docs.map((ticketDoc) =>
+        ticketDoc.ref.update({ sold: false })
+      );
+    }
+    
 
     const salesDocRef = db.collection("sales").doc(data.id);
     const saleUpdatePromise = salesDocRef.update({ verified: false });
@@ -614,10 +618,10 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
 
     if(event.type==="checkout.session.completed"){
 
-      let ticketNumbers: number[] = [];
+      let raffles: number[] = [];
       
       try{
-        ticketNumbers = JSON.parse(infoRaffle.ticketNumbers);
+        raffles = JSON.parse(infoRaffle.raffles);
       }catch(err){
         console.error("Error parsing ticketNumbers:", err);
       }
@@ -630,9 +634,8 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
         phone: infoCustomer.phone || "",
         email: infoCustomer.email || "",
         ticketCount: infoRaffle.ticketCount || 0,
-        ticketNumbers: ticketNumbers || [],
         totalSalePrice: infoRaffle.totalSalePrice || 0,
-        raffle_id: infoRaffle.raffle_id || "",
+        raffles: raffles,   
         paymentMethod: "card",
         verified: true,
       });

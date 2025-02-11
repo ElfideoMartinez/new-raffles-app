@@ -61,12 +61,16 @@ const SaleCard: React.FC<SaleCardProps> = ({
   };
   const rejectPayment = async (sale: {
     id: string;
-    ticketNumbers: number[];
-    raffle_id: string;
-    raffleId?: string;
+    raffles: {
+      raffleId: string;
+      raffleName: string;
+      ticketNumbers: number[];
+      raffleTotalPrice: number;
+    }[];
   }) => {
     console.log("Rejecting payment", sale);
     const res = await fetch(
+      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/rejectSale`,
       `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/rejectSale`,
       {
         method: "POST",
@@ -75,8 +79,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
         },
         body: JSON.stringify({
           id: sale.id,
-          ticketNumbers: sale.ticketNumbers,
-          raffle_id: sale.raffle_id || sale.raffleId,
+          raffles: sale.raffles,
         }),
       }
     );
