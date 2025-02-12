@@ -1,5 +1,6 @@
 import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
+import ImageWithModal from "./ImageModal";
 
 
 interface Sale {
@@ -112,7 +113,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   return (
     <div className='bg-slate-600 p-4 rounded-md'>
       {sale.paymentImage && (
-        <img src={sale.paymentImage} alt='payment' className='w-20 h-20 mb-2' />
+        <ImageWithModal sale={sale} />
       )}
       {sale.name && <div>Cliente: {sale.name}</div>}
       <div>Email: {sale.email}</div>
