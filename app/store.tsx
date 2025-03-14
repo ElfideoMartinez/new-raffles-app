@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 
 interface IUserCartStore {
   raffleId: string;
+  raffleName: string;
   ticketNumbers: number[];
   raffleTotalPrice?: number;
 }
@@ -33,29 +34,35 @@ interface TicketState {
   tickets: Record<string, { ticketNumbers: number[] }>;
   userCartStore: Array<{
     raffleId: string;
+    raffleName: string;
     ticketNumbers: number[];
     raffleTotalPrice: number;
   }>;
+  paymentMethod: string;
   addTicket: (ticketNumber: number, raffleId: string) => void;
   removeTicket: (ticketNumber: number, raffleId: string) => void;
-  addTicketsToCart: (raffleId: string, price: number) => void;
+  addTicketsToCart: (raffleId: string, price: number, raffleName: string) => void;
   cleanCart: () => void;
   getItemsFromCart: () => Array<{
     raffleId: string;
+    raffleName: string;
     ticketNumbers: number[];
     raffleTotalPrice: number;
   }>;
   removeItemFromCart: (raffleId: string) => void;
   getSelectedTickets: (raffleId: string) => number[];
   clearSelectedTickets: () => void;
+  getTicketsInCartByRaffleId: (raffleId: string) => number[];
+  setPaymentMethod: (method: string) => void;
 }
 
 // Create the store with proper typing
 const useTicketStore = create<TicketState>()(
-  persist(
+  persist<TicketState>(
     (set, get) => ({
       tickets: {},
       userCartStore: [],
+      paymentMethod: "",
 
       addTicket: (ticketNumber, raffleId) =>
         set((state) => {
@@ -85,40 +92,46 @@ const useTicketStore = create<TicketState>()(
           },
         })),
 
-      addTicketsToCart: (raffleId, price) => {
+      addTicketsToCart: (raffleId, price, raffleName) => {
         const ticketNumbers = get().tickets[raffleId]?.ticketNumbers || [];
-        const raffleTotalPrice = ticketNumbers.length * price;
-
         set((state) => {
           const existingCartIndex = state.userCartStore.findIndex(
             (item) => item.raffleId === raffleId
           );
-
+      
           if (existingCartIndex !== -1) {
             const updatedCart = [...state.userCartStore];
+            const combinedTickets = [
+              ...new Set([...updatedCart[existingCartIndex].ticketNumbers, ...ticketNumbers]),
+            ];
             updatedCart[existingCartIndex] = {
               ...updatedCart[existingCartIndex],
-              ticketNumbers: [
-                ...new Set([
-                  ...updatedCart[existingCartIndex].ticketNumbers,
-                  ...ticketNumbers,
-                ]),
-              ],
-              raffleTotalPrice:
-                updatedCart[existingCartIndex].ticketNumbers.length * price,
+              ticketNumbers: combinedTickets,
+              raffleTotalPrice: combinedTickets.length * price,
+              raffleName: updatedCart[existingCartIndex].raffleName || raffleName, 
             };
-            return { userCartStore: updatedCart };
+            return {
+              userCartStore: updatedCart,
+              tickets: {
+                ...state.tickets,
+                [raffleId]: { ticketNumbers: [] },
+              },
+            };
           }
-
+      
           return {
             userCartStore: [
               ...state.userCartStore,
-              { raffleId, ticketNumbers, raffleTotalPrice },
+              { raffleId, raffleName ,ticketNumbers, raffleTotalPrice: ticketNumbers.length * price },
             ],
+            tickets: {
+              ...state.tickets,
+              [raffleId]: { ticketNumbers: [] },
+            },
           };
         });
       },
-
+        
       cleanCart: () => set({ userCartStore: [] }),
 
       getItemsFromCart: () => get().userCartStore,
@@ -134,6 +147,7 @@ const useTicketStore = create<TicketState>()(
         get().tickets[raffleId]?.ticketNumbers || [],
 
       clearSelectedTickets: () => set({ tickets: {} }),
+
       getTicketsInCartByRaffleId: (raffleId: string) => {
         const cartItems = get().userCartStore;
         const ticketsForRaffle = cartItems.filter(
@@ -144,6 +158,8 @@ const useTicketStore = create<TicketState>()(
         );
         return ticketNumbers;
       },
+      setPaymentMethod: (method) => set({ paymentMethod: method }),
+      
     }),
     {
       name: "ticket-store",

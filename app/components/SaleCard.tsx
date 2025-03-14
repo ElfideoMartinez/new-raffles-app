@@ -1,15 +1,25 @@
 import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
+import ImageWithModal from "./ImageModal";
+
 
 interface Sale {
   id: string;
+  raffles: {
+    raffleId: string;
+    raffleName: string;
+    ticketNumbers: number[];
+    raffleTotalPrice: number;
+  }[];
   phone: string;
+  name: string;
   email?: string;
   raffle_id: string;
   raffle_name: string;
   totalSalePrice: number;
   ticketNumbers: number[];
   paymentImage?: string;
+  payment_intent: string;
   verified: boolean;
 }
 
@@ -27,11 +37,15 @@ const SaleCard: React.FC<SaleCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const confirmPayment = async (sale: {
     id: string;
-    ticketNumbers: number[];
-    raffle_id: string;
-    raffleId?: string;
+    raffles: {
+      raffleId: string;
+      raffleName: string;
+      ticketNumbers: number[];
+      raffleTotalPrice: number;
+    }[];
   }) => {
     const res = await fetch(
+      //${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/confirmSale`,
       `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/confirmSale`,
       {
         method: "POST",
@@ -40,8 +54,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
         },
         body: JSON.stringify({
           id: sale.id,
-          ticketNumbers: sale.ticketNumbers,
-          raffle_id: sale.raffle_id || sale.raffleId,
+          raffles: sale.raffles,
         }),
       }
     );
@@ -49,13 +62,17 @@ const SaleCard: React.FC<SaleCardProps> = ({
   };
   const rejectPayment = async (sale: {
     id: string;
-    ticketNumbers: number[];
-    raffle_id: string;
-    raffleId?: string;
+    raffles: {
+      raffleId: string;
+      raffleName: string;
+      ticketNumbers: number[];
+      raffleTotalPrice: number;
+    }[];
   }) => {
     console.log("Rejecting payment", sale);
     const res = await fetch(
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/reject`,
+      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/rejectSale`,
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/rejectSale`,
       {
         method: "POST",
         headers: {
@@ -63,8 +80,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
         },
         body: JSON.stringify({
           id: sale.id,
-          ticketNumbers: sale.ticketNumbers,
-          raffle_id: sale.raffle_id || sale.raffleId,
+          raffles: sale.raffles,
         }),
       }
     );
@@ -97,21 +113,29 @@ const SaleCard: React.FC<SaleCardProps> = ({
   return (
     <div className='bg-slate-600 p-4 rounded-md'>
       {sale.paymentImage && (
-        <img src={sale.paymentImage} alt='payment' className='w-20 h-20' />
+        <ImageWithModal sale={sale} />
       )}
-      <div>Cliente: {sale.phone}</div>
-      {sale.email && <div>Email: {sale.email}</div>}
-      <div>Rifa: {sale.raffle_name}</div>
-      <div>Total de venta: {sale.totalSalePrice}</div>
-      <div>
-        Boletos vendidos:
-        {sale.ticketNumbers.map((tn) => (
-          <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1'>
-            {tn}
-          </span>
+      {sale.name && <div>Cliente: {sale.name}</div>}
+      <div>Email: {sale.email}</div>
+      <div>Telefono: {sale.phone.replace("+52", "")}</div>   
+      <div className="flex flex-wrap flex-col">
+        {sale.raffles?.map((raffle) => (         
+          <div key={raffle.raffleId}>
+            <h2>Rifa: {raffle.raffleName}</h2>  
+            <div className="flex flex-wrap"> 
+              Boletos vendidos:
+              {raffle.ticketNumbers.map((tn) => (
+                <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1 ml-1'>
+                  {tn}
+                </span>
+              ))}
+            </div>    
+          </div>     
         ))}
       </div>
+      <div>Total de venta: ${sale.totalSalePrice}</div>
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
+      {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
         <button className='bg-gray-400 text-white rounded-md p-2' disabled>
           <FadeLoader color='#ffffff' />
@@ -121,7 +145,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
           onClick={handleAction}
           className={`${
             isVerified ? "bg-red-500" : "bg-green-500"
-          } text-white p-2 rounded-md`}
+          } text-white p-2 rounded-md my-2`}
         >
           {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
         </button>

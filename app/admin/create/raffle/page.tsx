@@ -11,7 +11,7 @@ interface IRaffle {
   pricePerTicket: string;
   awardName: string;
   awardDescription: string;
-  awardImage: File | null;
+  awardImage: string;
 }
 
 const CreateRaffle = () => {
@@ -23,7 +23,7 @@ const CreateRaffle = () => {
     pricePerTicket: "",
     awardName: "",
     awardDescription: "",
-    awardImage: null,
+    awardImage: "",
   });
 
   const handleChange = (e: React.ChangeEvent<any>) => {
@@ -59,11 +59,23 @@ const CreateRaffle = () => {
       raffle.title
     );
     formData.append("awardImage", downloadURL);
-    // Convert FormData to a plain object
-    const plainObject = Object.fromEntries(formData.entries());
 
-    console.log(plainObject);
-    createNewRaffle(plainObject as any);
+    // Convert FormData to a plain object
+    const plainObject: { [key: string]: string | File } = Object.fromEntries(formData.entries());
+
+    // Crear el objeto con la interfaz IRaffle
+    const raffleData: IRaffle = {
+      title: plainObject.name as string,
+      date: plainObject.date as string,
+      numberOfTickets: plainObject.numberOfTickets as string,
+      pricePerTicket: plainObject.pricePerTicket as string,
+      awardName: plainObject.awardName as string,
+      awardDescription: plainObject.description as string,
+      awardImage: plainObject.awardImage as string,
+    };
+
+    console.log("Objeto Plano",raffleData);
+    createNewRaffle(raffleData);
     setIsLoading(false);
     alert("Rifa creada exitosamente");
   };
@@ -79,12 +91,21 @@ const CreateRaffle = () => {
     const downloadURL = await getDownloadURL(storageRef);
     return downloadURL;
   };
-  const createNewRaffle = async (raffle: FormData) => {
+  const createNewRaffle = async (raffle: IRaffle) => {
+
+    const raffleData = {
+      ...raffle,
+    }
+
     const res = await fetch(
+      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createRaffle`,
       `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createRaffle`,
       {
         method: "POST",
-        body: JSON.stringify(raffle),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(raffleData),
       }
     );
     if (!res.ok) {
@@ -99,7 +120,7 @@ const CreateRaffle = () => {
   return (
     <div className='max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-5'>
       <h2 className='text-black text-2xl font-bold mb-6 text-center'>
-        Create New Raffle
+        Crear nueva rifa
       </h2>
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
@@ -118,7 +139,7 @@ const CreateRaffle = () => {
 
         <div>
           <label className='text-black block text-sm font-medium mb-1'>
-            Numero de Tickets(Boletos):
+            Numero de Tickets (Boletos):
           </label>
           <input
             type='number'

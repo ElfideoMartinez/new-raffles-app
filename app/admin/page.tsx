@@ -21,7 +21,7 @@ const LoginPage = () => {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/admin/dashboard"); // Redirect to the admin dashboard
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      setError("Correo electrónico o contraseña no válidos. Por favor, inténtalo de nuevo.");
       console.error(err);
     }
   };
@@ -29,38 +29,38 @@ const LoginPage = () => {
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-100'>
       <div className='w-full max-w-md p-8 space-y-6 bg-white rounded shadow-lg'>
-        <h2 className='text-black text-2xl font-bold text-center'>Sign In</h2>
+        <h2 className='text-black text-2xl font-bold text-center'>Iniciar sesion</h2>
         {error && <p className='text-red-500 text-center'>{error}</p>}
         <form onSubmit={handleLogin} className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-gray-700'>
-              Email
+              Correo electronico
             </label>
             <input
               type='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500'
+              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500 bg-white '
             />
           </div>
           <div>
             <label className='block text-sm font-medium text-gray-700'>
-              Password
+              Constraseña
             </label>
             <input
               type='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500'
+              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500 bg-white'
             />
           </div>
           <button
             type='submit'
             className='w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
           >
-            Sign In
+            Iniciar sesion
           </button>
         </form>
       </div>

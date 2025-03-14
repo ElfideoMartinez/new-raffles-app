@@ -4,8 +4,9 @@ import RaffleDetailsButton from "./RaffleDetailsButton";
 
 interface ICardsProps {
   id: string;
+  title: string;
   name: string;
-  total_tickets: number;
+  numberOfTickets: number;
   tickets_left: number;
   pricePerTicket: number;
   date: string;
@@ -14,7 +15,8 @@ interface ICardsProps {
 const Cards = ({
   id,
   name,
-  total_tickets,
+  title,
+  numberOfTickets,
   tickets_left,
   pricePerTicket,
   date,
@@ -22,23 +24,23 @@ const Cards = ({
 }: ICardsProps) => {
   return (
     <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
-      <img src={awardImage} alt='raffle' className='object-fill self-center' />
+      <img src={awardImage} alt='raffle' className='object-fill self-center'/>
       <div className='p-4'>
         <h2 className='text-xl font-bold mb-2 text-slate-500'>
-          {name || "Event"}
+          {title || name || "Event"}
         </h2>
         <p className='text-gray-600'>
-          Total Tickets: <span className='font-semibold'>{total_tickets}</span>
+          Boletos totales: <span className='font-semibold'>{numberOfTickets}</span>
         </p>
-        <p className='text-gray-600'>
+        {/* <p className='text-gray-600'>
           Tickets Available:{" "}
           <span className='font-semibold'>{tickets_left}</span>
-        </p>
+        </p> */}
         <p className='text-gray-600'>
-          Price: <span className='font-semibold'>${pricePerTicket}</span> per
-          unit
+          Precio: <span className='font-semibold'>${pricePerTicket}</span> por
+          unidad
         </p>
-        <p className='text-gray-600'>End Date:{date} </p>
+        <p className='text-gray-600'>Fecha final: {date} </p>
       </div>
       <RaffleDetailsButton id={id} price={pricePerTicket} />
     </div>

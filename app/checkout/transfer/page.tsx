@@ -1,28 +1,35 @@
 "use client";
 import useTicketStore from "@/app/store";
 import { storage } from "@/app/firebaseconfig";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentConceptKey] = useState(() =>
-    Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join("")
-  );
-  const card = useTicketStore((state) => state.getItemsFromCart());
+  const [paymentConceptKey, setPaymenthConcept] = useState("");
+  const raffles = useTicketStore((state) => state.getItemsFromCart());
   //get first raffle id from the first raffle in the cart
-  const raffleId = card[0]?.raffleId;
-  const totalRafflePrice = card.reduce(
+  const raffleId = raffles[0]?.raffleId;
+  const totalRafflePrice = raffles.reduce(
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-  const allTickets = card.flatMap((raffle) => raffle.ticketNumbers);
+  const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
-  const ticketCount = 10;
+  const [total, setTotal] = useState(0);
+  const ticketCount = allTickets.length; 
+
+  useEffect(()=>{
+    setTotal(totalRafflePrice);
+    setPaymenthConcept(() => Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join(""))
+  },[])
+
+  // function to set the type of payment
+  const setPaymentMethod = useTicketStore((state) => state.setPaymentMethod);
 
   const copyToClipboard = (text: any) => {
     navigator.clipboard
@@ -33,35 +40,57 @@ const CheckoutTransferPage = () => {
 
   const isPhoneValid = phone.length === 10 && /^\d+$/.test(phone);
   const isImageValid = image !== null;
+  
+  const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+  const isEmailValid = emailRegex.test(email);
 
   const handleImageChange = (e: any) => {
+
+    const file = e.target.files[0];
+    if(!file) return;
+
+    // validate file extension
+    const fileName = file.name;
+    const fileExtension = fileName.split('.').pop()?.toLowerCase ();
+    const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp", "jfif"];
+
+    if (!fileExtension || !validExtension.includes(fileExtension)){
+      alert('El archivo seleccionado no es valido');
+      return;
+    }
+
     setImage(e.target.files[0]);
   };
 
   return (
     <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-lg'>
       <h2 className='text-black text-2xl font-bold'>
-        Checkout por Transferencia
+        Pago por Transferencia
       </h2>
-
+      
       {/* General Explanation */}
-      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-lg border border-blue-300'>
+      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-lg border border-blue-300'>       
         <p>
           Para completar su compra, realice una transferencia bancaria al número
           de cuenta a continuación. Asegúrese de pegar la clave del concepto de
           pago en el campo del concepto de la transferencia.
         </p>
-        <button
-          onClick={() => copyToClipboard("1232392019203219")}
-          className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
-        >
-          1232392019203219
-        </button>
-        <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+        <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
+          <button
+            onClick={() => copyToClipboard("4152314380833197")}
+            className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          >
+            4152314380833197
+          </button>
+          <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+        </div>
+        <h1 className='text-black text-xl font-bold text-center mt-2'>
+          Monto total ${total}
+        </h1>
       </div>
 
       {/* Conditional Verification Message */}
-      {ticketCount > 5 && (
+      {ticketCount > 10000000 && (
         <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-lg border border-yellow-400'>
           <p>
             Nota: Dado que está comprando más de 5 boletos, necesitará verificar
@@ -78,7 +107,7 @@ const CheckoutTransferPage = () => {
         </p>
         <button
           onClick={() => copyToClipboard(paymentConceptKey)}
-          className='mt-2 text-xl font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          className='mt-2 text-xl text-black font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
         >
           {paymentConceptKey}
         </button>
@@ -95,7 +124,7 @@ const CheckoutTransferPage = () => {
           type='tel'
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
           placeholder='Ingrese su número de teléfono'
         />
       </div>
@@ -103,14 +132,14 @@ const CheckoutTransferPage = () => {
       {/* Email Input (Optional) with Copy Button */}
       <div className='flex flex-col items-center'>
         <label htmlFor='email' className='text-black text-lg font-semibold'>
-          Correo Electrónico (Opcional)
+          Correo Electrónico
         </label>
         <input
           id='email'
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 text-black px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           placeholder='Ingrese su correo electrónico (opcional)'
         />
       </div>
@@ -151,7 +180,8 @@ const CheckoutTransferPage = () => {
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
               const data = await fetch(
-                `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkout`,
+                //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
+                `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,
                 {
                   method: "POST",
                   headers: {
@@ -162,15 +192,16 @@ const CheckoutTransferPage = () => {
                     email,
                     paymentConceptKey,
                     ticketCount,
-                    raffle_id: raffleId,
-                    totalSalePrice: totalRafflePrice,
-                    ticketNumbers: allTickets,
+                    raffles,
+                    totalSalePrice: totalRafflePrice,                    
                     paymentImage: downloadURL,
                   }),
                 }
               );
               const result = await data.json();
               setIsLoading(false);
+              setPaymentMethod("transfer");
+
               //got to success page
               router.push("/checkout/success");
             } catch (error) {
@@ -187,9 +218,9 @@ const CheckoutTransferPage = () => {
           }
         }}
         className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 ${
-          !(isPhoneValid && isImageValid) && "opacity-50 cursor-not-allowed"
+          !(isPhoneValid && isImageValid && isEmailValid) && "opacity-50 cursor-not-allowed"
         }`}
-        disabled={!(isPhoneValid && isImageValid)}
+        disabled={!(isPhoneValid && isImageValid && isEmailValid)}
       >
         {isLoading ? "Procesando..." : "Completar Compra"}
       </button>

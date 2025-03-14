@@ -6,14 +6,19 @@ const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
+  const paymentMethod = useTicketStore((state) => state.paymentMethod);
 
   console.log("Tickets", raffles);
   useEffect(() => {
-    markAsSold();
+    
+    if(paymentMethod !== "transfer"){
+      markAsSold();
+    }
     cleanCart();
     console.log("cleaning cart from outside");
     cleanSelected();
   }, []);
+
   const markAsSold = async () => {
     const promises = raffles.map((raffle) =>
       fetch(`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/success`, {
@@ -32,11 +37,10 @@ const SuccessPage = () => {
   };
 
   return (
-    <div className='flex flex-col w-full items-center'>
-      <h1>Success</h1>
-      <div>Thank you for your purchase!</div>
+    <div className='flex flex-col w-full items-center mt-7'>
+      <div>Gracias por su compra!</div>
       <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4'>
-        Back to Home
+        Ir a inicio
       </Link>
     </div>
   );
