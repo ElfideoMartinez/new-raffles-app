@@ -77,10 +77,10 @@ const CheckoutTransferPage = () => {
         </p>
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
-            onClick={() => copyToClipboard("1232392019203219")}
+            onClick={() => copyToClipboard("4152314380833197")}
             className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
           >
-            1232392019203219
+            4152314380833197
           </button>
           <span className='text-sm text-gray-500'>(Toca para copiar)</span>
         </div>
