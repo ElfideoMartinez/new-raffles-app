@@ -271,7 +271,7 @@ export const createCheckoutSession = functions.https.onRequest(
           ticketCount: data.ticketCount,
           raffles: JSON.stringify(data.raffles),
         },
-        return_url: isProduction ? "https://raffleapp-dbc1b--testwebhook-xl2cpz8j.web.app/checkout/success" : "http://localhost:3000/checkout/success"
+        return_url: isProduction ? "https://raffleapp-dbc1b.web.app/checkout/success" : "http://localhost:3000/checkout/success"
         //return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
       });
 

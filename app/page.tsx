@@ -26,7 +26,7 @@ export default async function Home() {
     console.log("result", result);
 
     return (
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Cargando...</div>}>
         <main className='min-h-screen grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4'>
           {result.map((element: any, index: number) => (
             <Cards key={index} {...element} />

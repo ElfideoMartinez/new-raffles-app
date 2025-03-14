@@ -23,7 +23,7 @@ const withAuth = (Component: any) => {
       return () => unsubscribe();
     }, [router]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Cargando...</p>;
     if (!authenticated) return null;
 
     return <Component {...props} />;

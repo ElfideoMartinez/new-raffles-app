@@ -8,6 +8,7 @@ import {
   EmbeddedCheckoutProvider,
 } from "@stripe/react-stripe-js";
 import { useRouter } from "next/navigation";
+import { env } from "process";
 
 const stripePromise = loadStripe(
   "pk_test_51OhNGHFa61udd4SXroKyqczB8jmGHIAyLgdBpgqk1E85bJU3GeikWSylKDUEZdbOYypqyM8GFxiqC1FQ2UUGQNQ2007qKbxnjZ"
@@ -34,7 +35,7 @@ const CardCheckoutPage = () => {
     const iniStripe = async () => {
       try {
         const response = await fetch(
-          //${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
+          //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
           `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
           {
             method: "POST",
@@ -77,11 +78,11 @@ const CardCheckoutPage = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Display loading state while fetching clientSecret
+    return <div>Cargando...</div>; // Display loading state while fetching clientSecret
   }
 
   if (!clientSecret) {
-    return <div>Error loading payment form</div>; // Display error if clientSecret isn't set
+    return <div>Error al cargar el formulario de pago</div>; // Display error if clientSecret isn't set
   }
 
   return (

@@ -2,10 +2,11 @@
 
 "use client";
 
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import TicketButton from "@/app/components/TicketButton";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
+import { FadeLoader } from "react-spinners";
 
 interface IticketNumber {
   number: number | string
@@ -30,11 +31,16 @@ const RafflePageClient = ({
   const selectedTickets = getTicketsInCartByRaffleId(raffleId);
   //console.log(SelectedTickets);
 
+  const [isHydrated, setIsHydrated] = useState(false);
+
   const verifyInTheCart = (ticketNumber: IticketNumber) => selectedTickets.includes(ticketNumber as any);
 
   useEffect(() => {
     clearSelectedTickets();
+    setIsHydrated(true);
   },[])
+
+  if (!isHydrated) return <FadeLoader color='#ffffff'/>
 
   return (
     

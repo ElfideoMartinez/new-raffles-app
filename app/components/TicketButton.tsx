@@ -22,22 +22,19 @@ const TicketButton = ({
   const addTicket = useTicketStore((state) => state.addTicket);
   const removeTicket = useTicketStore((state) => state.removeTicket);
 
+  useEffect(() => {
+    if (isSelected) {
+      addTicket(ticketNumber, raffleId);
+    } else {
+      removeTicket(ticketNumber, raffleId);
+    }
+  }, [isSelected, addTicket, removeTicket, raffleId, ticketNumber]);
+
   const handleClick = useCallback(() => {
-    
     if (isUnavailable) return;
-
     console.log("ticketId", ticketId);
-
-    setIsSelected((prevSelected) => {
-      const newSelected = !prevSelected;
-      if (newSelected) {
-        addTicket(ticketNumber, raffleId);
-      } else {
-        removeTicket(ticketNumber, raffleId);
-      }
-      return newSelected;
-    });
-  }, [addTicket, removeTicket, raffleId, ticketNumber]);
+    setIsSelected((prevSelected) => !prevSelected);
+  }, [isUnavailable, ticketId]);
 
   return (
     <button

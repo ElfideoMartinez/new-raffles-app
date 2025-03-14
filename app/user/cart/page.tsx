@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 import Link from "next/link";
 
@@ -10,6 +10,7 @@ const UserCartPage = () => {
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
+  const [isHydrated, setIsHydrated] = useState(false);
 
   console.log("Total Raffle Price:", totalRafflePrice);
 
@@ -27,6 +28,18 @@ const UserCartPage = () => {
   // Convert the grouped tickets object back to an array
   const groupedTicketsArray = Object.values(groupedTickets);
   console.log("Grouped Tickets", groupedTicketsArray);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  },[]);
+
+  if (!isHydrated) return (
+    <div>
+      <header className="flex justify-center mt-2">
+        <h1>Carrito</h1>
+      </header>
+    </div>
+  )
 
   return (
     <div>

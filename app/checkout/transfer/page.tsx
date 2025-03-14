@@ -1,16 +1,14 @@
 "use client";
 import useTicketStore from "@/app/store";
 import { storage } from "@/app/firebaseconfig";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentConceptKey] = useState(() =>
-    Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join("")
-  );
+  const [paymentConceptKey, setPaymenthConcept] = useState("");
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   //get first raffle id from the first raffle in the cart
   const raffleId = raffles[0]?.raffleId;
@@ -18,12 +16,17 @@ const CheckoutTransferPage = () => {
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-
   const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
+  const [total, setTotal] = useState(0);
   const ticketCount = allTickets.length; 
+
+  useEffect(()=>{
+    setTotal(totalRafflePrice);
+    setPaymenthConcept(() => Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join(""))
+  },[])
 
   // function to set the type of payment
   const setPaymentMethod = useTicketStore((state) => state.setPaymentMethod);
@@ -49,7 +52,7 @@ const CheckoutTransferPage = () => {
     // validate file extension
     const fileName = file.name;
     const fileExtension = fileName.split('.').pop()?.toLowerCase ();
-    const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp"];
+    const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp", "jfif"];
 
     if (!fileExtension || !validExtension.includes(fileExtension)){
       alert('El archivo seleccionado no es valido');
@@ -64,25 +67,30 @@ const CheckoutTransferPage = () => {
       <h2 className='text-black text-2xl font-bold'>
         Pago por Transferencia
       </h2>
-
+      
       {/* General Explanation */}
-      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-lg border border-blue-300'>
+      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-lg border border-blue-300'>       
         <p>
           Para completar su compra, realice una transferencia bancaria al número
           de cuenta a continuación. Asegúrese de pegar la clave del concepto de
           pago en el campo del concepto de la transferencia.
         </p>
-        <button
-          onClick={() => copyToClipboard("1232392019203219")}
-          className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
-        >
-          1232392019203219
-        </button>
-        <span className='text-sm text-gray-500 ml-2'>(Toca para copiar)</span>
+        <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
+          <button
+            onClick={() => copyToClipboard("1232392019203219")}
+            className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          >
+            1232392019203219
+          </button>
+          <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+        </div>
+        <h1 className='text-black text-xl font-bold text-center mt-2'>
+          Monto total ${total}
+        </h1>
       </div>
 
       {/* Conditional Verification Message */}
-      {ticketCount > 5 && (
+      {ticketCount > 10000000 && (
         <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-lg border border-yellow-400'>
           <p>
             Nota: Dado que está comprando más de 5 boletos, necesitará verificar
@@ -124,7 +132,7 @@ const CheckoutTransferPage = () => {
       {/* Email Input (Optional) with Copy Button */}
       <div className='flex flex-col items-center'>
         <label htmlFor='email' className='text-black text-lg font-semibold'>
-          Correo Electrónico (Opcional)
+          Correo Electrónico
         </label>
         <input
           id='email'
