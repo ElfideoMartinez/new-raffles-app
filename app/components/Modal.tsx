@@ -21,7 +21,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white text-3xl font-bold focus:outline-none p-2 rounded-full"
+          className="absolute top-4 right-4 text-white text-2xl font-bold focus:outline-none p-1 m-1 rounded-full"
+          style={{ backgroundColor: '#355b6eff'}}
         >
           &times;
         </button>
