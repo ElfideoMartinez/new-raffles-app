@@ -58,7 +58,7 @@ const UserCartPage = () => {
               <li className='flex w-full justify-between'>
                 <ul className='flex flex-wrap gap-2'>
                   {ticket.ticketNumbers.map((number: number, index: number) => (
-                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center'>
+                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-default'>
                       {number}
                     </li>
                   ))}

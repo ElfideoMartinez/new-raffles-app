@@ -47,7 +47,9 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
       .where("raffle_id", "==", id)
       .get();
 
-    const ticketsData = ticketQuerySnapshot.docs.map((doc) => doc.data());
+    const tickets = ticketQuerySnapshot.docs.map((doc) => doc.data());
+    const ticketsData = tickets.sort((a,b) => a.number - b.number);
+    
     console.log({
       raffleData,
       ticketsData,
