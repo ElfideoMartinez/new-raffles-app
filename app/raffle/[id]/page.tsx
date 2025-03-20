@@ -54,7 +54,7 @@ const RafflePageServer = async ({ params }: { params: { id: string } }) => {
   const raffleData = await fetchRaffleData(params.id);
 
   return (
-    <Suspense fallback={<FadeLoader color='#ffffff' />}>
+    <Suspense fallback={<div className="flex justify-center items-center mt-5"><FadeLoader color='#ffffff' /></div>}>
       <RafflePageClient raffleData={raffleData} raffleId={params.id} />
     </Suspense>
   );

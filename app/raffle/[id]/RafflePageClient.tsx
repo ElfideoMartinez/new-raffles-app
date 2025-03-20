@@ -40,7 +40,7 @@ const RafflePageClient = ({
     setIsHydrated(true);
   },[])
 
-  if (!isHydrated) return <FadeLoader color='#ffffff'/>
+  if (!isHydrated) return <div className="flex justify-center items-center mt-5"><FadeLoader color='#ffffff'/></div>
 
   return (
     

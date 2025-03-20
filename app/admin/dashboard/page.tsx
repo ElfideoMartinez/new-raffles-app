@@ -3,6 +3,7 @@ import SaleCard from "@/app/components/SaleCard";
 import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { FadeLoader } from "react-spinners";
 interface Sale {
   id: string;
   phone: string;
@@ -23,6 +24,7 @@ interface Sale {
 const Page = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [activeTab, setActiveTab] = useState("verified"); // State to track active tab
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -31,7 +33,8 @@ const Page = () => {
   const fetchData = async () => {
     try {
       const res = await fetch(
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`,
+        `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSales`,
+        //`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`,
         {
           method: "GET",
           mode: "cors", // Important for cross-origin requests
@@ -40,6 +43,7 @@ const Page = () => {
       const data = await res.json();
       console.log(data);
       setSales(data.sales);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching sales data:", error);
       setSales([]);
@@ -73,25 +77,32 @@ const Page = () => {
           Ventas no verificadas
         </button>
       </div>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
-        {activeTab === "verified"
-          ? verifiedSales.map((sale: any) => (
-              <SaleCard
-                key={sale.id}
-                sale={sale}
-                setSalesFunction={setSales}
-                isVerified={true}
-              />
-            ))
-          : nonVerifiedSales.map((sale: any) => (
-              <SaleCard
-                key={sale.id}
-                sale={sale}
-                setSalesFunction={setSales}
-                isVerified={false}
-              />
-            ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center w-full h-64">
+          <FadeLoader color='#ffffff'/>
+        </div>
+      ):(
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
+          {activeTab === "verified"
+            ? verifiedSales.map((sale: any) => (
+                <SaleCard
+                  key={sale.id}
+                  sale={sale}
+                  setSalesFunction={setSales}
+                  isVerified={true}
+                />
+              ))
+            : nonVerifiedSales.map((sale: any) => (
+                <SaleCard
+                  key={sale.id}
+                  sale={sale}
+                  setSalesFunction={setSales}
+                  isVerified={false}
+                />
+              ))
+          }
+        </div>
+      )}     
       <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4 mb-1 '>
         Volver al inicio
       </Link>
