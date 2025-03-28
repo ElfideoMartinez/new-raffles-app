@@ -620,14 +620,15 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
 
     if(event.type==="checkout.session.completed"){
 
-      let raffles: number[] = [];
-      
-      try{
-        raffles = JSON.parse(infoRaffle.raffles);
-      }catch(err){
-        console.error("Error parsing ticketNumbers:", err);
-      }
-
+      interface Raffle {
+        raffleId: string;
+        raffleName: string;
+        ticketNumbers: number[];
+        raffleTotalPrice: number;
+      };
+      let raffles: Raffle[]; 
+      raffles = JSON.parse(infoRaffle.raffles);
+    
       // add to sales collection
       const salesCollection = db.collection("sales");
       await salesCollection.add({
