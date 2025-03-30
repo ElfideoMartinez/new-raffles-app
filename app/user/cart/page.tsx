@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 import Link from "next/link";
+import { toast } from "nextjs-toast-notify";
 
 const UserCartPage = () => {
   const tickets = useTicketStore((state) => state.getItemsFromCart());
@@ -31,6 +32,16 @@ const UserCartPage = () => {
 
   useEffect(() => {
     setIsHydrated(true);
+    if(totalRafflePrice!=0) {
+      toast.info('Para eliminar boletos individualmente has click o tap',{
+        duration: 2000,
+        progress: true,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+    }
   },[]);
 
   if (!isHydrated) return (
@@ -57,8 +68,19 @@ const UserCartPage = () => {
             <ul>
               <li className='flex w-full justify-between'>
                 <ul className='flex flex-wrap gap-2'>
-                  {ticket.ticketNumbers.map((number: number, index: number) => (
-                    <li key={index} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-default'>
+                  {ticket.ticketNumbers.map((number: number) => (
+                    <li key={number} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-pointer hover:bg-red-500'
+                      onClick={() => {
+                        useTicketStore.getState().removeTicketFromCart(ticket.raffleId, number);
+                        toast.success('Boleto borrado',{
+                          duration: 800,
+                          transition: 'popUp',
+                          progress: false,
+                          sound: false,
+                          position: 'top-right',
+                        })
+                      }}
+                    >
                       {number}
                     </li>
                   ))}

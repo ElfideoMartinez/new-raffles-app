@@ -42,6 +42,7 @@ interface TicketState {
   addTicket: (ticketNumber: number, raffleId: string) => void;
   removeTicket: (ticketNumber: number, raffleId: string) => void;
   addTicketsToCart: (raffleId: string, price: number, raffleName: string) => void;
+  removeTicketFromCart: (raffleId: string, ticketNumber: number) => void;
   cleanCart: () => void;
   getItemsFromCart: () => Array<{
     raffleId: string;
@@ -129,6 +130,35 @@ const useTicketStore = create<TicketState>()(
               [raffleId]: { ticketNumbers: [] },
             },
           };
+        });
+      },
+
+      removeTicketFromCart: (raffleId, ticketNumber) => {
+        set((state) => {
+          const existingCartIndex = state.userCartStore.findIndex(
+            (item) => item.raffleId === raffleId
+          );
+      
+          if (existingCartIndex !== -1) {
+            const updatedCart = [...state.userCartStore];
+            const updatedTickets = updatedCart[existingCartIndex].ticketNumbers.filter(
+              (num) => num !== ticketNumber
+            );
+      
+            if (updatedTickets.length === 0) {
+              // Si ya no quedan boletos, eliminar la rifa del carrito
+              updatedCart.splice(existingCartIndex, 1);
+            } else {
+              updatedCart[existingCartIndex] = {
+                ...updatedCart[existingCartIndex],
+                ticketNumbers: updatedTickets,
+                raffleTotalPrice: updatedTickets.length * (updatedCart[existingCartIndex].raffleTotalPrice / updatedCart[existingCartIndex].ticketNumbers.length),
+              };
+            }
+      
+            return { userCartStore: updatedCart };
+          }
+          return {};
         });
       },
         
