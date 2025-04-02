@@ -699,3 +699,41 @@ export const updateRaffle = functions.https.onRequest( async (req, res) => {
     })
   }
 })
+
+export const deleteRaffle = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "DELETE") {
+    res.status(405).send({ message: "Only DELETE requests are allowed" });
+    return;
+  }
+
+  try {
+    console.log("Deleting raffle...");
+    const body = req.body;
+    
+    await db.collection("raffles").doc(body.idRaffle).delete();
+    
+    res.status(200).json({
+      status: 200,
+      message: "Raffle correctly deleted",
+    })
+
+  } catch(err){
+    console.error("Error deleting raffle: ", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error deleting raffle",
+    })
+  }
+})

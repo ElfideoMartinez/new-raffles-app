@@ -1,4 +1,5 @@
 'use client'
+import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +17,7 @@ const EditRaffle = () => {
   const [newImage, setNewImage] = useState<File | null>(null);
   const [options, setOptions] = useState<number[]>([]);
   const [rafflesData, setRafflesData] = useState<IRaffleData[]>([])
+  const [updatedRafflesData, setUpdatedRafflesData] = useState(false);
   const [raffle, setRaffle] = useState({
     title: "",
     date: "",
@@ -39,6 +41,36 @@ const EditRaffle = () => {
     const fileImage = e.target.files[0];
     setNewImage(fileImage);
   };
+
+  const handleDeleteRaffle = async (raffleId: string) => {
+    
+    try{
+      const result = await fetch(
+        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/deleteRaffle`,
+        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/deleteRaffle`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({idRaffle, raffle}),
+        }
+      )
+
+      if (!result.ok) {
+        console.log(result);
+        throw new Error(result.statusText);
+      }
+    }catch(e){
+      console.error(e);
+    }
+    alert('Rifa borrada correctamente');
+    cleanRaffle();
+    resetForm();
+    setTimeout(() => {
+      setUpdatedRafflesData((prev) => !prev);
+    }, 1000);    
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +107,7 @@ const EditRaffle = () => {
     setNewImage(null)
     resetForm();
     alert('Rifa actualizada correctamente');
+    setUpdatedRafflesData((prev) => !prev);
   }
 
   const uploadRaffleImage = async (file: File, raffleId: string) => {
@@ -173,7 +206,7 @@ const EditRaffle = () => {
       }
     };
     fetchRaffleData();
-  }, []); // Solo ejecuta una vez cuando el componente se monta
+  }, [updatedRafflesData]); 
 
   const formRef = useRef<HTMLFormElement>(null);
   const resetForm = () => {
@@ -319,16 +352,19 @@ const EditRaffle = () => {
             </div>
           </div>
         }
-        <button
-          disabled={isLoading}
-          type='submit'
-          className={`w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold 
-            hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50
-            `
-          }
-        >
-          {isLoading ? "Actualizando..." : "Actualizar rifa"}
-        </button>
+        <div className="flex gap-1">
+          <button
+            disabled={isLoading}
+            type='submit'
+            className={`w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold 
+              hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50
+              `
+            }
+          >
+            {isLoading ? "Actualizando..." : "Actualizar rifa"}
+          </button>
+          <DeleteRaffleModal idRaffle={idRaffle} onDelete={handleDeleteRaffle} />
+        </div>        
       </form>
     </div>
   )
