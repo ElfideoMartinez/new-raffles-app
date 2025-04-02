@@ -1,6 +1,6 @@
 // app/raffle/[id]/RafflePageServer.tsx
 
-import React, { Suspense } from "react";
+import React, { Suspense, createContext } from "react";
 import RafflePageClient from "./RafflePageClient";
 import { FadeLoader } from "react-spinners";
 
@@ -17,6 +17,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
     //   `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`
     // );
     const responseData = await fetch(
+      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`,
       `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getRaffleData`,
       {
         cache: "no-store",
@@ -32,6 +33,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       throw new Error("Failed to fetch raffle data");
     }
     const result = await responseData.json();
+    console.log(result);
 
     return {
       data: result.data,
@@ -50,10 +52,11 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
   }
 }
 
+
 const RafflePageServer = async ({ params }: { params: { id: string } }) => {
   const raffleData = await fetchRaffleData(params.id);
 
-  return (
+  return ( 
     <Suspense fallback={<div className="flex justify-center items-center mt-5"><FadeLoader color='#ffffff' /></div>}>
       <RafflePageClient raffleData={raffleData} raffleId={params.id} />
     </Suspense>

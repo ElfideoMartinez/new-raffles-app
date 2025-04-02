@@ -661,3 +661,41 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
   
 
 })
+
+export const updateRaffle = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "PATCH") {
+    res.status(405).send({ message: "Only POST requests are allowed" });
+    return;
+  }
+
+  try {
+    console.log("Updating raffle info...");
+    const body = req.body;
+    
+    await db.collection("raffles").doc(body.idRaffle).set(body.raffle, {merge: true});
+    
+    res.status(200).json({
+      status: 200,
+      message: "Raffle correctly updated",
+    })
+
+  } catch(err){
+    console.error("Error updating raffle: ", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error updating raffle",
+    })
+  }
+})
