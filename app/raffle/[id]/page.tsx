@@ -9,6 +9,7 @@ interface IRaffleDataResponse {
   price: string;
   raffleImage: string;
   raffleName: string;
+  ticketWinner: string;
 }
 
 async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
@@ -40,6 +41,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       price: result.raffleData.pricePerTicket,
       raffleImage: result.raffleData.awardImage,
       raffleName: result.raffleData.title,
+      ticketWinner: result.raffleData.ticketWinner || "",
     };
   } catch (error) {
     console.error(error);
@@ -48,6 +50,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
       price: "",
       raffleImage: "",
       raffleName: "",
+      ticketWinner: "",
     };
   }
 }
