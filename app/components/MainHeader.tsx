@@ -9,7 +9,8 @@ import { useRouter, usePathname } from "next/navigation";
 const MainHeader = () => {
   const router = useRouter();
   const pathName = usePathname();
-  const isMain = pathName === '/' || pathName === '/admin/dashboard';
+  const isMain = pathName === '/' || pathName === '/admin/dashboard' || pathName === '/checkout/success';
+  const isCartIconAvailable = pathName === '/checkout/success';
   //console.log(pathName);
   return (
     <div className='bg-gradient-to-b from-blue-500 to-teal-400 text-white p-4 flex items-center justify-between'>
@@ -27,7 +28,9 @@ const MainHeader = () => {
           height={100}
         />
       </Link>
-      <CartButton />
+      <div className={`${isCartIconAvailable ? 'invisible' : ''}`}>
+        <CartButton />
+      </div>
     </div>
   );
 };

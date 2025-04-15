@@ -121,6 +121,8 @@ const SaleCard: React.FC<SaleCardProps> = ({
     pago (entonces si se marcan como vendidos)✅. Cualquier información adicional será enviada a este número o 
     al correo electrónico proporcionado‼️. ¡Gracias por tu paciencia y por participar!¡te deseamos suerte!🍀` ;
 
+  const msgFailed = `¡Hola ${sale.name}! hubo un error al confirmar tu compra 😕 Si necesitas ayuda para completarla, estoy aquí para apoyarte 😊`
+
   return (
     <div className='bg-slate-600 p-4 rounded-md'>
       {sale.paymentImage && (
@@ -161,14 +163,20 @@ const SaleCard: React.FC<SaleCardProps> = ({
           >
             {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
           </button>
-          {sale.verified && 
+          {sale.verified ? 
             <Link 
             className="bg-green-500 p-2 rounded-md w-full text-center"
             href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msg}`}
             >
               Confirmar con Whatsapp
             </Link>
-          } 
+          : 
+            <Link
+              className="bg-red-500 p-2 rounded-md w-full text-center"
+              href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msgFailed}`}
+            >
+              Notificar Problema
+            </Link>}
         </div>
       )}
     </div>

@@ -52,13 +52,13 @@ const TicketButton = ({
         handleClick();
       }}
       className={`m-1 text-white py-2 px-4 rounded 
-        ${isUnavailable ? "cursor-not-allowed opacity-50 bg-red-500" : ""}
+        ${isUnavailable ? "cursor-not-allowed opacity-50 bg-blue-500 capitalize" : ""}
         ${inTheCart ? "bg-yellow-400" : ""}
         ${!inTheCart && !isUnavailable && (isSelected ? "bg-yellow-400" : "bg-green-500")}
       `}
       disabled={isUnavailable}
     >
-      {ticketNumber}
+      {isUnavailable ? 'x': ticketNumber}
     </button>
   );
 };

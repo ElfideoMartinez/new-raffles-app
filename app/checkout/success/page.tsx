@@ -10,7 +10,6 @@ const SuccessPage = () => {
 
   console.log("Tickets", raffles);
   useEffect(() => {
-    
     if(paymentMethod !== "transfer"){
       markAsSold();
     }
@@ -37,9 +36,16 @@ const SuccessPage = () => {
   };
 
   return (
-    <div className='flex flex-col w-full items-center mt-7'>
-      <div>Gracias por su compra!</div>
-      <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4'>
+    <div className='flex flex-col w-full items-center mt-7 px-7 text-center gap-3'>
+      <p>
+    🎉 <strong>¡Gracias por tu compra!</strong> 🎉<br/><br/>
+        Para conocer al ganador, ingresa a la página de la rifa el día que finalice.
+      </p>
+      <p> 
+        Ahí mismo donde escogiste tus boletos se publicará el número ganador.<br/>
+        ¡Guarda ese enlace y mucha suerte! 🍀
+      </p>
+      <Link href='../' className='p-2 mt-4 rounded-md' style={{ backgroundColor: '#355b6eff'}}>
         Ir a inicio
       </Link>
     </div>

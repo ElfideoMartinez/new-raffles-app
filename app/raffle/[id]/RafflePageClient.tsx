@@ -7,6 +7,7 @@ import TicketButton from "@/app/components/TicketButton";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
 import { FadeLoader } from "react-spinners";
+import { toast } from "nextjs-toast-notify";
 
 interface IticketNumber {
   number: number | string
@@ -105,6 +106,14 @@ const RafflePageClient = ({
     
     if (validTicketFound && ticketRandom !== null) {
       addTicket(ticketRandom, raffleId);
+      toast.success('Listo! Mucha suerte 🍀😉',{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
       //addTicketsToCart(raffleId, parseInt(raffleData.price), raffleData.raffleName);
     } else {
       alert("No hay mas boletos por escoger");
@@ -113,8 +122,16 @@ const RafflePageClient = ({
 
   return (
     
-    <div className='container mx-auto w-4/5 p-4'>
-      <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
+    <div className='container mx-auto flex w-11/12 p-4 relative'>
+      <div className="absolute left-0 top-10 z-10" >
+        <button
+          disabled={thereIsWinner} 
+          className={`${thereIsWinner ? 'opacity-80 cursor-not-allowed' : ''} random-ticket-button`}
+          onClick={() => handleRandomTicket()}>
+          🎯 ¡Dame un número!
+        </button>
+      </div>
+      <div className='bg-white shadow-lg rounded-lg overflow-hidden w-10/12 right-7 sm:right-10 md:right-14 lg:right-20 xl:right-32 absolute'>
         <img
           src={raffleData.raffleImage}
           alt='Raffle Image'
@@ -140,20 +157,12 @@ const RafflePageClient = ({
             />
           ))}
         </div>
-        <div className="flex justify-center mb-3" >
-          <button
-            disabled={thereIsWinner} 
-            className={`bg-blue-500 px-6 py-2 rounded-lg font-bold ${thereIsWinner ? 'opacity-80 cursor-not-allowed' : ''}`}
-            onClick={() => handleRandomTicket()}>
-            Boleto al azar
-          </button>
-        </div>
+        <AddToCartButton
+          raffleId={raffleId}
+          raffleName={raffleData.raffleName}
+          rafflePrice={parseInt(raffleData.price)}
+        />
       </div>
-      <AddToCartButton
-        raffleId={raffleId}
-        raffleName={raffleData.raffleName}
-        rafflePrice={parseInt(raffleData.price)}
-      />
     </div>
   );
 };
