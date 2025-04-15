@@ -122,7 +122,7 @@ const RafflePageClient = ({
 
   return (
     
-    <div className='container mx-auto flex w-11/12 p-4 relative'>
+    <div className='container mx-auto flex w-11/12 p-4 relative justify-center'>
       <div className="absolute left-0 top-10 z-10" >
         <button
           disabled={thereIsWinner} 
@@ -131,7 +131,7 @@ const RafflePageClient = ({
           🎯 ¡Dame un número!
         </button>
       </div>
-      <div className='bg-white shadow-lg rounded-lg overflow-hidden w-10/12 right-7 sm:right-10 md:right-14 lg:right-20 xl:right-32 absolute'>
+      <div className='bg-white shadow-lg rounded-lg overflow-hidden w-10/12'>
         <img
           src={raffleData.raffleImage}
           alt='Raffle Image'
