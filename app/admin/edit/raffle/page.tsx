@@ -81,7 +81,7 @@ const EditRaffle = () => {
       raffle.title
     );
     if(downloadURL != '') raffle.awardImage = downloadURL;
-    
+
     try{
       const result = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/updateRaffle`,
@@ -136,6 +136,7 @@ const EditRaffle = () => {
   
   const handleChangeRaffle = async (id: string) => {
     if(id=='default'){
+      setIdRaffle(id);
       cleanRaffle();
       return;
     }
@@ -181,6 +182,7 @@ const EditRaffle = () => {
   useEffect(() => {
     const createNumberArray = Array.from({ length: 100 }, (_, i) => i);
     setOptions(createNumberArray);
+    setIdRaffle('default');
     const fetchRaffleData = async () => {
       try {
         const response = await fetch(
@@ -212,7 +214,8 @@ const EditRaffle = () => {
   const resetForm = () => {
     formRef.current?.reset();
   }
-
+  const isValidRaffle = idRaffle != 'default';
+  console.log('Rifa valida:',isValidRaffle)
   return(
     <div className='max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-5'>
       <h2 className='text-black text-2xl font-bold mb-6 text-center'>
@@ -325,7 +328,8 @@ const EditRaffle = () => {
                 value={raffle.ticketWinner}
                 onChange={handleChange}
               >
-                <option>Selecciona un ganador</option>
+                <option value=''>Selecciona un ganador</option>
+                <option value='.'>No hay ganador</option>
                 {options.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}
@@ -352,9 +356,9 @@ const EditRaffle = () => {
             </div>
           </div>
         }
-        <div className="flex gap-1">
+        <div className={`flex gap-1 ${!isValidRaffle ? 'opacity-50 cursor-none' : ''}`}>
           <button
-            disabled={isLoading}
+            disabled={isLoading || !isValidRaffle}
             type='submit'
             className={`w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold 
               hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50
@@ -363,7 +367,7 @@ const EditRaffle = () => {
           >
             {isLoading ? "Actualizando..." : "Actualizar rifa"}
           </button>
-          <DeleteRaffleModal idRaffle={idRaffle} onDelete={handleDeleteRaffle} />
+          <DeleteRaffleModal idRaffle={idRaffle} isAvailable={!isValidRaffle} onDelete={handleDeleteRaffle} />
         </div>        
       </form>
     </div>

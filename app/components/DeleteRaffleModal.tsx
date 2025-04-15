@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const DeleteRaffleModal = ({ idRaffle, onDelete }: { idRaffle: string; onDelete: (id: string) => void }) => {
+const DeleteRaffleModal = ({ idRaffle, isAvailable, onDelete }: { idRaffle: string; isAvailable: boolean; onDelete: (id: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       {/* Botón para abrir el modal */}
-      <button 
+      <button
+      disabled={isAvailable}
         type="button"
         className='bg-red-500 p-2 h-12 w-12 rounded-lg flex items-center justify-center hover:bg-red-600'
         onClick={() => setIsOpen(true)}
@@ -26,7 +27,7 @@ const DeleteRaffleModal = ({ idRaffle, onDelete }: { idRaffle: string; onDelete:
               >
                 Cancelar
               </button>
-              <button 
+              <button              
                 className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                 onClick={() => {
                   onDelete(idRaffle);
