@@ -44,9 +44,13 @@ const CheckoutTransferPage = () => {
       .catch((error) => console.error("Error al copiar:", error));
   };
 
+  const removeAccents = (name: string): string => {
+    return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
   const handleName = (characterInput: string) => {
-    const regexName = /^[A-Za-z\s]+$/;
-    if(regexName.test(characterInput) || characterInput == '') return setName(characterInput);
+    const regexName = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    if(regexName.test(characterInput) || characterInput == '') return setName(removeAccents(characterInput));
   }
 
   const handlePhone = (numberInput: string) => {
@@ -139,7 +143,7 @@ const CheckoutTransferPage = () => {
           type='text'
           value={name}
           onChange={(e) => handleName(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
           placeholder='Ingrese su nombre completo'
         />
       </div>
@@ -154,7 +158,7 @@ const CheckoutTransferPage = () => {
           type='tel'
           value={phone}
           onChange={(e) => handlePhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
           placeholder='Ingrese su número de teléfono'
         />
       </div>
@@ -169,7 +173,7 @@ const CheckoutTransferPage = () => {
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 text-black px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           placeholder='Ingrese su correo electrónico (opcional)'
         />
       </div>
@@ -209,6 +213,7 @@ const CheckoutTransferPage = () => {
               );
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
+              
               const data = await fetch(
                 //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
                 `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,

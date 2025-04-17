@@ -24,6 +24,8 @@ interface IRaffleData {
   price: string;
   raffleImage: string;
   raffleName: string;
+  awardDescription: string;
+  awardName: string;
   ticketWinner: string;
 }
 
@@ -137,6 +139,10 @@ const RafflePageClient = ({
           alt='Raffle Image'
           className='w-full h-64 object-fill'
         />
+        <div className="text-black font-bold text-lg md:text-xl text-center pt-3 px-3 md:px-2">
+          <p>Premio: {raffleData.awardName}</p>
+          <p>Descripción del premio: {raffleData.awardDescription}</p>
+        </div>
         {thereIsWinner && (
         <div className="flex flex-col items-center text-center mt-4 p-4 bg-gray-100 rounded-xl shadow-md">
           <p className="text-black text-2xl font-semibold">🎉 Boleto Ganador 🎉</p>
