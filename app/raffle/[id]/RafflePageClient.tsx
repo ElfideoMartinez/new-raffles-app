@@ -69,7 +69,14 @@ const RafflePageClient = ({
     const availableTickets = raffleData.data.filter(ticket => !ticket.sold);
 
     if (availableTickets.length === 0) {
-      alert("Ya no hay boletos disponibles.");
+      toast.warning('Ya no hay boletos disponibles',{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      })
       return;
     }
     
@@ -118,7 +125,14 @@ const RafflePageClient = ({
       });
       //addTicketsToCart(raffleId, parseInt(raffleData.price), raffleData.raffleName);
     } else {
-      alert("No hay mas boletos por escoger");
+      toast.warning('No hay mas boletos por escoger',{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
     }
   }
 

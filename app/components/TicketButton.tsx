@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import useTicketStore from "../store";
+import { toast } from "nextjs-toast-notify";
 
 interface ITicketButtonProps {
   raffleId: string;
@@ -46,7 +47,14 @@ const TicketButton = ({
       onClick={(e) => {
         e.stopPropagation();
         if (inTheCart) {
-          alert(`El boleto ${ticketNumber} ya está en el carrito`);
+          toast.warning(`El boleto ${ticketNumber} ya está en el carrito`,{
+            duration: 2000,
+            progress: false,
+            position: 'top-right',
+            transition: 'popUp',
+            icon: '',
+            sound: false,
+          });
           return;
         }
         handleClick();

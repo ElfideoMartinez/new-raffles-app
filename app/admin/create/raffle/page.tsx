@@ -2,6 +2,7 @@
 import withAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Link from "next/link";
+import { toast } from "nextjs-toast-notify";
 import React, { useRef, useState } from "react";
 
 interface IRaffle {
@@ -78,7 +79,14 @@ const CreateRaffle = () => {
     createNewRaffle(raffleData);
     resetForm();
     setIsLoading(false);
-    alert("Rifa creada exitosamente");
+    toast.success(`Rifa creada exitosamente`,{
+      duration: 2000,
+      progress: false,
+      position: 'top-right',
+      transition: 'popUp',
+      icon: '',
+      sound: false,
+    });
   };
   const uploadRaffleImage = async (file: File, raffleId: string) => {
     const storage = getStorage();

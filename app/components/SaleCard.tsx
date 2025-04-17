@@ -2,6 +2,7 @@ import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
+import { toast } from "nextjs-toast-notify";
 
 
 interface Sale {
@@ -101,7 +102,14 @@ const SaleCard: React.FC<SaleCardProps> = ({
         )
       );
     } catch (error) {
-      alert("Error al completar la compra. Inténtalo de nuevo más tarde.");
+      toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde.`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
       setIsLoading(false);
       setSalesFunction((prevSales: any) =>
         prevSales.map((s: { id: string; verified: any }) =>

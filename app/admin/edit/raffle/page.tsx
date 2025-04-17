@@ -2,6 +2,7 @@
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { toast } from "nextjs-toast-notify";
 import { useEffect, useRef, useState } from "react";
 import { FadeLoader } from "react-spinners";
 
@@ -64,7 +65,14 @@ const EditRaffle = () => {
     }catch(e){
       console.error(e);
     }
-    alert('Rifa borrada correctamente');
+    toast.success(`Rifa borrada correctamente`,{
+      duration: 2000,
+      progress: false,
+      position: 'top-right',
+      transition: 'popUp',
+      icon: '',
+      sound: false,
+    });
     cleanRaffle();
     resetForm();
     setTimeout(() => {
@@ -106,7 +114,14 @@ const EditRaffle = () => {
     cleanRaffle();
     setNewImage(null)
     resetForm();
-    alert('Rifa actualizada correctamente');
+    toast.success(`Rifa actualizada correctamente`,{
+      duration: 2000,
+      progress: false,
+      position: 'top-right',
+      transition: 'popUp',
+      icon: '',
+      sound: false,
+    });
     setUpdatedRafflesData((prev) => !prev);
   }
 

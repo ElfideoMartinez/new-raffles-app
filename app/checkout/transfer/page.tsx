@@ -4,6 +4,7 @@ import { storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
+import { toast } from "nextjs-toast-notify";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
@@ -40,7 +41,16 @@ const CheckoutTransferPage = () => {
   const copyToClipboard = (text: any) => {
     navigator.clipboard
       .writeText(text)
-      .then(() => alert(`${text} copiado al portapapeles!`))
+      .then(() => {
+        toast.info(`${text} copiado al portapapeles!`,{
+          duration: 2000,
+          progress: false,
+          position: 'top-right',
+          transition: 'popUp',
+          icon: '',
+          sound: false,
+        });
+      })
       .catch((error) => console.error("Error al copiar:", error));
   };
 
@@ -68,7 +78,14 @@ const CheckoutTransferPage = () => {
     const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp", "jfif"];
 
     if (!fileExtension || !validExtension.includes(fileExtension)){
-      alert('El archivo seleccionado no es valido');
+      toast.warning(`El archivo seleccionado no es valido`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
       return;
     }
 
@@ -243,15 +260,25 @@ const CheckoutTransferPage = () => {
               router.push("/checkout/success");
             } catch (error) {
               console.error("Error al completar la compra:", error);
-              alert(
-                "Error al completar la compra. Inténtalo de nuevo más tarde."
-              );
+              toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde`,{
+                duration: 2000,
+                progress: false,
+                position: 'top-right',
+                transition: 'popUp',
+                icon: '',
+                sound: false,
+              });
               setIsLoading(false);
             }
           } else {
-            alert(
-              "Por favor, ingrese un número de teléfono válido de 10 dígitos."
-            );
+            toast.warning(`Por favor, ingrese un número de teléfono válido de 10 dígitos`,{
+              duration: 2000,
+              progress: false,
+              position: 'top-right',
+              transition: 'popUp',
+              icon: '',
+              sound: false,
+            });
           }
         }}
         className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 ${
