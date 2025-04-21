@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import useTicketStore from "../store";
+import { toast } from "nextjs-toast-notify";
 
 interface ITicketButtonProps {
   raffleId: string;
@@ -9,6 +10,7 @@ interface ITicketButtonProps {
   ticketNumber: number;
   isUnavailable?: boolean;
   inTheCart: boolean;
+  isSelectedPrev: boolean;
 }
 
 const TicketButton = ({
@@ -17,10 +19,15 @@ const TicketButton = ({
   ticketNumber,
   isUnavailable,
   inTheCart,
+  isSelectedPrev,
 }: ITicketButtonProps) => {
   const [isSelected, setIsSelected] = useState(false);
   const addTicket = useTicketStore((state) => state.addTicket);
   const removeTicket = useTicketStore((state) => state.removeTicket);
+
+  useEffect(() => {
+    setIsSelected(isSelectedPrev);
+  }, [isSelectedPrev]);
 
   useEffect(() => {
     if (isSelected) {
@@ -31,28 +38,35 @@ const TicketButton = ({
   }, [isSelected, addTicket, removeTicket, raffleId, ticketNumber]);
 
   const handleClick = useCallback(() => {
-    if (isUnavailable) return;
-    console.log("ticketId", ticketId);
-    setIsSelected((prevSelected) => !prevSelected);
-  }, [isUnavailable, ticketId]);
+    if (isUnavailable || inTheCart) return;
+    setIsSelected((prev) => !prev);
+  }, [isUnavailable, inTheCart]);
 
   return (
     <button
       onClick={(e) => {
         e.stopPropagation();
-        if(inTheCart){
-          alert(`El boleto ${ticketNumber} ya esta en el carrito`)
+        if (inTheCart) {
+          toast.warning(`El boleto ${ticketNumber} ya está en el carrito`,{
+            duration: 2000,
+            progress: false,
+            position: 'top-right',
+            transition: 'popUp',
+            icon: '',
+            sound: false,
+          });
           return;
         }
         handleClick();
       }}
-      className={`m-1 text-white py-2 px-4 rounded ${
-        isSelected ? "bg-yellow-400" : "bg-green-500"
-      } ${isUnavailable ? "cursor-not-allowed opacity-50 bg-red-500" : ""}
-      ${inTheCart ? "bg-yellow-400" : ""}`}
+      className={`m-1 text-white py-2 px-4 rounded 
+        ${isUnavailable ? "cursor-not-allowed opacity-50 bg-blue-500 capitalize" : ""}
+        ${inTheCart ? "bg-yellow-400" : ""}
+        ${!inTheCart && !isUnavailable && (isSelected ? "bg-yellow-400" : "bg-green-500")}
+      `}
       disabled={isUnavailable}
     >
-      {ticketNumber}
+      {isUnavailable ? 'x': ticketNumber}
     </button>
   );
 };

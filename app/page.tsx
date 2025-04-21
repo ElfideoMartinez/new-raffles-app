@@ -11,6 +11,7 @@ interface IRaffleDataResponse {
 export default async function Home() {
   try {
     const response = await fetch(
+      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getAllRaffles`,
       `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllRaffles`,
       {
         cache: "no-store",

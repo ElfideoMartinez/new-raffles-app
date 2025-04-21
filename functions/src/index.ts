@@ -47,7 +47,9 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
       .where("raffle_id", "==", id)
       .get();
 
-    const ticketsData = ticketQuerySnapshot.docs.map((doc) => doc.data());
+    const tickets = ticketQuerySnapshot.docs.map((doc) => doc.data());
+    const ticketsData = tickets.sort((a,b) => a.number - b.number);
+    
     console.log({
       raffleData,
       ticketsData,
@@ -237,7 +239,7 @@ export const createCheckoutSession = functions.https.onRequest(
     console.log(data);
 
     const stripe = new Stripe(
-      "sk_test_51OhNGHFa61udd4SXwmS44glXYRaTibPKX7W3oRfejoQ7NTddDQw0MSjAFXBsGv8wdCBQoa1GDvFfjQMyLztjIpDH00Ohkhas7m"
+      "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"
     );
 
     try {
@@ -596,10 +598,10 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
   } 
 
   const stripe = new Stripe(
-      "sk_test_51OhNGHFa61udd4SXwmS44glXYRaTibPKX7W3oRfejoQ7NTddDQw0MSjAFXBsGv8wdCBQoa1GDvFfjQMyLztjIpDH00Ohkhas7m"
+      "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"
   );
 
-  const endpointSecret = "whsec_1OCiXXvAIORBNAWJ6xQiljGQE5vmBZD6";
+  const endpointSecret = "whsec_DfOQcGKNocindFHvASZb10mapc0nE7AF";
 
   try{
 
@@ -618,14 +620,15 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
 
     if(event.type==="checkout.session.completed"){
 
-      let raffles: number[] = [];
-      
-      try{
-        raffles = JSON.parse(infoRaffle.raffles);
-      }catch(err){
-        console.error("Error parsing ticketNumbers:", err);
-      }
-
+      interface Raffle {
+        raffleId: string;
+        raffleName: string;
+        ticketNumbers: number[];
+        raffleTotalPrice: number;
+      };
+      let raffles: Raffle[]; 
+      raffles = JSON.parse(infoRaffle.raffles);
+    
       // add to sales collection
       const salesCollection = db.collection("sales");
       await salesCollection.add({
@@ -657,4 +660,93 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
   }
   
 
+})
+
+export const updateRaffle = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "PATCH") {
+    res.status(405).send({ message: "Only POST requests are allowed" });
+    return;
+  }
+
+  try {
+    console.log("Updating raffle info...");
+    const body = req.body;
+    
+    await db.collection("raffles").doc(body.idRaffle).set(body.raffle, {merge: true});
+    
+    res.status(200).json({
+      status: 200,
+      message: "Raffle correctly updated",
+    })
+
+  } catch(err){
+    console.error("Error updating raffle: ", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error updating raffle",
+    })
+  }
+})
+
+export const deleteRaffle = functions.https.onRequest( async (req, res) => {
+
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "DELETE") {
+    res.status(405).send({ message: "Only DELETE requests are allowed" });
+    return;
+  }
+
+  try {
+    console.log("Deleting raffle...");
+    const body = req.body;
+    
+    await db.collection("raffles").doc(body.idRaffle).delete();
+
+    const snapshot = await db.collection('tickets')
+      .where('raffle_id', '==', body.idRaffle)
+      .get();
+
+    const batch = db.batch();
+    snapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    console.log(`Se eliminaron ${snapshot.size} ticket(s) con raffle_id: ${body.idRaffle}`);
+    
+    res.status(200).json({
+      status: 200,
+      message: "Raffle and tickets correctly deleted",
+    })
+
+  } catch(err){
+    console.error("Error deleting raffle: ", err);
+
+    res.status(500).json({
+      status: 500,
+      message: "Error deleting raffle",
+    })
+  }
 })

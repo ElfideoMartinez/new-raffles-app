@@ -4,6 +4,7 @@ import { storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
+import { toast } from "nextjs-toast-notify";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
@@ -16,12 +17,18 @@ const CheckoutTransferPage = () => {
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-  const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
+  
+  const allTickets = raffles.map((raffle) => raffle.ticketNumbers.sort((a,b) => a-b)).flat().toString();
+  console.log(allTickets);
+  //const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
+  
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
   const [total, setTotal] = useState(0);
   const ticketCount = allTickets.length; 
+  //console.log(allTickets);
 
   useEffect(()=>{
     setTotal(totalRafflePrice);
@@ -34,15 +41,31 @@ const CheckoutTransferPage = () => {
   const copyToClipboard = (text: any) => {
     navigator.clipboard
       .writeText(text)
-      .then(() => alert(`${text} copiado al portapapeles!`))
+      .then(() => {
+        toast.info(`${text} copiado al portapapeles!`,{
+          duration: 2000,
+          progress: false,
+          position: 'top-right',
+          transition: 'popUp',
+          icon: '',
+          sound: false,
+        });
+      })
       .catch((error) => console.error("Error al copiar:", error));
   };
 
-  const isPhoneValid = phone.length === 10 && /^\d+$/.test(phone);
-  const isImageValid = image !== null;
-  
-  const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
-  const isEmailValid = emailRegex.test(email);
+  const removeAccents = (name: string): string => {
+    return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  const handleName = (characterInput: string) => {
+    const regexName = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    if(regexName.test(characterInput) || characterInput == '') return setName(removeAccents(characterInput));
+  }
+
+  const handlePhone = (numberInput: string) => {
+    if(/^\d+$/.test(numberInput) || numberInput == '') return setPhone(numberInput);
+  }
 
   const handleImageChange = (e: any) => {
 
@@ -55,12 +78,26 @@ const CheckoutTransferPage = () => {
     const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp", "jfif"];
 
     if (!fileExtension || !validExtension.includes(fileExtension)){
-      alert('El archivo seleccionado no es valido');
+      toast.warning(`El archivo seleccionado no es valido`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
       return;
     }
 
     setImage(e.target.files[0]);
   };
+
+  const isNameValid = name.length >= 5 && name.length < 50;
+  const isPhoneValid = phone.length === 10;
+  const isImageValid = image !== null;
+
+  const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+  const isEmailValid = emailRegex.test(email);
 
   return (
     <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-lg'>
@@ -73,7 +110,7 @@ const CheckoutTransferPage = () => {
         <p>
           Para completar su compra, realice una transferencia bancaria al número
           de cuenta a continuación. Asegúrese de pegar la clave del concepto de
-          pago en el campo del concepto de la transferencia.
+          pago en el campo del concepto de la transferencia (opcional).
         </p>
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
@@ -114,6 +151,20 @@ const CheckoutTransferPage = () => {
         <span className='text-sm text-gray-500'>(Toca para copiar)</span>
       </div>
 
+      <div className='flex flex-col items-center'>
+        <label htmlFor='phone' className='text-black text-lg font-semibold'>
+          Nombre
+        </label>
+        <input
+          id='name'
+          type='text'
+          value={name}
+          onChange={(e) => handleName(e.target.value)}
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
+          placeholder='Ingrese su nombre completo'
+        />
+      </div>
+
       {/* Phone Input with Copy Button */}
       <div className='flex flex-col items-center'>
         <label htmlFor='phone' className='text-black text-lg font-semibold'>
@@ -123,8 +174,8 @@ const CheckoutTransferPage = () => {
           id='phone'
           type='tel'
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
+          onChange={(e) => handlePhone(e.target.value)}
+          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
           placeholder='Ingrese su número de teléfono'
         />
       </div>
@@ -139,7 +190,7 @@ const CheckoutTransferPage = () => {
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 text-black px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           placeholder='Ingrese su correo electrónico (opcional)'
         />
       </div>
@@ -179,6 +230,7 @@ const CheckoutTransferPage = () => {
               );
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
+              
               const data = await fetch(
                 //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
                 `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,
@@ -188,10 +240,12 @@ const CheckoutTransferPage = () => {
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
+                    name,
                     phone,
                     email,
                     paymentConceptKey,
                     ticketCount,
+                    allTickets,
                     raffles,
                     totalSalePrice: totalRafflePrice,                    
                     paymentImage: downloadURL,
@@ -206,21 +260,31 @@ const CheckoutTransferPage = () => {
               router.push("/checkout/success");
             } catch (error) {
               console.error("Error al completar la compra:", error);
-              alert(
-                "Error al completar la compra. Inténtalo de nuevo más tarde."
-              );
+              toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde`,{
+                duration: 2000,
+                progress: false,
+                position: 'top-right',
+                transition: 'popUp',
+                icon: '',
+                sound: false,
+              });
               setIsLoading(false);
             }
           } else {
-            alert(
-              "Por favor, ingrese un número de teléfono válido de 10 dígitos."
-            );
+            toast.warning(`Por favor, ingrese un número de teléfono válido de 10 dígitos`,{
+              duration: 2000,
+              progress: false,
+              position: 'top-right',
+              transition: 'popUp',
+              icon: '',
+              sound: false,
+            });
           }
         }}
         className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 ${
-          !(isPhoneValid && isImageValid && isEmailValid) && "opacity-50 cursor-not-allowed"
+          !(isPhoneValid && isImageValid && isEmailValid && isNameValid) && "opacity-50 cursor-not-allowed"
         }`}
-        disabled={!(isPhoneValid && isImageValid && isEmailValid)}
+        disabled={!(isPhoneValid && isImageValid && isEmailValid && isNameValid)}
       >
         {isLoading ? "Procesando..." : "Completar Compra"}
       </button>
