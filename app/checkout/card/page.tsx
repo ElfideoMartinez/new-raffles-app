@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { env } from "process";
 
 const stripePromise = loadStripe(
-  "pk_test_51OhNGHFa61udd4SXroKyqczB8jmGHIAyLgdBpgqk1E85bJU3GeikWSylKDUEZdbOYypqyM8GFxiqC1FQ2UUGQNQ2007qKbxnjZ"
+  "pk_live_51OhNGHFa61udd4SXnw3EebSJfjIhzG2EwAwJLU6LKSguaAPkYjyw3R3cew2Q2r5a2PBMPsCB78SDdsCeKSL9xssS00If8jotey"
 );
 
 const CardCheckoutPage = () => {

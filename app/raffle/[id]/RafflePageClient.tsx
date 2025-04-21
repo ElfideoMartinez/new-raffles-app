@@ -115,7 +115,7 @@ const RafflePageClient = ({
     
     if (validTicketFound && ticketRandom !== null) {
       addTicket(ticketRandom, raffleId);
-      toast.success('Listo! Mucha suerte 🍀😉',{
+      toast.success(`Listo! tu numero es ${ticketRandom}, mucha suerte 🍀😉`,{
         duration: 2000,
         progress: false,
         position: 'top-right',

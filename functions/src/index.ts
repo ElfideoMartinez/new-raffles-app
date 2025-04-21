@@ -239,7 +239,7 @@ export const createCheckoutSession = functions.https.onRequest(
     console.log(data);
 
     const stripe = new Stripe(
-      "sk_test_51OhNGHFa61udd4SXwmS44glXYRaTibPKX7W3oRfejoQ7NTddDQw0MSjAFXBsGv8wdCBQoa1GDvFfjQMyLztjIpDH00Ohkhas7m"
+      "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"
     );
 
     try {
@@ -598,10 +598,10 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
   } 
 
   const stripe = new Stripe(
-      "sk_test_51OhNGHFa61udd4SXwmS44glXYRaTibPKX7W3oRfejoQ7NTddDQw0MSjAFXBsGv8wdCBQoa1GDvFfjQMyLztjIpDH00Ohkhas7m"
+      "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"
   );
 
-  const endpointSecret = "whsec_1OCiXXvAIORBNAWJ6xQiljGQE5vmBZD6";
+  const endpointSecret = "whsec_DfOQcGKNocindFHvASZb10mapc0nE7AF";
 
   try{
 
@@ -722,10 +722,23 @@ export const deleteRaffle = functions.https.onRequest( async (req, res) => {
     const body = req.body;
     
     await db.collection("raffles").doc(body.idRaffle).delete();
+
+    const snapshot = await db.collection('tickets')
+      .where('raffle_id', '==', body.idRaffle)
+      .get();
+
+    const batch = db.batch();
+    snapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    console.log(`Se eliminaron ${snapshot.size} ticket(s) con raffle_id: ${body.idRaffle}`);
     
     res.status(200).json({
       status: 200,
-      message: "Raffle correctly deleted",
+      message: "Raffle and tickets correctly deleted",
     })
 
   } catch(err){
