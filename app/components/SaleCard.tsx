@@ -120,14 +120,13 @@ const SaleCard: React.FC<SaleCardProps> = ({
   };
 
   const msg = sale.payment_intent ? 
-    `Gracias por realizar tu compra🤗. Tu pago ha sido recibido✅. Tus boletos de rifa estarán apartados 
-    en el sistema una vez verificado el pago🎟️. Cualquier información adicional será enviada a este número 
+    `Gracias por realizar tu compra 🤗. Tu pago ha sido recibido✅. Tus boletos de rifa ya 
+    estan apartados para ti 🎟️. Cualquier información adicional será enviada a este número 
     o al correo electrónico que proporcionaste. ¡Gracias por participar!¡te deseamos suerte!🍀` 
     : 
-    `Gracias por tu compra😊. Hemos recibido tu solicitud y estamos esperando la confirmación de tu pago por 
-    transferencia💰🤗. Tus boletos de rifa aparecerán como DISPONIBLES en la página hasta que se confirme el 
-    pago (entonces si se marcan como vendidos)✅. Cualquier información adicional será enviada a este número o 
-    al correo electrónico proporcionado‼️. ¡Gracias por tu paciencia y por participar!¡te deseamos suerte!🍀` ;
+    `Gracias por tu compra 🤗. Tu transferencia ha sido recibida✅. Tus boletos de rifa ya estan 
+    apartados para ti 🎟️. Cualquier información adicional será enviada a este número o al correo electrónico 
+    que proporcionaste. ¡Gracias por participar!¡te deseamos suerte!🍀` ;
 
   const msgFailed = `¡Hola ${sale.name}! hubo un error al confirmar tu compra 😕 Si necesitas ayuda para completarla, estoy aquí para apoyarte 😊`
 

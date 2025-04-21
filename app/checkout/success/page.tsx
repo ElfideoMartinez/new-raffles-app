@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
   const paymentMethod = useTicketStore((state) => state.paymentMethod);
+
+  const [isHydrated, setIsHydrated] = useState(false);
 
   console.log("Tickets", raffles);
   useEffect(() => {
@@ -16,6 +18,7 @@ const SuccessPage = () => {
     cleanCart();
     console.log("cleaning cart from outside");
     cleanSelected();
+    setIsHydrated(true);
   }, []);
 
   const markAsSold = async () => {
@@ -35,6 +38,8 @@ const SuccessPage = () => {
     await Promise.all(promises);
   };
 
+  const isTransfer = isHydrated && paymentMethod === 'transfer';
+
   return (
     <div className='flex flex-col w-full items-center mt-7 px-7 text-center gap-3'>
       <p>
@@ -45,6 +50,12 @@ const SuccessPage = () => {
         Ahí mismo donde escogiste tus boletos se publicará el número ganador.<br/>
         ¡Guarda ese enlace y mucha suerte! 🍀
       </p>
+      {isTransfer ? 
+        <div>
+          <p>Ojo 👀 <br></br>Como tu pago fue por transferencia, tus boletos comprados seguiran apareciendo como disponibles,<br></br> 
+          una vez verificada tu transferencia te lo haremos saber por medio de whatsapp y tus boletos apareceran como vendidos.</p>
+        </div> 
+      : '' }
       <Link href='../' className='p-2 mt-4 rounded-md' style={{ backgroundColor: '#355b6eff'}}>
         Ir a inicio
       </Link>
