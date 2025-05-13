@@ -12,9 +12,9 @@ const SuccessPage = () => {
 
   console.log("Tickets", raffles);
   useEffect(() => {
-    if(paymentMethod !== "transfer"){
-      markAsSold();
-    }
+    // if(paymentMethod !== "transfer"){
+    //   markAsSold();
+    // }
     cleanCart();
     console.log("cleaning cart from outside");
     cleanSelected();
@@ -56,6 +56,10 @@ const SuccessPage = () => {
           una vez verificada tu transferencia te lo haremos saber por medio de whatsapp y tus boletos apareceran como vendidos.</p>
         </div> 
       : '' }
+      <p>Si tienes cualquier duda o necesitas más información, no dudes en ponerte en contacto con nosotros</p>
+      <p>📧 Correo: ealejandramtzq04@gmail.com<br/>
+         📞 Telefono: 6391316226
+      </p>
       <Link href='../' className='p-2 mt-4 rounded-md' style={{ backgroundColor: '#355b6eff'}}>
         Ir a inicio
       </Link>

@@ -96,8 +96,9 @@ const CheckoutTransferPage = () => {
   const isPhoneValid = phone.length === 10;
   const isImageValid = image !== null;
 
-  const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
-  const isEmailValid = emailRegex.test(email);
+  const emailRegex = /^[a-zA-Z0-9]+([._+-]?[a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,10})+$/;
+  //const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+  const isEmailValid = emailRegex.test(email) && email.length < 50;
 
   return (
     <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-lg'>
@@ -114,10 +115,10 @@ const CheckoutTransferPage = () => {
         </p>
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
-            onClick={() => copyToClipboard("4152314380833197")}
+            onClick={() => copyToClipboard("4152314135006792")}
             className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
           >
-            4152314380833197
+            4152314135006792
           </button>
           <span className='text-sm text-gray-500'>(Toca para copiar)</span>
         </div>
