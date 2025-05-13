@@ -643,6 +643,10 @@ export const stripeWebHook = functions.https.onRequest( async (req, res) => {
         verified: true,
       });
 
+      await Promise.all(
+        raffles.map((raffle) => setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers))
+      );
+
     }
 
     res.status(200).json({
