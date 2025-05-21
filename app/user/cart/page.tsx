@@ -106,21 +106,11 @@ const UserCartPage = () => {
         <p className='self-center'>Monto total: ${totalRafflePrice}</p>
       </ul>
       {groupedTicketsArray.length > 0 ? (
-        <div className='flex justify-between mx-2 mt-1'>
-          <Link
-            locale='fr'
-            // href={{
-            //   pathname: "/checkout/card",
-            //   query: { cartTotal: totalRafflePrice },
-            // }}
-            href="/checkout/card"
-            className='bg-blue-500 text-center text-white p-2 rounded-lg w-1/2'
-          >
-            Pago con tarjeta
-          </Link>
+        <div className='mx-2 mt-2'>
+          
           <Link
             href='/checkout/transfer'
-            className='bg-yellow-500 text-white p-2 rounded-lg w-1/2 flex justify-center'
+            className='bg-yellow-500 text-white p-2 rounded-lg w-ful flex justify-center'
           >
             Pago por transferencia
           </Link>
