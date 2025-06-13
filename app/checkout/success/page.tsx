@@ -2,6 +2,14 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
+
+interface Purchase {
+  raffleId: string;
+  raffleName: string;
+  ticketNumbers: number[];
+  raffleTotalPrice: number;
+};
+
 const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
@@ -18,8 +26,30 @@ const SuccessPage = () => {
     cleanCart();
     console.log("cleaning cart from outside");
     cleanSelected();
+    saveSaleLocalStorage();
     setIsHydrated(true);
   }, []);
+
+  const saveSaleLocalStorage = () => {
+    const saved = localStorage.getItem("purchases");
+    let purchases: { date: string, items: Purchase[] }[] = [];
+
+    if (saved) {
+      try {
+        purchases = JSON.parse(saved);
+      } catch (err) {
+        console.error("Error parsing localStorage purchases");
+      }
+    }
+
+    const newPurchase = {
+      date: new Date().toISOString(), // puedes usar otra forma si lo prefieres
+      items: raffles,
+    };
+
+    purchases.push(newPurchase);
+    localStorage.setItem("purchases", JSON.stringify(purchases));
+  }
 
   const markAsSold = async () => {
     const promises = raffles.map((raffle) =>

@@ -17,7 +17,7 @@ const CheckoutTransferPage = () => {
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
-  
+  console.log('Info de las rifas',raffles);
   const allTickets = raffles.map((raffle) => raffle.ticketNumbers.sort((a,b) => a-b)).flat().toString();
   console.log(allTickets);
   //const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
