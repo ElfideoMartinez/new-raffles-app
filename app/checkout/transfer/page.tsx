@@ -19,20 +19,20 @@ const CheckoutTransferPage = () => {
   );
   console.log('Info de las rifas',raffles);
   const allTickets = raffles.map((raffle) => raffle.ticketNumbers.sort((a,b) => a-b)).flat().toString();
-  console.log(allTickets);
-  //const allTickets = raffles.flatMap((raffle) => raffle.ticketNumbers);
-  
+  const ticketCount = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
+  //console.log("Num tickets", ticketCount);
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState<any>(null);
   const [total, setTotal] = useState(0);
-  const ticketCount = allTickets.length; 
-  //console.log(allTickets);
+  
 
   useEffect(()=>{
     setTotal(totalRafflePrice);
     setPaymenthConcept(() => Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join(""))
+    //console.log('No. tickets: ',allTickets.length)
   },[])
 
   // function to set the type of payment
@@ -128,10 +128,10 @@ const CheckoutTransferPage = () => {
       </div>
 
       {/* Conditional Verification Message */}
-      {ticketCount > 10000000 && (
+      {ticketCount > 5 && (
         <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-lg border border-yellow-400'>
           <p>
-            Nota: Dado que está comprando más de 5 boletos, necesitará verificar
+            Nota: Dado que está comprando más de 5 boletos, se necesitará verificar
             su transferencia antes de que los boletos se confirmen como
             "vendidos".
           </p>

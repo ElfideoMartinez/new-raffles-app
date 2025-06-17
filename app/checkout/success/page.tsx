@@ -14,19 +14,21 @@ const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
-  const paymentMethod = useTicketStore((state) => state.paymentMethod);
 
   const [isHydrated, setIsHydrated] = useState(false);
+  const [ticketCount, setTicketCount] = useState(0);
 
-  console.log("Tickets", raffles);
+  console.log("Tickets", ticketCount);
   useEffect(() => {
     // if(paymentMethod !== "transfer"){
     //   markAsSold();
     // }
-    cleanCart();
-    console.log("cleaning cart from outside");
-    cleanSelected();
+    const count = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
+    setTicketCount(count);
     saveSaleLocalStorage();
+
+    cleanCart();
+    cleanSelected();
     setIsHydrated(true);
   }, []);
 
@@ -68,7 +70,11 @@ const SuccessPage = () => {
     await Promise.all(promises);
   };
 
-  const isTransfer = isHydrated && paymentMethod === 'transfer';
+  if(!isHydrated){
+    return(
+      <div></div>
+    )
+  }
 
   return (
     <div className='flex flex-col w-full items-center mt-7 px-7 text-center gap-3'>
@@ -80,12 +86,17 @@ const SuccessPage = () => {
         Ahí mismo donde escogiste tus boletos se publicará el número ganador.<br/>
         ¡Guarda ese enlace y mucha suerte! 🍀
       </p>
-      {isTransfer ? 
+      {ticketCount > 5 ? 
         <div>
-          <p>Ojo 👀 <br></br>Como tu pago fue por transferencia, tus boletos comprados seguiran apareciendo como disponibles,<br></br> 
+          <p>Ojo 👀 <br></br>Como tu compra fue de mas de 5 boletos, tus boletos comprados seguiran apareciendo como disponibles,<br></br> 
           una vez verificada tu transferencia te lo haremos saber por medio de whatsapp y tus boletos apareceran como vendidos.</p>
         </div> 
-      : '' }
+      : 
+        <div>
+          <p>✅ Hemos registrado tu compra por transferencia. <br></br>
+            Una vez que verifiquemos el pago, te avisaremos por WhatsApp.</p>
+        </div>
+      }
       <p>Si tienes cualquier duda o necesitas más información, no dudes en ponerte en contacto con nosotros</p>
       <p>📧 Correo: ealejandramtzq04@gmail.com<br/>
          📞 Telefono: 6391316226

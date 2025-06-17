@@ -557,12 +557,29 @@ export const checkTransfer = functions.https.onRequest( async (req, res) => {
   }
 
   try {
+
+    interface Raffle {
+      raffleId: string;
+      raffleName: string;
+      ticketNumbers: number[];
+      raffleTotalPrice: number;
+    };
+    let raffles: Raffle[]; 
+  
     console.log("Processing sale by tranfer");
     const body = req.body;
+    raffles = body.raffles;
 
     const salesCollection = db.collection("sales");
     await salesCollection.add(body);
 
+    console.log("Numero de tickets: ",body.ticketCount);
+    // set tickets as sold
+    if(body.ticketCount < 6){
+      await Promise.all(
+        raffles.map((raffle) => setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers))
+      );
+    }
     
     res.status(200).json({
       status: 200,
