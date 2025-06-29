@@ -11,19 +11,14 @@ export default function PlayPage() {
 
   useEffect(() => {
     // Get ticket id from localStorage and listen to ticket data from Firebase
-    let unSub: () => void;
+
     const localTicketId = localStorage.getItem("ticketId");
     if (localTicketId) {
-      unSub = listenToTicket(localTicketId);
+      listenToTicket(localTicketId);
       console.log("Using local ticket id:", localTicketId);
     } else {
-      unSub = createNewTicket() as any;
+      createNewTicket();
     }
-    return () => {
-      if (unSub) {
-        unSub(); // Cleanup listener on unmount
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -58,16 +53,17 @@ export default function PlayPage() {
     console.log("New ticket created:", data);
     // Save only the ticket id in localStorage
     localStorage.setItem("ticketId", data.id);
-    const unSub = listenToTicket(data.id);
-    return unSub;
+    setTicket(data);
+    listenToTicket(data.id);
   };
 
   const listenToTicket = (id: string) => {
     console.log("Listening to ticket updates for ID:", id);
     const itemRef = ref(realtimeDB, `quickTickets/${id}`);
-    const unSub = onValue(itemRef, (snapshot) => {
+    onValue(itemRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.val();
+        console.log("Ticket data received:", ticketData);
         setTicket(ticketData);
         // Only clear if expired, not if finished
         if (ticketData.status === "finnished") {
@@ -76,15 +72,15 @@ export default function PlayPage() {
       } else {
         // Ticket not found, clear local ticket
         clearLocalTicket();
+        console.warn("Ticket not found in database, clearing local storage.");
+        createNewTicket();
       }
     });
-    return unSub;
   };
 
   return (
-    <main className='max-h-screen flex flex-col items-center justify-center text-center p-4'>
-      <h1 className='text-3xl font-bold mb-4'>🎟️ Rascadito Rapido</h1>
-
+    <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
+      <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
       {!ticket?.id && <p>Loading ticket...</p>}
       {ticket?.id && ticket?.status === "pending" && (
         <div className='mb-6'>
@@ -104,7 +100,7 @@ export default function PlayPage() {
 
       {(ticket?.status === "active" || ticket?.status === "finnished") &&
         ticket.symbols && (
-          <div className='bg-white rounded-lg shadow-lg p-8 w-full'>
+          <div className='bg-white flex flex-col rounded-lg shadow-lg p-4 w-full'>
             {scratchedCardsCount >= 6 ? (
               <p className='text-2xl text-blue-700 font-bold mb-4'>
                 {ticket.isWinner
@@ -117,24 +113,37 @@ export default function PlayPage() {
                 premio.
               </p>
             )}
-            <div className='grid grid-cols-3 grid-rows-2 gap-2 text-5xl my-4 bg-white rounded-lg max-w-full max-h-max'>
-              {ticket.symbols.map((s: any, i: any) => (
-                <ScratchCard
-                  key={i}
-                  width={100}
-                  height={100}
-                  onComplete={() => {
-                    console.log(`Symbol ${i + 1} scratched!`);
-                    setScratchedCardsCount((prev) => prev + 1);
-                    navigator.vibrate(100);
-                  }}
-                  finishPercent={50}
-                >
-                  <div className='flex items-center justify-center h-full bg-slate-400 rounded-lg shadow-lg'>
-                    {s}
-                  </div>
-                </ScratchCard>
-              ))}
+            <div className='flex justify-center'>
+              <div className='grid grid-cols-3 grid-rows-2 gap-4 sm:gap-6 md:gap-8 w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto my-4'>
+                {ticket.symbols.map((s: any, i: any) => (
+                  <ScratchCard
+                    image='/icon.png'
+                    key={i}
+                    width={80}
+                    height={80}
+                    onComplete={() => {
+                      console.log(`Symbol ${i + 1} scratched!`);
+                      setScratchedCardsCount((prev) => prev + 1);
+                      navigator.vibrate(100);
+                    }}
+                    finishPercent={50}
+                  >
+                    <div
+                      className='flex items-center justify-center h-full w-full bg-slate-400 rounded-lg shadow-lg text-4xl sm:text-5xl select-none touch-none'
+                      style={{
+                        userSelect: "none",
+                        touchAction: "none",
+                        WebkitUserSelect: "none",
+                        msUserSelect: "none",
+                        MozUserSelect: "none",
+                      }}
+                      draggable={false}
+                    >
+                      {s}
+                    </div>
+                  </ScratchCard>
+                ))}
+              </div>
             </div>
             {scratchedCardsCount === ticket.symbols.length &&
               (ticket.isWinner ? (

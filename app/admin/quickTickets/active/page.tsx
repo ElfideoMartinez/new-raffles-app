@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { realtimeDB } from "../../../firebaseconfig"; // Adjust the import path as needed
 import { ref, onValue, update } from "firebase/database";
+import withAuth from "@/app/components/WithAuth";
+import TicketCard from "@/app/components/TicketCard";
+import { formatDateLocal } from "@/app/utils/formatDate";
 
 interface Ticket {
   activationCode: string;
@@ -88,39 +91,26 @@ const page = () => {
           <h2>Pending Tickets</h2>
           <ul>
             {activeTickets.map((ticket) => (
-              <li
-                key={ticket.id}
-                className='bg-white text-black p-4 rounded-lg mb-4 shadow flex justify-between items-center'
-              >
-                <div>
-                  <div>
-                    <strong>Activation Code:</strong>
-                    <span className='text-green-500 font-bold'>
-                      {ticket.activationCode}
-                    </span>
-                  </div>
-                  <div>
-                    <strong>Created At:</strong> {ticket.createdAt}
-                  </div>
-                  <div>
-                    <strong>Symbols:</strong> {ticket.symbols?.join(", ")}
-                  </div>
-                  <div>
-                    <strong>Status:</strong> {ticket.status}
-                  </div>
-                </div>
-                <button
-                  className='bg-green-500 text-white border-none rounded px-4 py-2 cursor-pointer'
-                  onClick={async () => {
-                    const ticketRef = ref(
-                      realtimeDB,
-                      `quickTickets/${ticket.id}`
-                    );
-                    await update(ticketRef, { status: "active" });
-                  }}
+              <li key={ticket.id}>
+                <TicketCard
+                  activationCode={ticket.activationCode}
+                  createdAt={formatDateLocal(ticket.createdAt)}
+                  symbols={ticket.symbols}
+                  isWinner={ticket.isWinner}
                 >
-                  Set Active
-                </button>
+                  <button
+                    className='bg-green-500 text-white border-none rounded px-4 py-2 cursor-pointer'
+                    onClick={async () => {
+                      const ticketRef = ref(
+                        realtimeDB,
+                        `quickTickets/${ticket.id}`
+                      );
+                      await update(ticketRef, { status: "active" });
+                    }}
+                  >
+                    Set Active
+                  </button>
+                </TicketCard>
               </li>
             ))}
           </ul>
@@ -131,27 +121,12 @@ const page = () => {
           <h2>All Tickets</h2>
           <ul>
             {tickets.map((ticket) => (
-              <li
-                key={ticket.id}
-                className='bg-white text-black p-4 rounded-lg mb-4 shadow flex justify-between items-center'
-              >
-                <div>
-                  <div>
-                    <strong>Activation Code:</strong>
-                    <span className='text-green-500 font-bold'>
-                      {ticket.activationCode}
-                    </span>
-                  </div>
-                  <div>
-                    <strong>Created At:</strong> {ticket.createdAt}
-                  </div>
-                  <div>
-                    <strong>Symbols:</strong> {ticket.symbols?.join(", ")}
-                  </div>
-                  <div>
-                    <strong>Status:</strong> {ticket.status}
-                  </div>
-                </div>
+              <li key={ticket.id}>
+                <TicketCard
+                  activationCode={ticket.activationCode}
+                  createdAt={formatDateLocal(ticket.createdAt)}
+                  symbols={ticket.symbols}
+                />
               </li>
             ))}
           </ul>
@@ -164,44 +139,30 @@ const page = () => {
             {tickets
               .filter((ticket) => ticket.isWinner)
               .map((ticket) => (
-                <li
-                  key={ticket.id}
-                  className='bg-white text-black p-4 rounded-lg mb-4 shadow flex justify-between items-center'
-                >
-                  <div>
-                    <div>
-                      <strong>Activation Code:</strong>
-                      <span className='text-green-500 font-bold'>
-                        {ticket.activationCode}
-                      </span>
+                <li key={ticket.id}>
+                  <TicketCard
+                    activationCode={ticket.activationCode}
+                    createdAt={formatDateLocal(ticket.createdAt)}
+                    symbols={ticket.symbols}
+                  >
+                    <div className='flex items-center'>
+                      <label className='mr-2'>Claimed:</label>
+                      <input
+                        type='checkbox'
+                        className='cursor-pointer'
+                        checked={ticket.claimed}
+                        onChange={async (e) => {
+                          const ticketRef = ref(
+                            realtimeDB,
+                            `quickTickets/${ticket.id}`
+                          );
+                          await update(ticketRef, {
+                            claimed: e.target.checked,
+                          });
+                        }}
+                      />
                     </div>
-                    <div>
-                      <strong>Created At:</strong> {ticket.createdAt}
-                    </div>
-                    <div>
-                      <strong>Symbols:</strong> {ticket.symbols?.join(", ")}
-                    </div>
-                    <div>
-                      <strong>Status:</strong> {ticket.status}
-                    </div>
-                  </div>
-                  <div className='flex items-center'>
-                    <label className='mr-2'>Claimed:</label>
-                    <input
-                      type='checkbox'
-                      className='cursor-pointer'
-                      checked={ticket.claimed}
-                      onChange={async (e) => {
-                        const ticketRef = ref(
-                          realtimeDB,
-                          `quickTickets/${ticket.id}`
-                        );
-                        await update(ticketRef, {
-                          claimed: e.target.checked,
-                        });
-                      }}
-                    />
-                  </div>
+                  </TicketCard>
                 </li>
               ))}
           </ul>
@@ -227,4 +188,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default withAuth(page);

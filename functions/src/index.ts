@@ -25,7 +25,7 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
       const activationCode =
         //random 6 digit number
         Math.floor(100000 + Math.random() * 900000).toString();
-      const isWinner = Math.random() < 0.1; // 10% chance to win
+      const isWinner = Math.random() < 0.2;
       const symbols = getQuickTicketsSymbols(isWinner);
 
       const ticketData = {
