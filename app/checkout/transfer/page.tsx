@@ -11,12 +11,16 @@ const CheckoutTransferPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentConceptKey, setPaymenthConcept] = useState("");
   const raffles = useTicketStore((state) => state.getItemsFromCart());
+  const bets = useTicketStore((state) => state.getBetsFromCart());
   //get first raffle id from the first raffle in the cart
   const raffleId = raffles[0]?.raffleId;
   const totalRafflePrice = raffles.reduce(
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
   );
+  const totalBetsPrice = bets.reduce(
+    (total, bet) => total + (bet.totalPrice || 0), 0
+  )
   console.log('Info de las rifas',raffles);
   const allTickets = raffles.map((raffle) => raffle.ticketNumbers.sort((a,b) => a-b)).flat().toString();
   const ticketCount = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
@@ -30,7 +34,8 @@ const CheckoutTransferPage = () => {
   
 
   useEffect(()=>{
-    setTotal(totalRafflePrice);
+    const totalprice = totalRafflePrice+totalBetsPrice;
+    setTotal(totalprice);
     setPaymenthConcept(() => Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join(""))
     //console.log('No. tickets: ',allTickets.length)
   },[])
@@ -248,7 +253,10 @@ const CheckoutTransferPage = () => {
                     ticketCount,
                     allTickets,
                     raffles,
-                    totalSalePrice: totalRafflePrice,                    
+                    bets,
+                    totalBetsPrice: totalBetsPrice,
+                    totalRafflePrice: totalRafflePrice,
+                    totalSalePrice: totalRafflePrice+totalBetsPrice,                    
                     paymentImage: downloadURL,
                   }),
                 }

@@ -13,6 +13,7 @@ interface Purchase {
 const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
+  const cleanBets = useTicketStore((state) => state.clearCartBets);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
 
   const [isHydrated, setIsHydrated] = useState(false);
@@ -28,6 +29,7 @@ const SuccessPage = () => {
     saveSaleLocalStorage();
 
     cleanCart();
+    cleanBets();
     cleanSelected();
     setIsHydrated(true);
   }, []);
