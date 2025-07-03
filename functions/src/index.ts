@@ -1049,3 +1049,40 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
   }
 });
 
+export const createBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS"){
+    res.status(204).send('');
+    return;
+  }
+
+  if(req.method !== "POST"){
+    res.status(405).send({
+      message: "Only POST request are allowed"
+    });
+    return;
+  }
+
+  try{
+
+    console.log("Procesing request");
+    const data = req.body;
+    await db.collection("bets").add(data);
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet created successfully",
+    });
+
+
+  }catch(e){
+    console.error("Error creating bet", e);
+    res.status(500).json({
+      message: "An error ocurred while creating the bet"
+    });
+  }
+
+}); 
