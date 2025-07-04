@@ -1,5 +1,5 @@
 'use client'
-import withAuth from "@/app/components/WithAuth";
+import WithAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { toast } from "nextjs-toast-notify";
 import { useMemo, useRef, useState } from "react";
@@ -107,9 +107,9 @@ const CreateBet = () => {
     });   
   };
 
-  const uploadRaffleImage = async (file: File, raffleId: string) => {
+  const uploadRaffleImage = async (file: File, betId: string) => {
     const storage = getStorage();
-    const storageRef = ref(storage, `betImages/${raffleId}`);
+    const storageRef = ref(storage, `betImages/${betId}`);
 
     // Upload the file
     const snapshot = await uploadBytes(storageRef, file);
@@ -221,7 +221,7 @@ const CreateBet = () => {
         
         <div>
           <label className='text-black block text-sm font-medium mb-1'>
-            Fecha de Sorteo:
+            Fecha de cierre:
           </label>
           <input
             type='date'
@@ -278,7 +278,7 @@ const CreateBet = () => {
 
         <div>
           <label className='text-black block text-sm font-medium mb-1'>
-            Imagen de la apusta:
+            Imagen de la apuesta:
           </label>
           <input
             type='file'
@@ -303,4 +303,4 @@ const CreateBet = () => {
   )
 } 
 
-export default withAuth(CreateBet);
+export default WithAuth(CreateBet);

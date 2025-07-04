@@ -20,7 +20,7 @@ interface IBetDataResponse {
 async function fetchBetData(id: string): Promise<IBetDataResponse> {
   try {
     // console.log(
-    //   `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`
+    //   `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getBetData`
     // );
     const responseData = await fetch(
       //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getBetData`,

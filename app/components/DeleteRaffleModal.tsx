@@ -18,7 +18,7 @@ const DeleteRaffleModal = ({ idRaffle, isAvailable, onDelete }: { idRaffle: stri
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-            <h2 className="text-xl font-bold mb-4 text-gray-950">¿Eliminar rifa?</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-950">¿Eliminar?</h2>
             <p className="text-gray-600 mb-6">Esta acción no se puede deshacer.</p>
             <div className="flex justify-center gap-4">
               <button 

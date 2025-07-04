@@ -823,6 +823,49 @@ export const deleteRaffle = functions.https.onRequest( async (req, res) => {
   }
 })
 
+export const getAllBets = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS") {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== "GET") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  try{
+
+    const betsCollection = db.collection("bets");
+    const collectionSnapshot = await betsCollection.get();
+
+    const result = collectionSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json({
+      result,
+    })
+
+  }catch(err){
+    console.error('Error fetching bets', err);
+    res.status(500).send({
+      message: 'Error fetching bets',
+      error: err
+    })
+  }
+
+
+})
+
 export const getBetData = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -882,6 +925,80 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
     res.status(500).json({ error: "Failed to fetch raffle data" });
   }
 });
+
+export const updateBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "PATCH") {
+    res.status(405).send({ message: "Only PATCH requests are allowed" });
+    return;
+  }
+
+  try{
+
+    console.log('Updating bet info...');
+    const data = req.body;
+
+    await db.collection("bets").doc(data.idBet).set(data.bet, {merge: true});
+
+    res.status(200).json({
+      status: 200,
+      message: 'Bet correctly updated',
+    });
+
+  }catch(err){
+    console.error('Error updating bet: ', err)
+    res.status(500).json({
+      message: 'Error updating bet',
+      status: 500,
+    })
+  }
+});
+
+export const deleteBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "DELETE") {
+    res.status(405).send({ message: "Only DELETE requests are allowed" });
+    return;
+  }
+
+  try{
+    console.log('Deleting bet...');
+    const data = req.body;
+
+    await db.collection("bets").doc(data.idBet).delete();
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet correctly deleted",
+    });
+
+  }catch(err){
+    console.error('Error deleting bet: ', err);
+    res.status(500).json({
+      status: 500,
+      message: 'Error deleting bet'
+    })
+  }
+
+})
 
 export const getSalesBets = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
