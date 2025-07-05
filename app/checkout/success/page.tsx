@@ -3,15 +3,25 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 
-interface Purchase {
+interface IRaffle {
   raffleId: string;
   raffleName: string;
   ticketNumbers: number[];
   raffleTotalPrice: number;
 };
 
+interface IBet {
+  betId: string;
+  betName: string;
+  team: string;
+  letterTeam: string;
+  ticketNumbers: number;
+  totalPrice: number;
+};
+
 const SuccessPage = () => {
   const raffles = useTicketStore((state) => state.getItemsFromCart());
+  const bets = useTicketStore((state) => state.getBetsFromCart());
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanBets = useTicketStore((state) => state.clearCartBets);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
@@ -36,7 +46,7 @@ const SuccessPage = () => {
 
   const saveSaleLocalStorage = () => {
     const saved = localStorage.getItem("purchases");
-    let purchases: { date: string, items: Purchase[] }[] = [];
+    let purchases: { date: string, raffles: IRaffle[], bets: IBet[] }[] = [];
 
     if (saved) {
       try {
@@ -48,7 +58,8 @@ const SuccessPage = () => {
 
     const newPurchase = {
       date: new Date().toISOString(), // puedes usar otra forma si lo prefieres
-      items: raffles,
+      raffles: raffles,
+      bets: bets,
     };
 
     purchases.push(newPurchase);

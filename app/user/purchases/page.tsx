@@ -3,16 +3,26 @@
 import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
 
-interface Purchase {
+interface IRaffle {
   raffleId: string;
   raffleName: string;
   ticketNumbers: number[];
   raffleTotalPrice: number;
 };
 
+interface IBet {
+  betId: string;
+  betName: string;
+  team: string;
+  letterTeam: string;
+  ticketNumbers: number;
+  totalPrice: number;
+};
+
 interface PurchaseGroup {
   date: string;
-  items: Purchase[];
+  raffles: IRaffle[];
+  bets: IBet[];
 }
 
 const PurchasesPage = () => {
@@ -52,13 +62,25 @@ const PurchasesPage = () => {
             <li key={index} className="bg-slate-700 p-4 rounded-md">
               <p className="text-sm text-gray-300 mb-2">📅 Compra realizada el: {new Date(group.date).toLocaleString()}</p>
               <ul className="space-y-3">
-                {group.items.map((purchase) => (
-                  <li key={`${purchase.raffleId}-${purchase.ticketNumbers.join(",")}`} className="bg-slate-600 p-3 rounded-md md:flex md:justify-between md:items-center">
+                {group.raffles.map((raffle) => (
+                  <li key={`${raffle.raffleId}-${raffle.ticketNumbers.join(",")}`} className="bg-slate-600 p-3 rounded-md md:flex md:justify-between md:items-center">
                     <section>
-                      <strong>🎟 Rifa:</strong> {purchase.raffleName}<br />
-                      <strong>Boletos:</strong> {purchase.ticketNumbers.join(", ")}<br />
+                      <strong>🎟 Rifa:</strong> {raffle.raffleName}<br />
+                      <strong>Boletos:</strong> {raffle.ticketNumbers.join(", ")}<br />
                     </section>
-                    <p><strong>Total:</strong> ${purchase.raffleTotalPrice}</p>
+                    <p><strong>Total:</strong> ${raffle.raffleTotalPrice}</p>
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-3 mt-3">
+                {group.bets.map((bet) => (
+                  <li key={`${bet.betId}`} className="bg-slate-600 p-3 rounded-md md:flex md:justify-between md:items-center">
+                    <section>
+                      <strong>🎟 Apuesta:</strong> {bet.betName}<br />
+                      <strong>Equipo:</strong> {bet.team}<br />
+                      <strong>Boletos:</strong> {bet.ticketNumbers}<br />
+                    </section>
+                    <p><strong>Total:</strong> ${bet.totalPrice}</p>
                   </li>
                 ))}
               </ul>

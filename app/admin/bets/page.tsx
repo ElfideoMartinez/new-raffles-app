@@ -1,6 +1,6 @@
 'use client'
 import BetSaleCard from "@/app/components/BetSaleCard";
-import SaleCard from "@/app/components/SaleCard";
+import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
@@ -23,7 +23,7 @@ interface Bets{
   verified: boolean;
 }
 
-export default function BetsPage() {
+const BetsPage = () => {
 
   const [salesBets, setSales] = useState<Bets[]>([]);
   const [activeTab, setActiveTab] = useState("verified"); // State to track active tab
@@ -112,3 +112,5 @@ export default function BetsPage() {
     </div>
   );
 };
+
+export default withAuth(BetsPage()); 
