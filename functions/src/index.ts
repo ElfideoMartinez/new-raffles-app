@@ -1,17 +1,115 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
+import { getDatabase } from "firebase-admin/database";
 
 admin.initializeApp();
 const db = admin.firestore();
+const rtdb = getDatabase();
+
+export const createQuickTicket = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "*");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  try {
+    // Handle GET: create the ticket but don't return full data
+    if (req.method === "GET") {
+      const ticketId = `ticket_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 8)}`;
+      const activationCode =
+        //random 6 digit number
+        Math.floor(100000 + Math.random() * 900000).toString();
+      const isWinner = Math.random() < 0.2;
+      const symbols = getQuickTicketsSymbols(isWinner);
+
+      const ticketData = {
+        id: ticketId,
+        status: "pending",
+        symbols,
+        activationCode,
+        createdAt: Date.now(),
+        isWinner,
+      };
+      //add ticket to quickTickets collection
+      const itemRef = rtdb.ref(`quickTickets/${ticketId}`);
+      await itemRef.set(ticketData);
+      console.log("Ticket generated and saved:", ticketId);
+      res.status(200).json({
+        status: 200,
+        message: "Ticket created",
+        data: {
+          id: ticketId,
+          status: "pending",
+          activationCode,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error creating quick ticket:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Error creating quick ticket",
+      error: error || "Unknown error",
+    });
+  }
+});
+
+const getQuickTicketsSymbols = (isWinner: boolean): string[] => {
+  const symbols = [
+    "🍀", // Lucky Clover
+    "🎉", // Party Popper
+    "💰", // Money Bag
+    "🎁", // Gift
+    "🌟", // Star
+    "🏆", // Trophy
+    "🎈", // Balloon
+    "🥇", // Gold Medal
+    "🎊", // Confetti Ball
+    "💎", // Gem Stone
+    "🍭", // Lollipop
+    "🍫", // Chocolate Bar
+    "🍩", // Doughnut
+  ];
+  // Make sure a non-winner does not have 3 or more of the same symbol out of 6
+  if (!isWinner) {
+    const randomSymbols: string[] = [];
+    while (randomSymbols.length < 6) {
+      const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+      // Allow at most 2 of the same symbol
+      if (randomSymbols.filter((s) => s === randomSymbol).length < 2) {
+        randomSymbols.push(randomSymbol);
+      }
+    }
+    return randomSymbols;
+  } else {
+    // If it's a winner, return at least 3 of the same symbol
+    const winnerSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const randomSymbols: string[] = Array(3).fill(winnerSymbol);
+    while (randomSymbols.length < 6) {
+      const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+      // Allow at most 2 of the same symbol
+      if (randomSymbols.filter((s) => s === randomSymbol).length < 2) {
+        randomSymbols.push(randomSymbol);
+      }
+    }
+    // Shuffle the symbols to randomize their order
+    return randomSymbols.sort(() => Math.random() - 0.5);
+  }
+};
 
 export const getRaffleData = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
-  if(req.method === "OPTIONS") {
-    res.status(204).send('');
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
     return;
   }
 
@@ -48,8 +146,8 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
       .get();
 
     const tickets = ticketQuerySnapshot.docs.map((doc) => doc.data());
-    const ticketsData = tickets.sort((a,b) => a.number - b.number);
-    
+    const ticketsData = tickets.sort((a, b) => a.number - b.number);
+
     console.log({
       raffleData,
       ticketsData,
@@ -273,7 +371,9 @@ export const createCheckoutSession = functions.https.onRequest(
           ticketCount: data.ticketCount,
           raffles: JSON.stringify(data.raffles),
         },
-        return_url: isProduction ? "https://raffleapp-dbc1b.web.app/checkout/success" : "http://localhost:3000/checkout/success"
+        return_url: isProduction
+          ? "https://raffleapp-dbc1b.web.app/checkout/success"
+          : "http://localhost:3000/checkout/success",
         //return_url: "https://raffleapp-dbc1b.web.app/checkout/success",
       });
 
@@ -370,8 +470,8 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
-  if(req.method === "OPTIONS"){
-    res.status(204).send('');
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
     return;
   }
 
@@ -390,7 +490,7 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
     const ticketsCollection = db.collection("tickets");
     let updatePromises: Promise<FirebaseFirestore.WriteResult>[] = [];
 
-    for(const raffle of data.raffles){
+    for (const raffle of data.raffles) {
       const ticketQuery = ticketsCollection
         .where("raffle_id", "==", raffle.raffleId)
         .where("number", "in", raffle.ticketNumbers);
@@ -405,7 +505,6 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
         ticketDoc.ref.update({ sold: false })
       );
     }
-    
 
     const salesDocRef = db.collection("sales").doc(data.id);
     const saleUpdatePromise = salesDocRef.update({ verified: false });
@@ -431,8 +530,8 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS"){
-    res.status(204).send('');
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
     return;
   }
 
@@ -490,10 +589,10 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
 
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    res.status(204).send(""); // Respuesta sin contenido para OPTIONS
     return;
   }
-  
+
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests are allowed" });
     return;
@@ -539,25 +638,23 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const checkTransfer = functions.https.onRequest( async (req, res) => {
-
+export const checkTransfer = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    res.status(204).send(""); // Respuesta sin contenido para OPTIONS
     return;
   }
-  
+
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests are allowed" });
     return;
   }
 
   try {
-
     interface Raffle {
       raffleId: string;
       raffleName: string;
@@ -635,117 +732,109 @@ export const checkTransfer = functions.https.onRequest( async (req, res) => {
     res.status(200).json({
       status: 200,
       message: "Sale created successfully",
-    })
-
-  } catch(err){
+    });
+  } catch (err) {
     console.error("Error creating sale: ", err);
 
     res.status(500).json({
       status: 500,
       message: "Error creating sale",
-    })
+    });
   }
+});
 
-})
-
-export const stripeWebHook = functions.https.onRequest( async (req, res) => {
-
+export const stripeWebHook = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    res.status(204).send(''); // Respuesta sin contenido para OPTIONS
+    res.status(204).send(""); // Respuesta sin contenido para OPTIONS
     return;
   }
-  
+
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests are allowed" });
     return;
-  } 
+  }
 
   const stripe = new Stripe(
-      "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"
+    "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"
   );
 
   const endpointSecret = "whsec_DfOQcGKNocindFHvASZb10mapc0nE7AF";
 
-  try{
-
+  try {
     const body = req.body;
     console.log(body);
 
     const infoRaffle = body.data.object.metadata;
     const infoCustomer = body.data.object.customer_details;
     const paymentIntent = body.data.object.payment_intent;
-    console.log("PaymentIntent: ",paymentIntent);
+    console.log("PaymentIntent: ", paymentIntent);
 
     const sig = req.headers["stripe-signature"] as string;
 
     let event: Stripe.Event;
-    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret,)
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
 
-    if(event.type==="checkout.session.completed"){
-
+    if (event.type === "checkout.session.completed") {
       interface Raffle {
         raffleId: string;
         raffleName: string;
         ticketNumbers: number[];
         raffleTotalPrice: number;
-      };
-      let raffles: Raffle[]; 
+      }
+      let raffles: Raffle[];
       raffles = JSON.parse(infoRaffle.raffles);
-    
+
       // add to sales collection
       const salesCollection = db.collection("sales");
       await salesCollection.add({
-        payment_intent: paymentIntent|| "",
+        payment_intent: paymentIntent || "",
         name: infoCustomer.name || "",
         phone: infoCustomer.phone || "",
         email: infoCustomer.email || "",
         ticketCount: infoRaffle.ticketCount || 0,
         totalSalePrice: infoRaffle.totalSalePrice || 0,
-        raffles: raffles,   
+        raffles: raffles,
         paymentMethod: "card",
         verified: true,
       });
 
       await Promise.all(
-        raffles.map((raffle) => setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers))
+        raffles.map((raffle) =>
+          setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers)
+        )
       );
-
     }
 
     res.status(200).json({
       status: 200,
       message: "Webook working correctly",
-    })
-
-  }catch(err){
+    });
+  } catch (err) {
     console.error("Error in webhook:", err);
 
     res.status(500).json({
       status: 500,
       message: "Error in webhook:",
-    })
+    });
   }
-  
+});
 
-})
-
-export const updateRaffle = functions.https.onRequest( async (req, res) => {
-
+export const updateRaffle = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    res.status(204).send(''); 
+    res.status(204).send("");
     return;
   }
-  
+
   if (req.method !== "PATCH") {
     res.status(405).send({ message: "Only POST requests are allowed" });
     return;
@@ -754,36 +843,37 @@ export const updateRaffle = functions.https.onRequest( async (req, res) => {
   try {
     console.log("Updating raffle info...");
     const body = req.body;
-    
-    await db.collection("raffles").doc(body.idRaffle).set(body.raffle, {merge: true});
-    
+
+    await db
+      .collection("raffles")
+      .doc(body.idRaffle)
+      .set(body.raffle, { merge: true });
+
     res.status(200).json({
       status: 200,
       message: "Raffle correctly updated",
-    })
-
-  } catch(err){
+    });
+  } catch (err) {
     console.error("Error updating raffle: ", err);
 
     res.status(500).json({
       status: 500,
       message: "Error updating raffle",
-    })
+    });
   }
-})
+});
 
-export const deleteRaffle = functions.https.onRequest( async (req, res) => {
-
+export const deleteRaffle = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    res.status(204).send(''); 
+    res.status(204).send("");
     return;
   }
-  
+
   if (req.method !== "DELETE") {
     res.status(405).send({ message: "Only DELETE requests are allowed" });
     return;
@@ -792,34 +882,36 @@ export const deleteRaffle = functions.https.onRequest( async (req, res) => {
   try {
     console.log("Deleting raffle...");
     const body = req.body;
-    
+
     await db.collection("raffles").doc(body.idRaffle).delete();
 
-    const snapshot = await db.collection('tickets')
-      .where('raffle_id', '==', body.idRaffle)
+    const snapshot = await db
+      .collection("tickets")
+      .where("raffle_id", "==", body.idRaffle)
       .get();
 
     const batch = db.batch();
-    snapshot.docs.forEach(doc => {
+    snapshot.docs.forEach((doc) => {
       batch.delete(doc.ref);
     });
 
     await batch.commit();
 
-    console.log(`Se eliminaron ${snapshot.size} ticket(s) con raffle_id: ${body.idRaffle}`);
-    
+    console.log(
+      `Se eliminaron ${snapshot.size} ticket(s) con raffle_id: ${body.idRaffle}`
+    );
+
     res.status(200).json({
       status: 200,
       message: "Raffle and tickets correctly deleted",
-    })
-
-  } catch(err){
+    });
+  } catch (err) {
     console.error("Error deleting raffle: ", err);
 
     res.status(500).json({
       status: 500,
       message: "Error deleting raffle",
-    })
+    });
   }
 })
 
