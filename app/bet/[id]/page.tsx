@@ -15,6 +15,7 @@ interface IBetDataResponse {
   betsTeamA: number;
   betsTeamB: number;
   teams: Array<string>;
+  isFinished: boolean;
 }
 
 async function fetchBetData(id: string): Promise<IBetDataResponse> {
@@ -52,6 +53,7 @@ async function fetchBetData(id: string): Promise<IBetDataResponse> {
       betsTeamB: result.betData.betsTeamB,
       initialPool: result.betData.initialPool,
       teams: result.betData.teams,
+      isFinished: result.betData.isFinished
     };
   } catch (error) {
     console.error(error);
@@ -65,7 +67,8 @@ async function fetchBetData(id: string): Promise<IBetDataResponse> {
       betsTeamA: 0,
       betsTeamB: 0,
       initialPool: 0,
-      teams: []
+      teams: [],
+      isFinished: false
     };
   }
 }

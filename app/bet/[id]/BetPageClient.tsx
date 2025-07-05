@@ -15,6 +15,7 @@ interface IBetDataResponse {
   betsTeamA: number;
   betsTeamB: number;
   teams: Array<string>;
+  isFinished: boolean;
 }
 
 const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: string}) => {
@@ -22,6 +23,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
   const router = useRouter();
   const { updateBet } = useTicketStore();
   const userCartBets = useTicketStore((state) => state.getBetsFromCart);
+  const userTicketsBets = useTicketStore((state) => state.getTicketInfoByBetId);
 
   const [favorite, setFavorite] = useState('');
   const [team, setTeam] = useState('');
@@ -32,6 +34,13 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
   const [toWin, setToWin] = useState(0);
 
   useEffect(() => {
+    
+    const infoCartBets = userTicketsBets(betId);
+    if(infoCartBets){
+      infoCartBets?.letterTeam == 'A' ? setTicketsTeamA(infoCartBets.ticketNumbers): setTicketsTeamB(infoCartBets.ticketNumbers);
+      calculateGain(infoCartBets.ticketNumbers, infoCartBets.letterTeam);
+    }
+    
     if(betData.betsTeamA == betData.betsTeamB){
       setFavorite('Equals');
       return;
@@ -56,10 +65,18 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
 
   const calculateGain = (numberOfTickets: number, team: string) => {
     let toWin;
+    let poolTotal;
   
-    const poolTotal = (betData.initialPool) * 0.9;
-    const winPerTicket = team == 'A' ? poolTotal/betData.betsTeamA : poolTotal/betData.betsTeamB;
-    toWin = (winPerTicket*numberOfTickets);
+    poolTotal = (betData.initialPool) * 0.9;
+
+    if(betData.betsTeamA == 0 && team === 'A'){
+      toWin=poolTotal*numberOfTickets;
+    }else if(betData.betsTeamB == 0 && team === 'B'){
+      toWin=poolTotal*numberOfTickets;
+    }else{
+      const winPerTicket = team == 'A' ? poolTotal/betData.betsTeamA : poolTotal/betData.betsTeamB;
+      toWin = (winPerTicket*numberOfTickets);
+    }
     
     setToWin(toWin);
     setTotalTickets(numberOfTickets);
@@ -80,7 +97,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-100 p-4 text-gray-800">
+    <div className='flex min-h-screen flex-col items-center bg-gray-100 p-4 text-gray-800'>
       {/* Imagen principal */}
       <img
         className="mb-6 h-[33vh] w-full rounded-xl bg-cover bg-center shadow-lg"
@@ -88,8 +105,9 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
       ></img>
 
       {/* Título y descripción */}
-      <h1 className="mb-2 text-2xl font-bold text-center">🏆 ¡Haz tu apuesta ahora!</h1>
-      <h1 className="mb-3 text-3xl font-bold text-center">{betData.betTitle}</h1>
+      <h1 className="mb-2 text-xl font-bold text-center">🏆 ¡Haz tu apuesta ahora!</h1>
+      <h1 className="mb-2 text-3xl font-bold text-center">{betData.betTitle}</h1>
+      <h2 className="mb-3 text-xl font-bold text-center">{betData.betDescription}</h2>
       <p className="mb-4 text-center text-sm text-gray-600">
         Apuesta por tu equipo favorito y gana más
       </p>
@@ -101,10 +119,10 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
       </div>
 
       {/* Contenedores de los equipos */}
-      <div className="flex w-full sm:max-w-2xl items-center flex-col md:flex-row justify-center gap-6">
+      <div className={`flex w-full sm:max-w-2xl items-center flex-col md:flex-row justify-center gap-6 ${betData.isFinished ? 'pointer-events-none opacity-40': '' }`}>
         {/* Equipo A */}
         <div 
-          className={`flex sm:w-1/2 flex-col items-center justify-between rounded-xl bg-green-600 text-white shadow cursor-pointer transition hover:bg-green-700 p-4
+          className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl bg-green-600 text-white shadow cursor-pointer transition hover:bg-green-700 p-4
           ${ticketsTeamB > 0 ? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
           onClick={() => updateTickets('A', 1)}
         > 
@@ -128,12 +146,16 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
             <span id="ticketsA" className="text-lg font-semibold">{ticketsTeamA}</span>
           </div>
           <div className="mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center">
-            Puedes ganar hasta: <span id="winningsA" className="cursor-pointer">${((betData.initialPool*.9)/betData.betsTeamA).toFixed(2)}</span> x boleto
+            Puedes ganar hasta: $
+            <span id="winningsA" className="cursor-pointer">
+              {betData.betsTeamA == 0 ? `${betData.initialPool*.9} `: `${((betData.initialPool*.9)/betData.betsTeamA).toFixed(2)} `}
+            </span> 
+            x boleto
           </div>
         </div>
         {/* Equipo B */}
         <div 
-          className={`flex sm:w-1/2 flex-col items-center justify-between rounded-xl bg-red-600 text-white shadow transition cursor-pointer hover:bg-red-700 p-4
+          className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl bg-red-600 text-white shadow transition cursor-pointer hover:bg-red-700 p-4
           ${ticketsTeamA > 0 ? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
           onClick={() => updateTickets('B', 1)}
         > 
@@ -155,8 +177,12 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
             </button>
             <span id="ticketsB" className="text-lg font-semibold">{ticketsTeamB}</span>
           </div>
-          <div className="mt-2 bg-yellow-300 text-red-900 rounded px-3 py-1 text-sm font-semibold text-center">
-            Puedes ganar hasta: <span id="winningsB" className="cursor-pointer">${((betData.initialPool*.9)/betData.betsTeamB).toFixed(2)}</span> x boleto
+          <div className="mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center">
+            Puedes ganar hasta: $
+            <span id="winningsA" className="cursor-pointer">
+              {betData.betsTeamB == 0 ? `${betData.initialPool*.9}  `: `${((betData.initialPool*.9)/betData.betsTeamB).toFixed(2)} ` }
+            </span> 
+             x boleto
           </div>
         </div>
       </div>
@@ -166,15 +192,17 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
         ⚠️ Las ganancias pueden cambiar según nuevas apuestas antes del cierre
       </p>
 
-      <div className="w-full bg-blue-600 shadow-lg flex flex-col sm:flex-row justify-between sm:items-center px-4 py-4 fixed bottom-0">
+      <div className="w-full bg-blue-600 shadow-lg flex sm:flex-row justify-between sm:items-center px-4 py-4 fixed bottom-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
           <span className="text-white font-bold text-lg">Total:</span>
           <span className="text-white font-semibold">
             🎟️ <span id="cartTickets">{ticketsTeamA || ticketsTeamB}</span> boletos
           </span>
-          <span className="text-white font-semibold text-md">
-            🏆 Gana hasta: $<span id="cartWinnings">{ticketsTeamA == 0 && ticketsTeamB == 0 ? 0 : toWin.toFixed(2)}</span>
-          </span>
+          <div>
+            <span className="text-white font-semibold text-md text-start">
+              🏆 Gana hasta: <span id="cartWinnings" className="ml-8 sm:ml-0"> {ticketsTeamA == 0 && ticketsTeamB == 0 ? '$0' : `$${toWin.toFixed(2)}`}</span>
+            </span>
+          </div>
         </div>
         <div className="flex justify-start">
           <button

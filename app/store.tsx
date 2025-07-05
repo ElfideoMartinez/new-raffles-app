@@ -83,6 +83,10 @@ interface TicketState {
   }>;
   removeBetById: (betId: string) => void;
   clearCartBets: () => void,
+  getTicketInfoByBetId: (betId: string) => {
+    ticketNumbers: number;
+    letterTeam: string;
+  } | null;
 }
 
 // Create the store with proper typing
@@ -250,6 +254,18 @@ const useTicketStore = create<TicketState>()(
       },
 
       clearCartBets: () => set({ userCartBets: [] }),
+
+      getTicketInfoByBetId: (betId: string) => {
+        const bets = get().getBetsFromCart();
+        const bet = bets.find((b) => b.betId === betId);
+        if (bet) {
+          return {
+            ticketNumbers: bet.ticketNumbers,
+            letterTeam: bet.letterTeam,
+          };
+        }
+        return null;
+      },
     }),
     {
       name: "ticket-store",
