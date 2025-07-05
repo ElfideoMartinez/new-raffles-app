@@ -63,7 +63,6 @@ export default function PlayPage() {
     onValue(itemRef, (snapshot) => {
       if (snapshot.exists()) {
         const ticketData = snapshot.val();
-        console.log("Ticket data received:", ticketData);
         setTicket(ticketData);
         // Only clear if expired, not if finished
         if (ticketData.status === "finnished") {
