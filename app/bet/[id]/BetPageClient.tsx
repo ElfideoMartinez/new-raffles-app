@@ -67,7 +67,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
     let toWin;
     let poolTotal;
   
-    poolTotal = (betData.initialPool) * 0.9;
+    poolTotal = (betData.initialPool);
 
     if(betData.betsTeamA == 0 && team === 'A'){
       toWin=poolTotal*numberOfTickets;
@@ -115,7 +115,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
         <OfferStar text={betData.pricePerTicket}/>
       </div>
       <div className="flex text-center mb-2 font-semibold gap-7">
-        <p>Pool actual: ${betData.initialPool*.9}</p>
+        <p>Pool actual: ${betData.initialPool}</p>
       </div>
 
       {/* Contenedores de los equipos */}
@@ -127,7 +127,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
           onClick={() => updateTickets('A', 1)}
         > 
           {favorite == 'Equals' ? <p>Empatados: {betData.betsTeamA}</p> : 
-            <p className="">{betData.teams[0] == favorite ? 'Favorito: ' : 'No favorito: '} {betData.betsTeamA}</p>
+            <p className="">{betData.teams[0] == favorite ? 'Favorito: ' : 'Menos favorito: '} {betData.betsTeamA}</p>
           }         
           <button className="w-full py-4 text-xl font-bold cursor-pointer">⚪ {betData.teams[0]}</button>
           {/* Ticket Selector */}
@@ -148,7 +148,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
           <div className="mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center">
             Puedes ganar hasta: $
             <span id="winningsA" className="cursor-pointer">
-              {betData.betsTeamA == 0 ? `${betData.initialPool*.9} `: `${((betData.initialPool*.9)/betData.betsTeamA).toFixed(2)} `}
+              {betData.betsTeamA == 0 ? `${betData.initialPool} `: `${((betData.initialPool)/betData.betsTeamA).toFixed(2)} `}
             </span> 
             x boleto
           </div>
@@ -160,7 +160,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
           onClick={() => updateTickets('B', 1)}
         > 
           {favorite == 'Equals' ? <p>Empatados: {betData.betsTeamB}</p> : 
-            <p className="">{betData.teams[1] == favorite ? 'Favorito: ' : 'No favorito: '} {betData.betsTeamB}</p>
+            <p className="">{betData.teams[1] == favorite ? 'Favorito: ' : 'Menos favorito: '} {betData.betsTeamB}</p>
           }
           <button className="w-full py-4 text-xl font-bold cursor-pointer">🔴 {betData.teams[1]}</button>
           {/* Ticket Selector */}
@@ -180,7 +180,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
           <div className="mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center">
             Puedes ganar hasta: $
             <span id="winningsA" className="cursor-pointer">
-              {betData.betsTeamB == 0 ? `${betData.initialPool*.9}  `: `${((betData.initialPool*.9)/betData.betsTeamB).toFixed(2)} ` }
+              {betData.betsTeamB == 0 ? `${betData.initialPool}  `: `${((betData.initialPool)/betData.betsTeamB).toFixed(2)} ` }
             </span> 
              x boleto
           </div>
@@ -194,7 +194,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
 
       <div className="w-full bg-blue-600 shadow-lg flex sm:flex-row justify-between sm:items-center px-4 py-4 fixed bottom-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-          <span className="text-white font-bold text-lg">Total:</span>
+          <span className="text-white font-bold text-lg">Total: ${parseInt(betData.pricePerTicket)*totalTickets}</span>
           <span className="text-white font-semibold">
             🎟️ <span id="cartTickets">{ticketsTeamA || ticketsTeamB}</span> boletos
           </span>

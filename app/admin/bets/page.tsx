@@ -113,4 +113,4 @@ const BetsPage = () => {
   );
 };
 
-export default withAuth(BetsPage()); 
+export default withAuth(BetsPage); 
