@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../firebaseconfig";
 import {
@@ -21,7 +21,9 @@ const LoginPage = () => {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/admin/dashboard"); // Redirect to the admin dashboard
     } catch (err) {
-      setError("Correo electrónico o contraseña no válidos. Por favor, inténtalo de nuevo.");
+      setError(
+        "Correo electrónico o contraseña no válidos. Por favor, inténtalo de nuevo."
+      );
       console.error(err);
     }
   };
@@ -29,7 +31,9 @@ const LoginPage = () => {
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-100'>
       <div className='w-full max-w-md p-8 space-y-6 bg-white rounded shadow-lg'>
-        <h2 className='text-black text-2xl font-bold text-center'>Iniciar sesion</h2>
+        <h2 className='text-black text-2xl font-bold text-center'>
+          Iniciar sesion
+        </h2>
         {error && <p className='text-red-500 text-center'>{error}</p>}
         <form onSubmit={handleLogin} className='space-y-4'>
           <div>

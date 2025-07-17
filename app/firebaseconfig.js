@@ -29,4 +29,9 @@ const db = getFirestore(firebaseApp);
 const realtimeDB = getDatabase(firebaseApp);
 
 export default firebaseApp;
-export { db, auth, storage, realtimeDB };
+export {
+  db,
+  auth,
+  storage,
+  realtimeDB,
+};
