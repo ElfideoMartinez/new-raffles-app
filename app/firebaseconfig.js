@@ -4,7 +4,6 @@ import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -28,36 +27,6 @@ const storage = getStorage(firebaseApp);
 //initialize db
 const db = getFirestore(firebaseApp);
 const realtimeDB = getDatabase(firebaseApp);
-const messagin = getMessaging(firebaseApp);
-const getMessagingToken = async () => {
-  try {
-    const token = await getToken(messagin, {
-      vapidKey:
-        "BC_nlAx1Fti-x-M1WRmWkdIVmwNV_PVYbcksLOUzaTww2ytV2GVDCepRlBk6kbT8oKXDRHOLJ07tc6m1KYA929A",
-    });
-    if (token) {
-      console.log("Token generated:", token);
-      return token;
-    } else {
-      console.log(
-        "No registration token available. Request permission to generate one."
-      );
-      return null;
-    }
-  } catch (error) {
-    console.error("Error getting messaging token:", error);
-    return null;
-  }
-};
-const onMessageListener = () => {
-  return new Promise((resolve) => {
-    onMessage(messagin, (payload) => {
-      console.log("Message received. ", payload);
-      // You can handle the payload here, e.g., show a notification
-      resolve(payload.notification);
-    });
-  });
-};
 
 export default firebaseApp;
 export {
@@ -65,7 +34,4 @@ export {
   auth,
   storage,
   realtimeDB,
-  messagin,
-  getMessagingToken,
-  onMessageListener,
 };

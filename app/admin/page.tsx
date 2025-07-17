@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  auth,
-  messagin,
-  getMessagingToken,
-  onMessageListener,
-} from "../firebaseconfig";
+import { auth } from "../firebaseconfig";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,

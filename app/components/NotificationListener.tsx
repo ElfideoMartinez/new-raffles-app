@@ -1,6 +1,6 @@
 // Example: NotificationListener.js
 import React, { useEffect } from "react";
-import { onMessageListener } from "../firebaseconfig"; // Adjust the import path as needed
+import { onMessageListener } from "../firebaseMessaging"; // Adjust the import path as needed
 
 const NotificationListener = () => {
   useEffect(() => {
