@@ -1,116 +1,102 @@
 'use client'
-import BetSaleCard from "@/app/components/BetSaleCard";
-import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { toast } from "nextjs-toast-notify";
+import { useEffect, useState } from "react"
 import { FadeLoader } from "react-spinners";
 
-interface Bets{
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  bet: {
-    betId: string;
-    betName: string;
-    team: string;
-    letterTeam: string;
-    ticketNumbers: number;
-    totalPrice: number;
-  }
-  paymentImage: string;
-  totalBetsPrice: string;
-  verified: boolean;
+interface IBetsData{
+  id: string,
+  data: { number: number; sold: boolean; id: string }[];
+  pricePerTicket: string;
+  image: string;
+  title: string;
+  date: string;
+  description: string;
+  initialPool: number;
+  betsTeamA: number;
+  betsTeamB: number;
+  teams: Array<string>;
+  isFinished: boolean;
 }
 
-const BetsPage = () => {
+export default function BetsPage() {
 
-  const [salesBets, setSales] = useState<Bets[]>([]);
-  const [activeTab, setActiveTab] = useState("verified"); // State to track active tab
-  const [loading, setLoading] = useState(true);
+  const [dataBet, setDataBet] = useState<IBetsData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchData();
+    
+    const fetchBets = async () => {
+      
+      try{
+        setIsLoading(true);
+        const response = await fetch(
+          //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getAllBets`,
+          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllBets`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        if(!response.ok){
+          console.error(response);
+          throw new Error("Failed to fetch bet data");
+        }
+        
+        const data = await response.json();
+        setDataBet(data.result); 
+        setIsLoading(false);
+      }catch(err){
+        
+      }
+    }
+    fetchBets();
   },[])
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSalesBets`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSalesBets`,
-        {
-          method: "GET",
-          mode: "cors", // Important for cross-origin requests
-        }
-      );
-      const data = await res.json();
-      console.log(data);
-      setSales(data.betSales);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching sales data:", error);
-      setSales([]);
-    }
-  }
+  const copyToClipboard = (text: any) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        toast.info(`Link copiado al portapapeles!`,{
+          duration: 2000,
+          progress: false,
+          position: 'top-right',
+          transition: 'popUp',
+          icon: '',
+          sound: false,
+        });
+      })
+      .catch((error) => console.error("Error al copiar:", error));
+  };
 
-  // Filter verified and non-verified sales
-  const verifiedSales = salesBets.filter((betSale: any) => betSale.verified);
-  const nonVerifiedSales = salesBets.filter((betSale: any) => !betSale.verified);
-  
-  return (
-    <div className='flex flex-col w-full items-center'>
-      <h1 className="my-1">Apuestas</h1>
-      <div className='flex space-x-4 mb-4'>
-        <button
-          className={`p-2 ${
-            activeTab === "verified" ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600"
-          }`}
-          onClick={() => setActiveTab("verified")}
-        >
-          Apuestas verificadas
-        </button>
-        <button
-          className={`p-2 ${
-            activeTab === "non-verified"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-300 text-gray-600"
-          }`}
-          onClick={() => setActiveTab("non-verified")}
-        >
-          Apuestas no verificadas
-        </button>
-      </div>
-      {loading ? (
-        <div className="flex justify-center items-center w-full h-64">
-          <FadeLoader color='#ffffff'/>
-        </div>
-      ):(
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
-          {activeTab === "verified"
-            ? verifiedSales.map((betSale: any) => (
-                <BetSaleCard
-                  key={betSale.id}
-                  betSale={betSale}
-                  setSalesFunction={setSales}
-                  isVerified={true}
-                />
-              ))
-            : nonVerifiedSales.map((betSale: any) => (
-                <BetSaleCard
-                  key={betSale.id}
-                  betSale={betSale}
-                  setSalesFunction={setSales}
-                  isVerified={false}
-                />
-              ))
-          }
-        </div>
-      )}     
-      <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4 mb-1 '>
-        Volver al inicio
-      </Link>
+  return(
+    <div>
+      <h2 className="text-center mt-4">Apuestas actuales</h2>
+      {isLoading ? (
+        <div className="flex justify-center mt-20"><FadeLoader color='#ffffff'/> </div>
+      ):( 
+        <ul className="space-y-6 m-5 mt-6">
+          {dataBet.map((bet) => (
+            <li key={bet.id} className="bg-gray-600 my-3 px-4 py-6 rounded-md">
+              <p className="text-lg">🎯 Apuesta: {bet.title}</p>
+              <p>Pool actual: ${bet.initialPool}</p>
+              <p>Equipo A: {bet.teams[0]} - {bet.betsTeamA}</p>
+              <p>Equipo B: {bet.teams[1]} - {bet.betsTeamB}</p>
+              <p>Fecha de cierre: {bet.date}</p>
+              <Link href={`https://raffleapp-dbc1b.web.app/bet/${bet.id}`} className="text-blue-300 underline">Ir a la apuesta</Link> 
+              <div className="flex justify-center sm:justify-start">
+                <button
+                  className="text-gray-950 font-mono px-4 mt-4 bg-gray-100 rounded-md border border-gray-300 hover:bg-gray-200 active:bg-gray-300"             
+                  onClick={() => copyToClipboard(`https://raffleapp-dbc1b.web.app/bet/${bet.id}`)}
+                >
+                  Link de la apuesta
+                </button>
+              </div>
+              
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
-  );
+  )  
 };
-
-export default withAuth(BetsPage); 
