@@ -13,7 +13,7 @@ interface OfferStarProps {
 
 const OfferStar: React.FC<OfferStarProps> = ({
   text,
-  size = 50,
+  size = 45,
   fillColor = "#facc15",
   textColor = "#000000",
   strokeColor = "#000000",

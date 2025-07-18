@@ -3,6 +3,8 @@ import OfferStar from "@/app/components/OfferStar";
 import useTicketStore from "@/app/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
 
 interface IBetDataResponse {
   data: { number: number; sold: boolean; id: string }[];
@@ -14,6 +16,7 @@ interface IBetDataResponse {
   initialPool: number;
   betsTeamA: number;
   betsTeamB: number;
+  tieBets: number;
   teams: Array<string>;
   isFinished: boolean;
 }
@@ -30,6 +33,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
   const [letterTeam, setLetterTeam] = useState('');
   const [ticketsTeamA, setTicketsTeamA] = useState(0);
   const [ticketsTeamB, setTicketsTeamB] = useState(0);
+  const [tieTickets, setTieTickets] = useState(0);
   const [totalTickets, setTotalTickets] = useState(0);
   const [toWin, setToWin] = useState(0);
 
@@ -37,7 +41,7 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
     
     const infoCartBets = userTicketsBets(betId);
     if(infoCartBets){
-      infoCartBets?.letterTeam == 'A' ? setTicketsTeamA(infoCartBets.ticketNumbers): setTicketsTeamB(infoCartBets.ticketNumbers);
+      infoCartBets.letterTeam == 'C' ? setTieTickets(infoCartBets.ticketNumbers): infoCartBets?.letterTeam == 'A' ? setTicketsTeamA(infoCartBets.ticketNumbers): setTicketsTeamB(infoCartBets.ticketNumbers) ;
       calculateGain(infoCartBets.ticketNumbers, infoCartBets.letterTeam);
     }
     
@@ -50,22 +54,28 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
   },[])
 
   const updateTickets = (team: string, action: number) => {
-    if(team=='A'){
+    if(team == 'A'){
       const newCount = ticketsTeamA + action;
       setTicketsTeamA(newCount);
       setTeam(betData.teams[0])
       calculateGain(newCount, 'A');
-    }else{
+    }else if(team == 'B'){
       const newCount = ticketsTeamB + action;
       setTicketsTeamB(newCount);
       setTeam(betData.teams[1])
       calculateGain(newCount, 'B');
+    }else{
+      const newCount = tieTickets + action;
+      setTieTickets(newCount);
+      setTeam('Empate')
+      calculateGain(newCount, 'C');
     }
   }
 
   const calculateGain = (numberOfTickets: number, team: string) => {
     let toWin;
     let poolTotal;
+    let winPerTicket;
   
     poolTotal = (betData.initialPool);
 
@@ -73,8 +83,15 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
       toWin=poolTotal*numberOfTickets;
     }else if(betData.betsTeamB == 0 && team === 'B'){
       toWin=poolTotal*numberOfTickets;
+    }else if(betData.tieBets == 0 && team === 'C'){
+      toWin=poolTotal*numberOfTickets;
     }else{
-      const winPerTicket = team == 'A' ? poolTotal/betData.betsTeamA : poolTotal/betData.betsTeamB;
+      if(team === 'C') {
+        winPerTicket = poolTotal/betData.tieBets;
+      }else{
+        winPerTicket = team == 'A' ? poolTotal/betData.betsTeamA : poolTotal/betData.betsTeamB;
+      }
+      
       toWin = (winPerTicket*numberOfTickets);
     }
     
@@ -111,19 +128,23 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
       <p className="mb-4 text-center text-sm text-gray-600">
         Apuesta por tu equipo favorito y gana más
       </p>
-      <div className="mb-2">
+      <motion.div 
+        className="fixed mb-2 top-40 left-1 cursor-pointer"
+        drag
+        dragMomentum={false}
+      >
         <OfferStar text={betData.pricePerTicket}/>
-      </div>
-      <div className="flex text-center mb-2 font-semibold gap-7">
+      </motion.div>
+      {/* <div className="flex text-center mb-2 font-semibold gap-7">
         <p>Pool actual: ${betData.initialPool}</p>
-      </div>
+      </div> */}
 
       {/* Contenedores de los equipos */}
-      <div className={`flex w-full sm:max-w-2xl items-center flex-col md:flex-row justify-center gap-6 ${betData.isFinished ? 'pointer-events-none opacity-40': '' }`}>
+      <div className={`flex w-full sm:max-w-4xl items-center flex-col md:flex-row justify-center gap-6 ${betData.isFinished ? 'pointer-events-none opacity-40': '' }`}>
         {/* Equipo A */}
         <div 
           className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl bg-green-600 text-white shadow cursor-pointer transition hover:bg-green-700 p-4
-          ${ticketsTeamB > 0 ? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
+          ${ticketsTeamB > 0 || tieTickets > 0 ? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
           onClick={() => updateTickets('A', 1)}
         > 
           {favorite == 'Equals' ? <p>Empatados: {betData.betsTeamA}</p> : 
@@ -153,10 +174,43 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
             x boleto
           </div>
         </div>
+
+
+        <div 
+          className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl bg-gray-600 text-white shadow transition cursor-pointer hover:bg-gray-700 p-4
+          ${ticketsTeamA > 0 || ticketsTeamB > 0? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
+          onClick={() => updateTickets('C', 1)}
+        >
+          
+          <button className="w-full py-4 pt-4 text-xl font-bold cursor-pointer">Empate</button>
+          {/* Ticket Selector */}
+          <div className="flex items-center gap-2 mt-4 mb-1">
+            <button
+              className="bg-white text-gray-700 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-gray-200"
+              disabled={tieTickets == 0}
+              onClick={(e) => {
+                updateTickets('C', -1)
+                e.stopPropagation(); // prevent upward event propagation
+              }}
+            >
+              −
+            </button>
+            <span id="ticketsB" className="text-lg font-semibold">{tieTickets}</span>
+          </div>
+          <div className="mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center">
+            Puedes ganar hasta: $
+            <span id="winningsA" className="cursor-pointer">
+              {betData.tieBets == 0 ? `${betData.initialPool}  `: `${((betData.initialPool)/betData.tieBets).toFixed(2)} ` }
+            </span> 
+             x boleto
+          </div>
+        </div>
+
+
         {/* Equipo B */}
         <div 
           className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl bg-red-600 text-white shadow transition cursor-pointer hover:bg-red-700 p-4
-          ${ticketsTeamA > 0 ? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
+          ${ticketsTeamA > 0 || tieTickets > 0? 'bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none' : ''}`}
           onClick={() => updateTickets('B', 1)}
         > 
           {favorite == 'Equals' ? <p>Empatados: {betData.betsTeamB}</p> : 
@@ -196,11 +250,11 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
           <span className="text-white font-bold text-lg">Total: ${parseInt(betData.pricePerTicket)*totalTickets}</span>
           <span className="text-white font-semibold">
-            🎟️ <span id="cartTickets">{ticketsTeamA || ticketsTeamB}</span> boletos
+            🎟️ <span id="cartTickets">{ticketsTeamA || ticketsTeamB || tieTickets}</span> boletos
           </span>
           <div>
             <span className="text-white font-semibold text-md text-start">
-              🏆 Gana hasta: <span id="cartWinnings" className="ml-8 sm:ml-0"> {ticketsTeamA == 0 && ticketsTeamB == 0 ? '$0' : `$${toWin.toFixed(2)}`}</span>
+              🏆 Gana hasta: <span id="cartWinnings" className="ml-8 sm:ml-0"> {ticketsTeamA == 0 && ticketsTeamB == 0 && tieTickets == 0 ? '$0' : `$${toWin.toFixed(2)}`}</span>
             </span>
           </div>
         </div>
@@ -208,12 +262,12 @@ const BetPageClient = ({betData, betId}:{betData: IBetDataResponse, betId: strin
           <button
             className="bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-lg shadow transition text-md sm:text-lg disabled:opacity-55
             disabled:hover:bg-yellow-400 disabled:cursor-not-allowed"
-            disabled={ticketsTeamA == 0 && ticketsTeamB == 0}
+            disabled={ticketsTeamA == 0 && ticketsTeamB == 0 && tieTickets == 0}
             onClick={() => {
               addToCart()
-              router.push("/user/cart", {
-                scroll: false,
-              });
+              // router.push("/user/cart", {
+              //   scroll: false,
+              // });
             }}
           >
             Agregar al carrito
