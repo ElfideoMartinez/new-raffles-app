@@ -1153,7 +1153,7 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
     betId: string;
     totalPrice: string;
     ticketNumbers: number;
-    team: string;
+    team: string; // 'A', 'B', o 'C'
   }
 
   try {
@@ -1162,19 +1162,16 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
 
     const { id, action, betSummary } = data;
 
-    // Validación de campos requeridos
     if (!id || !action || !betSummary) {
       res.status(400).json({ status: 400, message: "Missing id, action, or betSummary" });
       return;
     }
 
-    // Validación de action
     if (action !== 'confirm' && action !== 'reject') {
       res.status(400).json({ status: 400, message: "Invalid action; must be 'confirm' or 'reject'" });
       return;
     }
 
-    // Validación de betSummary
     if (!Array.isArray(betSummary)) {
       res.status(400).json({ status: 400, message: "Invalid betSummary; must be an array" });
       return;
@@ -1182,7 +1179,6 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
 
     const bets: IBetsSummary[] = betSummary;
 
-    // Actualizar documento de venta
     const betSaleRef = db.collection("salesBets").doc(id);
     const verifiedValue = action === 'confirm';
     await betSaleRef.update({ verified: verifiedValue });
@@ -1190,6 +1186,7 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
     const initialPoolKey = 'initialPool';
     const betsTeamAKey = 'betsTeamA';
     const betsTeamBKey = 'betsTeamB';
+    const tieBetsKey = 'tieBets'; 
 
     const results = await Promise.all(
       bets.map(async (betData) => {
@@ -1197,7 +1194,6 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
           const docRef = db.collection("bets").doc(betData.betId);
           const totalBetPrice = Number(betData.totalPrice);
 
-          // Validar totalBetPrice como número válido
           if (isNaN(totalBetPrice)) {
             throw new Error(`Invalid totalPrice for betId ${betData.betId}`);
           }
@@ -1206,7 +1202,6 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
           const poolDelta = action === 'reject' ? -totalBetPrice : totalBetPrice;
           const ticketsDelta = action === 'reject' ? -totalTickets : totalTickets;
 
-          // Transacción para cada apuesta
           await db.runTransaction(async (transaction) => {
             const doc = await transaction.get(docRef);
 
@@ -1214,31 +1209,43 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
               throw new Error(`Documento con betId ${betData.betId} no existe.`);
             }
 
-            const currentInitialPool = doc.data()?.[initialPoolKey] ?? 0;
-            const currentBetsTeamA = doc.data()?.[betsTeamAKey] ?? 0;
-            const currentBetsTeamB = doc.data()?.[betsTeamBKey] ?? 0;
+            const data = doc.data();
+            const currentInitialPool = data?.[initialPoolKey] ?? 0;
+            const currentBetsTeamA = data?.[betsTeamAKey] ?? 0;
+            const currentBetsTeamB = data?.[betsTeamBKey] ?? 0;
+            const currentTieBets = data?.[tieBetsKey] ?? 0;
 
             const newInitialPool = currentInitialPool + poolDelta;
             let newBetsTeamA = currentBetsTeamA;
             let newBetsTeamB = currentBetsTeamB;
+            let newTieBets = currentTieBets;
 
             if (betData.team === 'A') {
               newBetsTeamA += ticketsDelta;
-            } else {
+            } else if (betData.team === 'B') {
               newBetsTeamB += ticketsDelta;
+            } else if (betData.team === 'C') {
+              newTieBets += ticketsDelta;
+            } else {
+              throw new Error(`Invalid team value '${betData.team}' for betId ${betData.betId}`);
             }
 
             transaction.update(docRef, {
               [initialPoolKey]: newInitialPool,
               [betsTeamAKey]: newBetsTeamA,
               [betsTeamBKey]: newBetsTeamB,
+              [tieBetsKey]: newTieBets,
             });
           });
 
           return { betId: betData.betId, success: true };
         } catch (error) {
           console.error(`Error updating bet ${betData.betId} in transaction:`, error);
-          return { betId: betData.betId, success: false, error: error instanceof Error ? error.message : String(error) };
+          return {
+            betId: betData.betId,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          };
         }
       })
     );
@@ -1257,6 +1264,7 @@ export const confirmRejectBetSale = functions.https.onRequest(async (req, res) =
     });
   }
 });
+
 
 export const createBet = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
