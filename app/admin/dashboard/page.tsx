@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import withAuth from "@/app/components/WithAuth";
 import ButtonDashboard from "@/app/components/ButtonDashboard";
 
@@ -17,7 +17,7 @@ const DashboardPage = () => {
         <ButtonDashboard buttonName='Editar Apuesta' url='/admin/edit/bet'/>
       </div>
     </div>
-  )
+  );
 };
 
-export default withAuth(DashboardPage)
+export default withAuth(DashboardPage);
