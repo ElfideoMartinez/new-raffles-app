@@ -10,6 +10,7 @@ const CartButton = () => {
     setIsHydrated(true);
   },[])
 
+  const userCartBets = useTicketStore((state) => state.getBetsFromCart());
   const selectedTicketCount = useTicketStore((state) =>
     state.getItemsFromCart()
   );
@@ -19,7 +20,10 @@ const CartButton = () => {
     (acc, item) => acc + item.ticketNumbers.length,
     0
   );
-  console.log("totalTickets", totalTickets);
+  const totalTicketsBets = userCartBets.reduce(
+    (acc, bet) => acc + (bet.ticketNumbers || 0), 0
+  )
+  console.log("totalTickets", totalTickets+totalTicketsBets);
   
   if (!isHydrated){
     return (
@@ -36,7 +40,7 @@ const CartButton = () => {
   return (
     <Link href='/user/cart' className='text-white focus:outline-none'>
       <span className='bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center'>
-        {totalTickets}
+        {totalTickets+totalTicketsBets}
       </span>
       <svg
         xmlns='http://www.w3.org/2000/svg'

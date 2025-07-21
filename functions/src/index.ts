@@ -728,26 +728,122 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
       raffleName: string;
       ticketNumbers: number[];
       raffleTotalPrice: number;
+    };
+    let raffles: Raffle[]; 
+
+    interface Bets {
+      betId: string;
+      betName: string;
+      ticketNumbers: number;
+      letterTeam: string;
+      totalPrice: number;
     }
-    let raffles: Raffle[];
+    let bets: Bets[];
 
     console.log("Processing sale by tranfer");
     const body = req.body;
     raffles = body.raffles;
+    bets = body.bets;
 
-    const salesCollection = db.collection("sales");
-    await salesCollection.add(body);
+    const { name, phone, email, paymentConceptKey, ticketCount, allTickets, totalBetsPrice, 
+      totalRafflePrice, paymentImage } = body;
 
-    console.log("Numero de tickets: ", body.ticketCount);
-    // set tickets as sold
-    if (body.ticketCount < 6) {
-      await Promise.all(
-        raffles.map((raffle) =>
-          setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers)
-        )
-      );
+    // raffles sale
+    if(raffles.length > 0) {
+      const salesCollection = db.collection("sales");
+      
+      await salesCollection.add({
+        phone,
+        name,
+        email,
+        paymentConceptKey,
+        raffles,
+        ticketCount,
+        allTickets,
+        totalRafflePrice,
+        paymentImage
+      });
+
+      console.log("tickets number: ",body.ticketCount);
+      // set tickets as sold
+      if(ticketCount < 6){
+        await Promise.all(
+          raffles.map((raffle) => setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers))
+        );
+      }
     }
 
+    // bets sale
+    console.log('Bets',bets);
+    if(bets.length > 0) {
+      try {
+        if (Array.isArray(bets) && bets.length > 0) {
+          const salesBets = db.collection("salesBets");
+          console.log("Adding betting sales...");
+          await salesBets.add({ 
+            name,
+            phone,
+            email,
+            paymentConceptKey,
+            bets,
+            totalBetsPrice,
+            paymentImage,
+           });
+          console.log("Registered betting sales");
+        }
+      } catch (err) {
+        console.error("Error creating sale:", err);
+      } 
+    }
+
+    try {
+      const data = req.body;
+      console.log("Data received:", data);
+
+      // Get the FCM token from the request body
+      // check notificationTokens collection in Firestore and bring all token strings in a an array
+      const notificationTokensCollection = db.collection("notificationTokens");
+      const tokensSnapshot = await notificationTokensCollection.get();
+      const fcmTokens: string[] = [];
+      tokensSnapshot.forEach((doc) => {
+        const tokenData = doc.data();
+        if (tokenData.token) {
+          fcmTokens.push(tokenData.token);
+        }
+      });
+      if (fcmTokens.length === 0) {
+        res.status(400).json({
+          status: 400,
+          message: "FCM token is required",
+        });
+        return;
+      }
+
+      // Create a message to send
+      const message = {
+        notification: {
+          title: "Nueva compra por recibida",
+          body: `Nueva compra por transferencia favor de confirmar ASAP`,
+        },
+        token: fcmTokens,
+      };
+
+      // Send the message using Firebase Cloud Messaging
+      const response = await admin.messaging().sendEachForMulticast({
+        tokens: fcmTokens,
+        notification: {
+          title: message.notification.title,
+          body: message.notification.body,
+          imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
+        },
+      });
+      console.log("Successfully sent message:", response);
+ 
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+    
     res.status(200).json({
       status: 200,
       message: "Sale created successfully",
@@ -932,4 +1028,393 @@ export const deleteRaffle = functions.https.onRequest(async (req, res) => {
       message: "Error deleting raffle",
     });
   }
+})
+
+export const getAllBets = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS") {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== "GET") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  try{
+
+    const betsCollection = db.collection("bets");
+    const collectionSnapshot = await betsCollection.get();
+
+    const result = collectionSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json({
+      result,
+    })
+
+  }catch(err){
+    console.error('Error fetching bets', err);
+    res.status(500).send({
+      message: 'Error fetching bets',
+      error: err
+    })
+  }
+
+
+})
+
+export const getBetData = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS") {
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+  try {
+    const data = req.body;
+    console.log("data", data);
+    const id = data.id;
+
+    if (!id) {
+      res.status(400).json({ error: "Invalid ID provided" });
+      return;
+    }
+
+    const betsCollection = db.collection("bets");
+    const betsDoc = betsCollection.doc(id);
+    const betsSnapshot = await betsDoc.get();
+
+    if (!betsSnapshot.exists) {
+      res.status(404).json({ data: null });
+      return;
+    }
+
+    const betData = betsSnapshot.data();
+    const betTicketsCollection = db.collection("betTickets");
+    const ticketQuerySnapshot = await betTicketsCollection
+      .where("betId", "==", id)
+      .get();
+
+    const tickets = ticketQuerySnapshot.docs.map((doc) => doc.data());
+    const betTicketsData = tickets.sort((a,b) => a.number - b.number);
+    
+    console.log({
+      betData,
+      betTicketsData,
+    });
+
+    res.status(200).json({
+      betData,
+      data: betTicketsData,
+    });
+  } catch (error) {
+    console.error("Error fetching raffle data:", error);
+    res.status(500).json({ error: "Failed to fetch raffle data" });
+  }
 });
+
+export const updateBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "PATCH") {
+    res.status(405).send({ message: "Only PATCH requests are allowed" });
+    return;
+  }
+
+  try{
+
+    console.log('Updating bet info...');
+    const data = req.body;
+
+    await db.collection("bets").doc(data.idBet).set(data.bet, {merge: true});
+
+    res.status(200).json({
+      status: 200,
+      message: 'Bet correctly updated',
+    });
+
+  }catch(err){
+    console.error('Error updating bet: ', err)
+    res.status(500).json({
+      message: 'Error updating bet',
+      status: 500,
+    })
+  }
+});
+
+export const deleteBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    res.status(204).send(''); 
+    return;
+  }
+  
+  if (req.method !== "DELETE") {
+    res.status(405).send({ message: "Only DELETE requests are allowed" });
+    return;
+  }
+
+  try{
+    console.log('Deleting bet...');
+    const data = req.body;
+
+    await db.collection("bets").doc(data.idBet).delete();
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet correctly deleted",
+    });
+
+  }catch(err){
+    console.error('Error deleting bet: ', err);
+    res.status(500).json({
+      status: 500,
+      message: 'Error deleting bet'
+    })
+  }
+
+})
+
+export const getSalesBets = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS"){
+    res.status(204).send('');
+    return;
+  }
+
+  if(req.method !== "GET"){
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  try{
+    const betSalesCollection = db.collection("salesBets");
+    const betSalesSnapshot = await betSalesCollection.get();
+    const betSales = betSalesSnapshot.docs.map((doc) => ({
+      id:doc.id,
+      ...doc.data(),
+    }));
+    res.status(200).json({
+      betSales,
+    });
+
+  }catch(err){
+    console.error("Error fetching sales:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Error fetching sales",
+      error: err,
+    });
+  }
+});
+
+export const confirmRejectBetSale = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send('');
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).json({
+      status: 405,
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
+  interface IBetsSummary {
+    betId: string;
+    totalPrice: string;
+    ticketNumbers: number;
+    team: string; // 'A', 'B', o 'C'
+  }
+
+  try {
+    const data = req.body;
+    console.log("data", data);
+
+    const { id, action, betSummary } = data;
+
+    if (!id || !action || !betSummary) {
+      res.status(400).json({ status: 400, message: "Missing id, action, or betSummary" });
+      return;
+    }
+
+    if (action !== 'confirm' && action !== 'reject') {
+      res.status(400).json({ status: 400, message: "Invalid action; must be 'confirm' or 'reject'" });
+      return;
+    }
+
+    if (!Array.isArray(betSummary)) {
+      res.status(400).json({ status: 400, message: "Invalid betSummary; must be an array" });
+      return;
+    }
+
+    const bets: IBetsSummary[] = betSummary;
+
+    const betSaleRef = db.collection("salesBets").doc(id);
+    const verifiedValue = action === 'confirm';
+    await betSaleRef.update({ verified: verifiedValue });
+
+    const initialPoolKey = 'initialPool';
+    const betsTeamAKey = 'betsTeamA';
+    const betsTeamBKey = 'betsTeamB';
+    const tieBetsKey = 'tieBets'; 
+
+    const results = await Promise.all(
+      bets.map(async (betData) => {
+        try {
+          const docRef = db.collection("bets").doc(betData.betId);
+          const totalBetPrice = Number(betData.totalPrice);
+
+          if (isNaN(totalBetPrice)) {
+            throw new Error(`Invalid totalPrice for betId ${betData.betId}`);
+          }
+
+          const totalTickets = betData.ticketNumbers;
+          const poolDelta = action === 'reject' ? -totalBetPrice : totalBetPrice;
+          const ticketsDelta = action === 'reject' ? -totalTickets : totalTickets;
+
+          await db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(docRef);
+
+            if (!doc.exists) {
+              throw new Error(`Documento con betId ${betData.betId} no existe.`);
+            }
+
+            const data = doc.data();
+            const currentInitialPool = data?.[initialPoolKey] ?? 0;
+            const currentBetsTeamA = data?.[betsTeamAKey] ?? 0;
+            const currentBetsTeamB = data?.[betsTeamBKey] ?? 0;
+            const currentTieBets = data?.[tieBetsKey] ?? 0;
+
+            const newInitialPool = currentInitialPool + poolDelta;
+            let newBetsTeamA = currentBetsTeamA;
+            let newBetsTeamB = currentBetsTeamB;
+            let newTieBets = currentTieBets;
+
+            if (betData.team === 'A') {
+              newBetsTeamA += ticketsDelta;
+            } else if (betData.team === 'B') {
+              newBetsTeamB += ticketsDelta;
+            } else if (betData.team === 'C') {
+              newTieBets += ticketsDelta;
+            } else {
+              throw new Error(`Invalid team value '${betData.team}' for betId ${betData.betId}`);
+            }
+
+            transaction.update(docRef, {
+              [initialPoolKey]: newInitialPool,
+              [betsTeamAKey]: newBetsTeamA,
+              [betsTeamBKey]: newBetsTeamB,
+              [tieBetsKey]: newTieBets,
+            });
+          });
+
+          return { betId: betData.betId, success: true };
+        } catch (error) {
+          console.error(`Error updating bet ${betData.betId} in transaction:`, error);
+          return {
+            betId: betData.betId,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      })
+    );
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet sale processed successfully",
+      results,
+    });
+  } catch (err) {
+    console.error("Error confirming bet sale:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Error confirming bet sale",
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+});
+
+
+export const createBet = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if(req.method === "OPTIONS"){
+    res.status(204).send('');
+    return;
+  }
+
+  if(req.method !== "POST"){
+    res.status(405).send({
+      message: "Only POST request are allowed"
+    });
+    return;
+  }
+
+  try{
+
+    console.log("Procesing request");
+    const data = req.body;
+    await db.collection("bets").add(data);
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet created successfully",
+    });
+
+
+  }catch(e){
+    console.error("Error creating bet", e);
+    res.status(500).json({
+      message: "An error ocurred while creating the bet"
+    });
+  }
+
+}); 

@@ -18,7 +18,7 @@ interface Sale {
   email?: string;
   raffle_id: string;
   raffle_name: string;
-  totalSalePrice: number;
+  totalRafflePrice: number;
   ticketNumbers: number[];
   paymentImage?: string;
   payment_intent: string;
@@ -153,7 +153,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
           </div>     
         ))}
       </div>
-      <div>Total de venta: ${sale.totalSalePrice}</div>
+      <div>Total de venta: ${sale.totalRafflePrice}</div>
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (

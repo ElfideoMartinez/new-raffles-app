@@ -9,6 +9,15 @@ interface IUserCartStore {
   raffleTotalPrice?: number;
 }
 
+interface IUserCartBets {
+  betId: string;
+  betName: string;
+  team: string;
+  letterTeam: string;
+  ticketNumbers: number;
+  totalPrice: number;
+}
+
 interface ITikets {
   [key: string]: {
     ticketNumbers: number[];
@@ -55,6 +64,29 @@ interface TicketState {
   clearSelectedTickets: () => void;
   getTicketsInCartByRaffleId: (raffleId: string) => number[];
   setPaymentMethod: (method: string) => void;
+  userCartBets: Array<{
+    betId: string;
+    betName: string;
+    team: string;
+    letterTeam: string;
+    ticketNumbers: number;
+    totalPrice: number;
+  }>
+  updateBet: (newBet: IUserCartBets) => void;
+  getBetsFromCart: () => Array<{
+    betId: string;
+    betName: string;
+    team: string;
+    letterTeam: string;
+    ticketNumbers: number;
+    totalPrice: number;
+  }>;
+  removeBetById: (betId: string) => void;
+  clearCartBets: () => void,
+  getTicketInfoByBetId: (betId: string) => {
+    ticketNumbers: number;
+    letterTeam: string;
+  } | null;
 }
 
 // Create the store with proper typing
@@ -64,6 +96,7 @@ const useTicketStore = create<TicketState>()(
       tickets: {},
       userCartStore: [],
       paymentMethod: "",
+      userCartBets: [],
 
       addTicket: (ticketNumber, raffleId) =>
         set((state) => {
@@ -190,6 +223,49 @@ const useTicketStore = create<TicketState>()(
       },
       setPaymentMethod: (method) => set({ paymentMethod: method }),
       
+      updateBet: (newBet) => {
+        const currentBets = get().userCartBets;
+        const existingIndex = currentBets.findIndex(b => b.betId === newBet.betId);
+      
+        if (newBet.ticketNumbers <= 0) {
+          // Eliminar si no hay boletos
+          return set({
+            userCartBets: currentBets.filter(b => b.betId !== newBet.betId),
+          });
+        }
+      
+        if (existingIndex !== -1) {
+          // Reemplazar toda la apuesta (incluye cambio de equipo)
+          const updatedBets = [...currentBets];
+          updatedBets[existingIndex] = newBet;
+          set({ userCartBets: updatedBets });
+        } else {
+          // Agregar nueva apuesta
+          set({ userCartBets: [...currentBets, newBet] });
+        }
+      },
+      
+      getBetsFromCart: () => get().userCartBets,
+
+      removeBetById: (betId) => {
+        set((state) => ({
+          userCartBets: state.userCartBets.filter((bet) => bet.betId !== betId),
+        }));
+      },
+
+      clearCartBets: () => set({ userCartBets: [] }),
+
+      getTicketInfoByBetId: (betId: string) => {
+        const bets = get().getBetsFromCart();
+        const bet = bets.find((b) => b.betId === betId);
+        if (bet) {
+          return {
+            ticketNumbers: bet.ticketNumbers,
+            letterTeam: bet.letterTeam,
+          };
+        }
+        return null;
+      },
     }),
     {
       name: "ticket-store",

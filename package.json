@@ -15,6 +15,7 @@
     "firebase-admin": "^12.7.0",
     "firebase-functions": "^6.1.0",
     "formidable": "^3.5.2",
+    "framer-motion": "^12.23.6",
     "next": "^14.2.17",
     "next-scratchcard": "^0.0.4",
     "nextjs-toast-notify": "^1.35.0",

@@ -15,7 +15,7 @@ interface Sale {
     raffleTotalPrice: number;
   }[];
   ticketCount: string;
-  totalSalePrice: number;
+  totalRafflePrice: number;
   ticketNumbers: number[];
   paymentImage?: string;
   verified: boolean;
