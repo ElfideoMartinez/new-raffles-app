@@ -795,7 +795,54 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
         console.error("Error creating sale:", err);
       } 
     }
-    
+
+    try {
+      const data = req.body;
+      console.log("Data received:", data);
+
+      // Get the FCM token from the request body
+      // check notificationTokens collection in Firestore and bring all token strings in a an array
+      const notificationTokensCollection = db.collection("notificationTokens");
+      const tokensSnapshot = await notificationTokensCollection.get();
+      const fcmTokens: string[] = [];
+      tokensSnapshot.forEach((doc) => {
+        const tokenData = doc.data();
+        if (tokenData.token) {
+          fcmTokens.push(tokenData.token);
+        }
+      });
+      if (fcmTokens.length === 0) {
+        res.status(400).json({
+          status: 400,
+          message: "FCM token is required",
+        });
+        return;
+      }
+
+      // Create a message to send
+      const message = {
+        notification: {
+          title: "Nueva compra por recibida",
+          body: `Nueva compra por transferencia favor de confirmar ASAP`,
+        },
+        token: fcmTokens,
+      };
+
+      // Send the message using Firebase Cloud Messaging
+      const response = await admin.messaging().sendEachForMulticast({
+        tokens: fcmTokens,
+        notification: {
+          title: message.notification.title,
+          body: message.notification.body,
+          imageUrl:
+            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
+        },
+      });
+      console.log("Successfully sent message:", response);
+ 
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
     
     res.status(200).json({
       status: 200,
