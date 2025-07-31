@@ -5,7 +5,14 @@ import { onValue, ref, set } from "firebase/database";
 import { realtimeDB } from "../../firebaseconfig"; // Adjust the import path as needed
 import { ScratchCard } from "next-scratchcard";
 
+type Errortype = {
+  code: string;
+  message: string;
+};
+
 export default function PlayPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Errortype | null>(null);
   const [ticket, setTicket] = useState<any>(null);
   const [scratchedCardsCount, setScratchedCardsCount] = useState(0);
 
@@ -35,26 +42,36 @@ export default function PlayPage() {
   };
 
   const createNewTicket = async () => {
-    // Call backend to create a new ticket
-    const response = await fetch(
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createQuickTicket`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    setIsLoading(true);
+    try {
+      // Call backend to create a new ticket
+      const response = await fetch(
+        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createQuickTicket`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
-    if (!response.ok) {
-      console.error("Failed to create new ticket");
-      return;
+      const { data } = await response.json();
+      console.log("New ticket created:", data);
+      // Save only the ticket id in localStorage
+      localStorage.setItem("ticketId", data.id);
+      setTicket(data);
+      listenToTicket(data.id);
+    } catch (error) {
+      console.error("Error creating new ticket:", error);
+      setError({
+        code: "ticket_creation_error",
+        message: "Error creating new ticket. Please try again later.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    const { data } = await response.json();
-    console.log("New ticket created:", data);
-    // Save only the ticket id in localStorage
-    localStorage.setItem("ticketId", data.id);
-    setTicket(data);
-    listenToTicket(data.id);
   };
 
   const listenToTicket = (id: string) => {
@@ -77,10 +94,25 @@ export default function PlayPage() {
     });
   };
 
+  if (error) {
+    return (
+      <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
+        <h1 className='text-2xl font-bold mb-2 mt-10'>Error</h1>
+        <p className='text-red-500'>{error.message}</p>
+        <button
+          className='mt-4 bg-blue-500 text-white px-4 py-2 rounded'
+          onClick={createNewTicket}
+        >
+          Try Again
+        </button>
+      </main>
+    );
+  }
+
   return (
     <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
       <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
-      {!ticket?.id && <p>Loading ticket...</p>}
+      {!isLoading && <p>Loading ticket...</p>}
       {ticket?.id && ticket?.status === "pending" && (
         <div className='mb-6'>
           <p className='text-lg text-white font-semibold'>
