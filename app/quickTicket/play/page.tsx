@@ -10,6 +10,14 @@ type Errortype = {
   message: string;
 };
 
+const WinnerLevelPrizes: { [key: string]: string } = {
+  none: "No Premio",
+  bigWinner: "Premio Grane",
+  specialWinner: "Premio Special",
+  regularWinner: "Premio Regular",
+  minorWinner: "Premio Chico",
+};
+
 export default function PlayPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Errortype | null>(null);
@@ -18,7 +26,6 @@ export default function PlayPage() {
 
   useEffect(() => {
     // Get ticket id from localStorage and listen to ticket data from Firebase
-
     const localTicketId = localStorage.getItem("ticketId");
     if (localTicketId) {
       listenToTicket(localTicketId);
@@ -29,13 +36,19 @@ export default function PlayPage() {
   }, []);
 
   useEffect(() => {
-    if (scratchedCardsCount >= 6 && ticket?.id) {
+    if (
+      scratchedCardsCount >= 6 &&
+      ticket?.id &&
+      ticket.status !== "finnished"
+    ) {
       set(ref(realtimeDB, `quickTickets/${ticket.id}`), {
         ...ticket,
         status: "finnished",
       });
+      console.log("Ticket status updated to 'finnished' in Firebase.");
+      clearLocalTicket();
     }
-  }, [scratchedCardsCount, ticket]);
+  }, [scratchedCardsCount]);
 
   const clearLocalTicket = () => {
     localStorage.removeItem("ticketId");
@@ -43,10 +56,11 @@ export default function PlayPage() {
 
   const createNewTicket = async () => {
     setIsLoading(true);
+    setScratchedCardsCount(0);
     try {
       // Call backend to create a new ticket
       const response = await fetch(
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createQuickTicket`,
+        `http://127.0.0.1:3001/raffleapp-dbc1b/us-central1/createQuickTicket`,
         {
           method: "GET",
           headers: {
@@ -59,10 +73,13 @@ export default function PlayPage() {
       }
       const { data } = await response.json();
       console.log("New ticket created:", data);
+      //clear any existing local ticket
+      clearLocalTicket();
       // Save only the ticket id in localStorage
       localStorage.setItem("ticketId", data.id);
       setTicket(data);
       listenToTicket(data.id);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error creating new ticket:", error);
       setError({
@@ -84,6 +101,12 @@ export default function PlayPage() {
         // Only clear if expired, not if finished
         if (ticketData.status === "finnished") {
           clearLocalTicket();
+          console.log(ticketData);
+          //change to finished
+          set(ref(realtimeDB, `quickTickets/${id}`), {
+            ...ticketData,
+            status: "finnished",
+          });
         }
       } else {
         // Ticket not found, clear local ticket
@@ -94,7 +117,7 @@ export default function PlayPage() {
     });
   };
 
-  if (error) {
+  if (error && !ticket) {
     return (
       <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
         <h1 className='text-2xl font-bold mb-2 mt-10'>Error</h1>
@@ -112,7 +135,10 @@ export default function PlayPage() {
   return (
     <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
       <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
-      {!isLoading && <p>Loading ticket...</p>}
+      {isLoading && <p>Loading ticket...</p>}
+      {!isLoading && !ticket && (
+        <p className='text-red-500'>No ticket found. Please try again.</p>
+      )}
       {ticket?.id && ticket?.status === "pending" && (
         <div className='mb-6'>
           <p className='text-lg text-white font-semibold'>
@@ -176,16 +202,25 @@ export default function PlayPage() {
                 ))}
               </div>
             </div>
-            {scratchedCardsCount === ticket.symbols.length &&
-              (ticket.isWinner ? (
-                <p className='text-2xl text-green-700 font-bold'>
-                  🎉 Ganaste {ticket.prize}!
-                </p>
-              ) : (
-                <p className='text-2xl text-red-700 font-bold'>
-                  Lo sentimos, no ganaste esta vez.
-                </p>
-              ))}
+            {scratchedCardsCount === ticket.symbols.length && (
+              <>
+                {ticket.isWinner ? (
+                  <p className='text-2xl text-green-700 font-bold'>
+                    🎉 Ganaste {WinnerLevelPrizes[String(ticket.winnerLevel)]}
+                  </p>
+                ) : (
+                  <p className='text-2xl text-red-700 font-bold'>
+                    Lo sentimos, no ganaste esta vez.
+                  </p>
+                )}
+                <button
+                  className='mt-4 bg-blue-500 text-white px-4 py-2 w-max self-center rounded-md bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-700 transition-colors'
+                  onClick={createNewTicket}
+                >
+                  Jugar de nuevo
+                </button>
+              </>
+            )}
           </div>
         )}
 

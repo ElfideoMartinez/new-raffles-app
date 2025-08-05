@@ -95,8 +95,11 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
       const activationCode =
         //random 6 digit number
         Math.floor(100000 + Math.random() * 900000).toString();
-      const isWinner = Math.random() < 0.2; // 20% chance to be a winner
-      const symbols = getQuickTicketsSymbols(isWinner);
+
+      // Determine winner level based on probabilities
+      const winnerLevel = determineWinnerLevel();
+      console.log("Winner level determined:", winnerLevel);
+      const symbols = getQuickTicketsSymbols(winnerLevel);
 
       const ticketData = {
         id: ticketId,
@@ -104,7 +107,8 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
         symbols,
         activationCode,
         createdAt: Date.now(),
-        isWinner,
+        isWinner: winnerLevel !== "none",
+        winnerLevel,
       };
       //add ticket to quickTickets collection
       const itemRef = rtdb.ref(`quickTickets/${ticketId}`);
@@ -130,44 +134,105 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
   }
 });
 
-const getQuickTicketsSymbols = (isWinner: boolean): string[] => {
-  const symbols = [
+// Winner level probabilities (easily configurable)
+const WINNER_PROBABILITIES = {
+  bigWinner: 0.003, // 0.3% - 🏆 Big Winner (rarest)
+  specialWinner: 0.005, // 0.5% - 💎 Special Winner
+  regularWinner: 0.1, // 10% - ⭐️ Regular Winner
+  minorWinner: 0.2, // 12% - 🎯 Minor Winner
+  // Remaining 80% are non-winners
+};
+
+type WinnerLevel =
+  | "bigWinner"
+  | "specialWinner"
+  | "regularWinner"
+  | "minorWinner"
+  | "none";
+
+const determineWinnerLevel = (): WinnerLevel => {
+  const random = Math.random();
+  let cumulativeProbability = 0;
+  console.log("Random number for winner level:", random);
+
+  // Check from highest tier to lowest
+  if (random < (cumulativeProbability += WINNER_PROBABILITIES.bigWinner)) {
+    return "bigWinner";
+  }
+  if (random < (cumulativeProbability += WINNER_PROBABILITIES.specialWinner)) {
+    return "specialWinner";
+  }
+  if (random < (cumulativeProbability += WINNER_PROBABILITIES.regularWinner)) {
+    return "regularWinner";
+  }
+  if (random < (cumulativeProbability += WINNER_PROBABILITIES.minorWinner)) {
+    return "minorWinner";
+  }
+
+  return "none"; // No winner
+};
+
+const getQuickTicketsSymbols = (winnerLevel: WinnerLevel): string[] => {
+  // Define winner symbols for each level
+  const winnerSymbols = {
+    bigWinner: "🏆", // Big Winner
+    specialWinner: "💎", // Special Winner
+    regularWinner: "⭐️", // Regular Winner
+    minorWinner: "🎯", // Minor Winner
+  };
+
+  // Other symbols for filling remaining slots
+  const otherSymbols = [
     "🍀", // Lucky Clover
     "🎉", // Party Popper
     "💰", // Money Bag
     "🎁", // Gift
-    "🌟", // Star
-    "🏆", // Trophy
-    "🎈", // Balloon
     "🥇", // Gold Medal
     "🎊", // Confetti Ball
-    "💎", // Gem Stone
     "🍭", // Lollipop
     "🍫", // Chocolate Bar
     "🍩", // Doughnut
+    "🎈", // Balloon
+    "🌈",
   ];
-  // Make sure a non-winner does not have 3 or more of the same symbol out of 6
-  if (!isWinner) {
+
+  if (winnerLevel === "none") {
+    // Non-winner: ensure no more than 2 of any symbol in 6 slots
     const randomSymbols: string[] = [];
+    const allSymbols = [...Object.values(winnerSymbols), ...otherSymbols];
+
     while (randomSymbols.length < 6) {
-      const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-      // Allow at most 2 of the same symbol
+      const randomSymbol =
+        allSymbols[Math.floor(Math.random() * allSymbols.length)];
+      // Allow at most 2 of the same symbol for non-winners
       if (randomSymbols.filter((s) => s === randomSymbol).length < 2) {
         randomSymbols.push(randomSymbol);
       }
     }
     return randomSymbols;
   } else {
-    // If it's a winner, return at least 3 of the same symbol
-    const winnerSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-    const randomSymbols: string[] = Array(3).fill(winnerSymbol);
+    // Winner: create pattern based on level
+    const winnerSymbol = winnerSymbols[winnerLevel];
+    let requiredMatches: number;
+
+    // All winner levels require 3 matching symbols to win
+    requiredMatches = 3;
+
+    const randomSymbols: string[] = Array(requiredMatches).fill(winnerSymbol);
+
+    // Fill remaining slots with other symbols (avoiding the winner symbol)
     while (randomSymbols.length < 6) {
-      const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-      // Allow at most 2 of the same symbol
-      if (randomSymbols.filter((s) => s === randomSymbol).length < 2) {
+      const randomSymbol =
+        otherSymbols[Math.floor(Math.random() * otherSymbols.length)];
+      // Don't add more winner symbols and limit other symbols to max 2
+      if (
+        randomSymbol !== winnerSymbol &&
+        randomSymbols.filter((s) => s === randomSymbol).length < 2
+      ) {
         randomSymbols.push(randomSymbol);
       }
     }
+
     // Shuffle the symbols to randomize their order
     return randomSymbols.sort(() => Math.random() - 0.5);
   }
