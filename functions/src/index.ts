@@ -139,7 +139,7 @@ const WINNER_PROBABILITIES = {
   bigWinner: 0.003, // 0.3% - 🏆 Big Winner (rarest)
   specialWinner: 0.005, // 0.5% - 💎 Special Winner
   regularWinner: 0.1, // 10% - ⭐️ Regular Winner
-  minorWinner: 0.2, // 12% - 🎯 Minor Winner
+  minorWinner: 0.2, // 20% - 🎯 Minor Winner
   // Remaining 80% are non-winners
 };
 

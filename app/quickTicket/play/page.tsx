@@ -60,7 +60,7 @@ export default function PlayPage() {
     try {
       // Call backend to create a new ticket
       const response = await fetch(
-        `http://127.0.0.1:3001/raffleapp-dbc1b/us-central1/createQuickTicket`,
+        `https://createquickticket-3ve3qo4dga-uc.a.run.app`,
         {
           method: "GET",
           headers: {
