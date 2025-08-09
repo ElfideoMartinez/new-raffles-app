@@ -13,6 +13,7 @@ import {
 import withAuth from "@/app/components/WithAuth";
 import TicketCard from "@/app/components/TicketCard";
 import { formatDateLocal } from "@/app/utils/formatDate";
+import Swal from "sweetalert2";
 
 interface Ticket {
   activationCode: string;
@@ -162,6 +163,14 @@ const page = () => {
                         await update(ticketRef, { status: "active" });
                         //check if ticket is winner and show alert when activated
                         if (ticket.isWinner) {
+                          Swal.fire({
+                            title: "Ticket Activado",
+                            text: `El Ticket ${
+                              ticket.activationCode
+                            } es un ganador!.
+                            Entrega el premio ${ticket.winnerLevel || "none"}.`,
+                            icon: "success",
+                          });
                         }
                       } catch (error) {
                         console.error("Error setting ticket active:", error);
