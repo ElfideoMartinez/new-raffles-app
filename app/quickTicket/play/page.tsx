@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { onValue, ref, set } from "firebase/database";
+import { useEffect, useState, useRef } from "react";
+import { onValue, ref, set, off } from "firebase/database";
 import { realtimeDB } from "../../firebaseconfig"; // Adjust the import path as needed
 import { ScratchCard } from "next-scratchcard";
 
@@ -23,16 +23,39 @@ export default function PlayPage() {
   const [error, setError] = useState<Errortype | null>(null);
   const [ticket, setTicket] = useState<any>(null);
   const [scratchedCardsCount, setScratchedCardsCount] = useState(0);
+  const listenerRef = useRef<any>(null);
+
+  // Debug Firebase connection on component mount
+  useEffect(() => {
+    console.log("=== FIREBASE DEBUG INFO ===");
+    console.log("Environment:", process.env.NODE_ENV);
+    console.log("Firebase DB instance:", realtimeDB);
+    console.log("Firebase DB app:", realtimeDB.app);
+    console.log("Database URL:", realtimeDB.app.options.databaseURL);
+    console.log("Browser location:", window.location.href);
+    console.log("User agent:", navigator.userAgent);
+  }, []);
 
   useEffect(() => {
+    console.log("Component mounted, checking for existing ticket...");
     // Get ticket id from localStorage and listen to ticket data from Firebase
     const localTicketId = localStorage.getItem("ticketId");
     if (localTicketId) {
+      console.log("Found local ticket ID:", localTicketId);
       listenToTicket(localTicketId);
-      console.log("Using local ticket id:", localTicketId);
     } else {
+      console.log("No local ticket found, creating new ticket...");
       createNewTicket();
     }
+
+    // Cleanup function to remove listener when component unmounts
+    return () => {
+      console.log("Component unmounting, cleaning up listener...");
+      if (listenerRef.current) {
+        off(listenerRef.current);
+        listenerRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -48,16 +71,18 @@ export default function PlayPage() {
       console.log("Ticket status updated to 'finnished' in Firebase.");
       clearLocalTicket();
     }
-  }, [scratchedCardsCount]);
+  }, [scratchedCardsCount, ticket]);
 
   const clearLocalTicket = () => {
     localStorage.removeItem("ticketId");
   };
 
   const createNewTicket = async () => {
+    console.log("=== CREATING NEW TICKET ===");
     setIsLoading(true);
     setScratchedCardsCount(0);
     try {
+      console.log("Calling Firebase function...");
       // Call backend to create a new ticket
       const response = await fetch(
         `https://createquickticket-3ve3qo4dga-uc.a.run.app`,
@@ -68,20 +93,31 @@ export default function PlayPage() {
           },
         }
       );
+
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const { data } = await response.json();
+
+      const result = await response.json();
+      console.log("Response data:", result);
+      const { data } = result;
+
       console.log("New ticket created:", data);
       //clear any existing local ticket
       clearLocalTicket();
       // Save only the ticket id in localStorage
       localStorage.setItem("ticketId", data.id);
+      console.log("Saved ticket ID to localStorage:", data.id);
+
       setTicket(data);
       listenToTicket(data.id);
       setIsLoading(false);
     } catch (error) {
-      console.error("Error creating new ticket:", error);
+      console.error("=== ERROR CREATING TICKET ===");
+      console.error("Error details:", error);
       setError({
         code: "ticket_creation_error",
         message: "Error creating new ticket. Please try again later.",
@@ -92,29 +128,60 @@ export default function PlayPage() {
   };
 
   const listenToTicket = (id: string) => {
-    console.log("Listening to ticket updates for ID:", id);
+    console.log("=== SETTING UP LISTENER ===");
+    console.log("Ticket ID:", id);
+    console.log("Firebase DB instance:", realtimeDB);
+
+    // Clean up any existing listener
+    if (listenerRef.current) {
+      console.log("Cleaning up existing listener...");
+      off(listenerRef.current);
+    }
+
     const itemRef = ref(realtimeDB, `quickTickets/${id}`);
-    onValue(itemRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const ticketData = snapshot.val();
-        setTicket(ticketData);
-        // Only clear if expired, not if finished
-        if (ticketData.status === "finnished") {
+    console.log("Firebase reference path:", `quickTickets/${id}`);
+    console.log("Firebase reference object:", itemRef);
+
+    // Set up the new listener
+    const unsubscribe = onValue(
+      itemRef,
+      (snapshot) => {
+        console.log("=== FIREBASE CALLBACK TRIGGERED ===");
+        console.log("Snapshot exists:", snapshot.exists());
+        console.log("Snapshot value:", snapshot.val());
+        console.log("Timestamp:", new Date().toISOString());
+
+        if (snapshot.exists()) {
+          const ticketData = snapshot.val();
+          console.log("Setting ticket data:", ticketData);
+          setTicket(ticketData);
+
+          // Only clear if expired, not if finished
+          if (ticketData.status === "finnished") {
+            console.log("Ticket is finished, clearing local storage...");
+            clearLocalTicket();
+          }
+        } else {
+          console.warn("=== TICKET NOT FOUND IN DATABASE ===");
+          console.warn("Clearing local storage and creating new ticket...");
           clearLocalTicket();
-          console.log(ticketData);
-          //change to finished
-          set(ref(realtimeDB, `quickTickets/${id}`), {
-            ...ticketData,
-            status: "finnished",
-          });
+          createNewTicket();
         }
-      } else {
-        // Ticket not found, clear local ticket
-        clearLocalTicket();
-        console.warn("Ticket not found in database, clearing local storage.");
-        createNewTicket();
+      },
+      (error) => {
+        console.error("=== FIREBASE LISTENER ERROR ===");
+        console.error("Error details:", error);
+        setError({
+          code: "firebase_error",
+          message:
+            "Error connecting to Firebase. Please check your connection.",
+        });
       }
-    });
+    );
+
+    // Store the listener reference for cleanup
+    listenerRef.current = itemRef;
+    console.log("Listener setup complete");
   };
 
   if (error && !ticket) {
@@ -135,7 +202,13 @@ export default function PlayPage() {
   return (
     <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
       <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
-      {isLoading && <p>Loading ticket...</p>}
+      {isLoading ? (
+        <p className='text-gray-500'>Cargando tu boleto...</p>
+      ) : (
+        <p className='text-gray-600 mb-4'>
+          {ticket?.id ? `Ticket ID: ${ticket.id}` : "No ticket found."}
+        </p>
+      )}
       {!isLoading && !ticket && (
         <p className='text-red-500'>No ticket found. Please try again.</p>
       )}

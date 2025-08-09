@@ -1,7 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { realtimeDB } from "../../../firebaseconfig"; // Adjust the import path as needed
-import { ref, onValue, update } from "firebase/database";
+import {
+  ref,
+  onValue,
+  update,
+  query,
+  equalTo,
+  orderByChild,
+  startAt,
+} from "firebase/database";
 import withAuth from "@/app/components/WithAuth";
 import TicketCard from "@/app/components/TicketCard";
 import { formatDateLocal } from "@/app/utils/formatDate";
@@ -14,6 +22,7 @@ interface Ticket {
   isWinner: boolean;
   symbols: string[];
   claimed?: boolean;
+  winnerLevel?: string;
 }
 
 const page = () => {
@@ -28,30 +37,69 @@ const page = () => {
     };
   }, []);
   const listenToDB = () => {
-    //reference to to quickTicketsCollection
     const quickTicketsCollection = ref(realtimeDB, "quickTickets");
-    // Listen to changes in the quickTicketsCollection
+
     const unsubscribe = onValue(
       quickTicketsCollection,
       (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          console.log("Quick Tickets Data:", data);
           const ticketsArray = Object.values(data) as Ticket[];
+
+          // Filter pending tickets
           const pendingTickets = ticketsArray.filter(
             (ticket) => ticket.status === "pending"
           );
           setActiveTickets(pendingTickets);
-
           setTickets(ticketsArray);
+
+          // 🔹 Get start of today in ms
+          const startOfToday = new Date();
+          startOfToday.setHours(0, 0, 0, 0);
+          const startMs = startOfToday.getTime();
+          const endMs = startMs + 24 * 60 * 60 * 1000; // start of next day
+
+          // 🔹 Count tickets purchased today
+          const ticketsToday = ticketsArray.filter(
+            (ticket) =>
+              Number(ticket.createdAt) >= startMs &&
+              Number(ticket.createdAt) < endMs
+          );
+          console.log(
+            `Tickets purchased today (${startOfToday.toDateString()}):`,
+            ticketsToday.length
+          );
+
+          // 🔹 Count winners by category
+          type WinnerCategory =
+            | "bigWinner"
+            | "specialWinner"
+            | "regularWinner"
+            | "minorWinner"
+            | "none";
+          const categoryCounts: Record<WinnerCategory, number> = {
+            bigWinner: 0,
+            specialWinner: 0,
+            regularWinner: 0,
+            minorWinner: 0,
+            none: 0,
+          };
+
+          ticketsArray.forEach((ticket) => {
+            const category = (ticket.winnerLevel || "none") as WinnerCategory;
+            if (categoryCounts.hasOwnProperty(category)) {
+              categoryCounts[category]++;
+            }
+          });
+
+          console.log("Winner counts by category:", categoryCounts);
         } else {
           console.log("No quick tickets found.");
         }
       },
-      {
-        onlyOnce: false, // Keep listening for changes
-      }
+      { onlyOnce: false }
     );
+
     return unsubscribe;
   };
 

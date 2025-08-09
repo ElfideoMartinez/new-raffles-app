@@ -1,11 +1,14 @@
 import * as functions from "firebase-functions";
+import crypto from "crypto";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
 import { getDatabase } from "firebase-admin/database";
+import { getRemoteConfig } from "firebase-admin/remote-config";
 
 admin.initializeApp();
 const db = admin.firestore();
 const rtdb = getDatabase();
+const remoteConfig = getRemoteConfig();
 
 export const sendPurchaseNotifications = functions.https.onRequest(
   async (req, res) => {
@@ -96,8 +99,12 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
         //random 6 digit number
         Math.floor(100000 + Math.random() * 900000).toString();
 
+      // Get probabilities from Remote Config
+      const probabilities = await getWinnerProbabilitiesFromRemoteConfig();
+      console.log("Using probabilities from Remote Config:", probabilities);
+
       // Determine winner level based on probabilities
-      const winnerLevel = determineWinnerLevel();
+      const winnerLevel = determineWinnerLevel(probabilities);
       console.log("Winner level determined:", winnerLevel);
       const symbols = getQuickTicketsSymbols(winnerLevel);
 
@@ -143,6 +150,62 @@ const WINNER_PROBABILITIES = {
   // Remaining 80% are non-winners
 };
 
+// Cache for Remote Config values
+let cachedProbabilities: any = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
+// Helper function to get probabilities from Remote Config with caching
+const getWinnerProbabilitiesFromRemoteConfig = async () => {
+  try {
+    // Check if cache is still valid
+    const now = Date.now();
+    if (cachedProbabilities && now - cacheTimestamp < CACHE_DURATION) {
+      console.log("Using cached Remote Config probabilities");
+      return cachedProbabilities;
+    }
+
+    console.log("Fetching fresh Remote Config probabilities");
+    const template = await remoteConfig.getTemplate();
+    const parameters = template.parameters;
+
+    const probabilities = {
+      bigWinner:
+        parameters.bigWinner?.defaultValue &&
+        "value" in parameters.bigWinner.defaultValue
+          ? parseFloat(parameters.bigWinner.defaultValue.value)
+          : WINNER_PROBABILITIES.bigWinner,
+      specialWinner:
+        parameters.specialWinner?.defaultValue &&
+        "value" in parameters.specialWinner.defaultValue
+          ? parseFloat(parameters.specialWinner.defaultValue.value)
+          : WINNER_PROBABILITIES.specialWinner,
+      regularWinner:
+        parameters.regularWinner?.defaultValue &&
+        "value" in parameters.regularWinner.defaultValue
+          ? parseFloat(parameters.regularWinner.defaultValue.value)
+          : WINNER_PROBABILITIES.regularWinner,
+      minorWinner:
+        parameters.minorWinner?.defaultValue &&
+        "value" in parameters.minorWinner.defaultValue
+          ? parseFloat(parameters.minorWinner.defaultValue.value)
+          : WINNER_PROBABILITIES.minorWinner,
+    };
+
+    // Update cache
+    cachedProbabilities = probabilities;
+    cacheTimestamp = now;
+
+    return probabilities;
+  } catch (error) {
+    console.error(
+      "Error fetching Remote Config probabilities, using defaults:",
+      error
+    );
+    return WINNER_PROBABILITIES;
+  }
+};
+
 type WinnerLevel =
   | "bigWinner"
   | "specialWinner"
@@ -150,25 +213,22 @@ type WinnerLevel =
   | "minorWinner"
   | "none";
 
-const determineWinnerLevel = (): WinnerLevel => {
-  const random = Math.random();
-  let cumulativeProbability = 0;
-  console.log("Random number for winner level:", random);
-
-  // Check from highest tier to lowest
-  if (random < (cumulativeProbability += WINNER_PROBABILITIES.bigWinner)) {
+const determineWinnerLevel = (
+  probabilities = WINNER_PROBABILITIES
+): WinnerLevel => {
+  const random = crypto.randomInt(0, 1000) / 1000; // Random number between 0 and 1
+  if (random < probabilities.bigWinner) {
     return "bigWinner";
   }
-  if (random < (cumulativeProbability += WINNER_PROBABILITIES.specialWinner)) {
+  if (random < probabilities.specialWinner) {
     return "specialWinner";
   }
-  if (random < (cumulativeProbability += WINNER_PROBABILITIES.regularWinner)) {
+  if (random < probabilities.regularWinner) {
     return "regularWinner";
   }
-  if (random < (cumulativeProbability += WINNER_PROBABILITIES.minorWinner)) {
+  if (random < probabilities.minorWinner) {
     return "minorWinner";
   }
-
   return "none"; // No winner
 };
 
@@ -1506,3 +1566,54 @@ export const createBet = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+
+// Function to get Remote Config values
+export const getRemoteConfigValues = functions.https.onRequest(
+  async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
+
+    if (req.method !== "GET") {
+      res.status(405).json({
+        status: 405,
+        message: "Method Not Allowed",
+      });
+      return;
+    }
+
+    try {
+      // Get the current Remote Config template
+      const template = await remoteConfig.getTemplate();
+
+      // Extract parameter values
+      const parameters = template.parameters;
+      const configValues: { [key: string]: any } = {};
+
+      for (const [key, parameter] of Object.entries(parameters)) {
+        if (parameter.defaultValue && "value" in parameter.defaultValue) {
+          configValues[key] = parameter.defaultValue.value;
+        } else {
+          configValues[key] = null;
+        }
+      }
+
+      res.status(200).json({
+        status: 200,
+        configValues,
+      });
+    } catch (error) {
+      console.error("Error fetching Remote Config:", error);
+      res.status(500).json({
+        status: 500,
+        message: "Error fetching Remote Config",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+);
