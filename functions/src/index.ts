@@ -1617,3 +1617,128 @@ export const getRemoteConfigValues = functions.https.onRequest(
     }
   }
 );
+
+export const simulate200QuickTickets = functions.https.onRequest(
+  async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "*");
+
+    if (req.method === "OPTIONS") {
+      res.status(204).send({
+        message: "Preflight request successful",
+      });
+      return;
+    }
+
+    if (req.method !== "GET") {
+      res.status(405).json({
+        status: 405,
+        message: "Method Not Allowed",
+      });
+      return;
+    }
+
+    try {
+      const totalTickets = 200;
+      const createdTickets = [];
+      const winnerStats = {
+        bigWinner: 0,
+        specialWinner: 0,
+        regularWinner: 0,
+        minorWinner: 0,
+        none: 0,
+      };
+
+      console.log(`Starting simulation of ${totalTickets} quick tickets...`);
+
+      // Get probabilities from Remote Config
+      const probabilities = await getWinnerProbabilitiesFromRemoteConfig();
+      console.log("Using probabilities from Remote Config:", probabilities);
+
+      for (let i = 0; i < totalTickets; i++) {
+        const ticketId = `sim_ticket_${Date.now()}_${i}_${Math.random()
+          .toString(36)
+          .substring(2, 8)}`;
+        const activationCode = Math.floor(
+          100000 + Math.random() * 900000
+        ).toString();
+
+        // Determine winner level based on probabilities
+        const winnerLevel = determineWinnerLevel(probabilities);
+        const symbols = getQuickTicketsSymbols(winnerLevel);
+
+        const ticketData = {
+          id: ticketId,
+          status: "pending",
+          symbols,
+          activationCode,
+          createdAt: Date.now(),
+          isWinner: winnerLevel !== "none",
+          winnerLevel,
+          simulation: true, // Mark as simulation
+        };
+
+        // Add ticket to quickTickets collection
+        const itemRef = rtdb.ref(`quickTickets/${ticketId}`);
+        await itemRef.set(ticketData);
+
+        // Update stats
+        winnerStats[winnerLevel]++;
+
+        createdTickets.push({
+          id: ticketId,
+          winnerLevel,
+          isWinner: winnerLevel !== "none",
+          symbols,
+        });
+
+        // Add a small delay every 50 tickets to avoid overwhelming the database
+        if ((i + 1) % 50 === 0) {
+          console.log(`Created ${i + 1}/${totalTickets} tickets...`);
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      }
+
+      // Calculate percentages
+      const winnerPercentages = {
+        bigWinner: ((winnerStats.bigWinner / totalTickets) * 100).toFixed(2),
+        specialWinner: (
+          (winnerStats.specialWinner / totalTickets) *
+          100
+        ).toFixed(2),
+        regularWinner: (
+          (winnerStats.regularWinner / totalTickets) *
+          100
+        ).toFixed(2),
+        minorWinner: ((winnerStats.minorWinner / totalTickets) * 100).toFixed(
+          2
+        ),
+        none: ((winnerStats.none / totalTickets) * 100).toFixed(2),
+      };
+
+      console.log(`Successfully created ${totalTickets} quick tickets`);
+      console.log("Winner statistics:", winnerStats);
+      console.log("Winner percentages:", winnerPercentages);
+
+      res.status(200).json({
+        status: 200,
+        message: `Successfully created ${totalTickets} quick tickets`,
+        data: {
+          totalTickets,
+          winnerStats,
+          winnerPercentages,
+          probabilities,
+          sampleTickets: createdTickets.slice(0, 10), // Return first 10 as samples
+        },
+      });
+    } catch (error) {
+      console.error("Error simulating quick tickets:", error);
+      res.status(500).json({
+        status: 500,
+        message: "Error simulating quick tickets",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+);

@@ -38,9 +38,13 @@ const page = () => {
   }, []);
   const listenToDB = () => {
     const quickTicketsCollection = ref(realtimeDB, "quickTickets");
+    const quickTicketsQuery = query(
+      quickTicketsCollection,
+      orderByChild("createdAt")
+    );
 
     const unsubscribe = onValue(
-      quickTicketsCollection,
+      quickTicketsQuery,
       (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -55,7 +59,8 @@ const page = () => {
 
           // 🔹 Get start of today in ms
           const startOfToday = new Date();
-          startOfToday.setHours(0, 0, 0, 0);
+          //set hours to 19:45
+          startOfToday.setHours(19, 45, 0, 0);
           const startMs = startOfToday.getTime();
           const endMs = startMs + 24 * 60 * 60 * 1000; // start of next day
 
@@ -149,11 +154,19 @@ const page = () => {
                   <button
                     className='bg-green-500 text-white border-none rounded px-4 py-2 cursor-pointer'
                     onClick={async () => {
-                      const ticketRef = ref(
-                        realtimeDB,
-                        `quickTickets/${ticket.id}`
-                      );
-                      await update(ticketRef, { status: "active" });
+                      try {
+                        const ticketRef = ref(
+                          realtimeDB,
+                          `quickTickets/${ticket.id}`
+                        );
+                        await update(ticketRef, { status: "active" });
+                        //check if ticket is winner and show alert when activated
+                        if (ticket.isWinner) {
+                        }
+                      } catch (error) {
+                        console.error("Error setting ticket active:", error);
+                        alert("Failed to set ticket active. Please try again.");
+                      }
                     }}
                   >
                     Set Active

@@ -12,7 +12,7 @@ type Errortype = {
 
 const WinnerLevelPrizes: { [key: string]: string } = {
   none: "No Premio",
-  bigWinner: "Premio Grane",
+  bigWinner: "Premio Grande",
   specialWinner: "Premio Special",
   regularWinner: "Premio Regular",
   minorWinner: "Premio Chico",
