@@ -1192,29 +1192,59 @@ export const getAllBets = functions.https.onRequest(async (req, res) => {
   }
 
   try {
-    const betsCollection = db.collection("bets");
-    const collectionSnapshot = await betsCollection.get();
+    // Get bets from Realtime Database for real-time data
+    const betsRef = rtdb.ref("bets");
+    const snapshot = await betsRef.once("value");
+    const betsData = snapshot.val();
 
-    const result = collectionSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+    if (!betsData) {
+      res.status(200).json({ result: [] });
+      return;
+    }
+
+    // Transform betsData object into an array with IDs
+    const result = Object.keys(betsData).map((key) => ({
+      id: key,
+      ...betsData[key],
     }));
 
     res.status(200).json({
       result,
     });
   } catch (err) {
-    console.error("Error fetching bets", err);
-    res.status(500).send({
-      message: "Error fetching bets",
-      error: err,
-    });
+    console.error("Error fetching bets from Realtime Database:", err);
+
+    // Fallback to Firestore if Realtime Database fails
+    try {
+      console.log("Falling back to Firestore...");
+      const betsCollection = db.collection("bets");
+      const collectionSnapshot = await betsCollection.get();
+
+      const result = collectionSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      res.status(200).json({
+        result,
+      });
+    } catch (firestoreErr) {
+      console.error("Error fetching bets from Firestore:", firestoreErr);
+      res.status(500).json({
+        status: 500,
+        message: "Error fetching bets",
+        error:
+          firestoreErr instanceof Error
+            ? firestoreErr.message
+            : String(firestoreErr),
+      });
+    }
   }
 });
 
 export const getBetData = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -1229,9 +1259,10 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
     });
     return;
   }
+
   try {
     const data = req.body;
-    console.log("data", data);
+    console.log("getBetData request data:", data);
     const id = data.id;
 
     if (!id) {
@@ -1239,27 +1270,55 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
       return;
     }
 
-    const betsCollection = db.collection("bets");
-    const betsDoc = betsCollection.doc(id);
-    const betsSnapshot = await betsDoc.get();
+    // Get bet data from Realtime Database first
+    const betRef = rtdb.ref(`bets/${id}`);
+    const snapshot = await betRef.once("value");
+    const betData = snapshot.val();
 
-    if (!betsSnapshot.exists) {
-      res.status(404).json({ data: null });
+    if (!betData) {
+      // Fallback to Firestore if not found in Realtime Database
+      console.log("Bet not found in Realtime Database, checking Firestore...");
+
+      const betsCollection = db.collection("bets");
+      const betsDoc = betsCollection.doc(id);
+      const betsSnapshot = await betsDoc.get();
+
+      if (!betsSnapshot.exists) {
+        res.status(404).json({
+          error: "Bet not found",
+          data: null,
+        });
+        return;
+      }
+
+      const firestoreBetData = betsSnapshot.data();
+
+      // Generate basic ticket data structure (if needed for compatibility)
+      const betTicketsData = Array.from({ length: 100 }, (_, index) => ({
+        number: index,
+        sold: false,
+        id: `ticket_${id}_${index}`,
+        betId: id,
+      }));
+
+      res.status(200).json({
+        betData: firestoreBetData,
+        data: betTicketsData,
+      });
       return;
     }
 
-    const betData = betsSnapshot.data();
-    const betTicketsCollection = db.collection("betTickets");
-    const ticketQuerySnapshot = await betTicketsCollection
-      .where("betId", "==", id)
-      .get();
+    // Generate ticket data structure for compatibility with existing frontend
+    const betTicketsData = Array.from({ length: 100 }, (_, index) => ({
+      number: index,
+      sold: false,
+      id: `ticket_${id}_${index}`,
+      betId: id,
+    }));
 
-    const tickets = ticketQuerySnapshot.docs.map((doc) => doc.data());
-    const betTicketsData = tickets.sort((a, b) => a.number - b.number);
-
-    console.log({
+    console.log("Bet data retrieved from Realtime Database:", {
       betData,
-      betTicketsData,
+      ticketCount: betTicketsData.length,
     });
 
     res.status(200).json({
@@ -1267,8 +1326,11 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
       data: betTicketsData,
     });
   } catch (error) {
-    console.error("Error fetching raffle data:", error);
-    res.status(500).json({ error: "Failed to fetch raffle data" });
+    console.error("Error fetching bet data:", error);
+    res.status(500).json({
+      error: "Failed to fetch bet data",
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 
@@ -1535,7 +1597,7 @@ export const confirmRejectBetSale = functions.https.onRequest(
 
 export const createBet = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -1545,24 +1607,82 @@ export const createBet = functions.https.onRequest(async (req, res) => {
 
   if (req.method !== "POST") {
     res.status(405).send({
-      message: "Only POST request are allowed",
+      message: "Only POST requests are allowed",
     });
     return;
   }
 
   try {
-    console.log("Procesing request");
+    console.log("Processing bet creation request");
     const data = req.body;
-    await db.collection("bets").add(data);
+    console.log("Bet data received:", data);
+
+    // Validate required fields
+    if (
+      !data.title ||
+      !data.description ||
+      !data.pricePerTicket ||
+      !data.teams
+    ) {
+      res.status(400).json({
+        status: 400,
+        message:
+          "Missing required fields: title, description, pricePerTicket, teams",
+      });
+      return;
+    }
+
+    // Generate unique bet ID
+    const betId = `bet_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 8)}`;
+
+    // Prepare bet data with initial values
+    const betData = {
+      title: data.title,
+      description: data.description,
+      image: data.image || "",
+      date: data.date,
+      pricePerTicket: data.pricePerTicket,
+      teams: data.teams, // { a: string, b: string }
+      oddsTeamA: data.oddsTeamA || "1.0",
+      oddsTeamB: data.oddsTeamB || "1.0",
+      // Initialize betting statistics
+      betsTeamA: 0,
+      betsTeamB: 0,
+      tieBets: 0,
+      initialPool: 0,
+      isFinished: false,
+      createdAt: Date.now(),
+    };
+
+    // Add bet to Firestore collection (for backward compatibility and queries)
+    const firestoreDocRef = await db.collection("bets").add(betData);
+    console.log("Bet added to Firestore with ID:", firestoreDocRef.id);
+
+    // Add bet to Realtime Database (for real-time updates)
+    const realtimeRef = rtdb.ref(`bets/${betId}`);
+    await realtimeRef.set({
+      ...betData,
+      firestoreId: firestoreDocRef.id,
+    });
+    console.log("Bet added to Realtime Database with ID:", betId);
 
     res.status(200).json({
       status: 200,
-      message: "Bet created successfully",
+      data: {
+        id: betId,
+        firestoreId: firestoreDocRef.id,
+        ...betData,
+      },
+      message: `Bet "${data.title}" created successfully`,
     });
-  } catch (e) {
-    console.error("Error creating bet", e);
+  } catch (error) {
+    console.error("Error creating bet:", error);
     res.status(500).json({
-      message: "An error ocurred while creating the bet",
+      status: 500,
+      message: "An error occurred while creating the bet",
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 });

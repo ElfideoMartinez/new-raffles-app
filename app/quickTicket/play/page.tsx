@@ -25,17 +25,6 @@ export default function PlayPage() {
   const [scratchedCardsCount, setScratchedCardsCount] = useState(0);
   const listenerRef = useRef<any>(null);
 
-  // Debug Firebase connection on component mount
-  useEffect(() => {
-    console.log("=== FIREBASE DEBUG INFO ===");
-    console.log("Environment:", process.env.NODE_ENV);
-    console.log("Firebase DB instance:", realtimeDB);
-    console.log("Firebase DB app:", realtimeDB.app);
-    console.log("Database URL:", realtimeDB.app.options.databaseURL);
-    console.log("Browser location:", window.location.href);
-    console.log("User agent:", navigator.userAgent);
-  }, []);
-
   useEffect(() => {
     console.log("Component mounted, checking for existing ticket...");
     // Get ticket id from localStorage and listen to ticket data from Firebase
@@ -82,7 +71,6 @@ export default function PlayPage() {
     setIsLoading(true);
     setScratchedCardsCount(0);
     try {
-      console.log("Calling Firebase function...");
       // Call backend to create a new ticket
       const response = await fetch(
         `https://createquickticket-3ve3qo4dga-uc.a.run.app`,
