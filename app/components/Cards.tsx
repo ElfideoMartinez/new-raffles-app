@@ -12,6 +12,20 @@ interface ICardsProps {
   date: string;
   awardImage: string;
 }
+
+/**
+ * Storefront raffle card.
+ *
+ * Reworked 2026-10-20:
+ *  - uses next/image (was a raw <img> despite next/image being imported and
+ *    unused) so images are lazily loaded and size-negotiated
+ *  - fixed 4:3 frame with object-cover instead of object-fill, which was
+ *    distorting raffle artwork
+ *  - restores the tickets-left figure that was computed and passed in but had
+ *    its display commented out
+ *  - shows a sold-out state (progress reaches 100%)
+ *  - brand tokens instead of ad hoc slate/gray classes
+ */
 const Cards = ({
   id,
   name,
@@ -22,28 +36,83 @@ const Cards = ({
   date,
   awardImage,
 }: ICardsProps) => {
+  const total = numberOfTickets || 0;
+  const left = typeof tickets_left === "number" ? tickets_left : null;
+  const sold = left !== null && total > 0 ? total - left : 0;
+  const pct = total > 0 ? Math.min(100, Math.round((sold / total) * 100)) : 0;
+  const isSoldOut = left !== null && left <= 0;
+
   return (
-    <div className='bg-white shadow-lg rounded-lg overflow-hidden'>
-      <img src={awardImage} alt='raffle' className='object-fill self-center'/>
-      <div className='p-4'>
-        <h2 className='text-xl font-bold mb-2 text-slate-500'>
+    <article className="group flex flex-col overflow-hidden rounded-card border border-ink-100 bg-white shadow-card transition-shadow hover:shadow-card-hover">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-ink-100">
+        {awardImage ? (
+          <Image
+            src={awardImage}
+            alt={title || name || "Rifa"}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-ink-500">
+            Sin imagen
+          </div>
+        )}
+
+        {left !== null && (
+          <span
+            className={`absolute right-3 top-3 rounded-pill px-3 py-1 text-xs font-semibold ${
+              isSoldOut
+                ? "bg-danger-500 text-white"
+                : "bg-white/95 text-ink-700 shadow-sm"
+            }`}
+          >
+            {isSoldOut ? "Agotada" : `${left} restantes`}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <h2 className="mb-1 text-lg font-bold leading-snug text-ink-900">
           {title || name || "Event"}
         </h2>
-        <p className='text-gray-600'>
-          Boletos totales: <span className='font-semibold'>{numberOfTickets}</span>
+
+        <p className="mb-3 text-2xl font-extrabold text-ink-900">
+          ${pricePerTicket}
+          <span className="ml-1 text-sm font-medium text-ink-500">/ boleto</span>
         </p>
-        {/* <p className='text-gray-600'>
-          Tickets Available:{" "}
-          <span className='font-semibold'>{tickets_left}</span>
-        </p> */}
-        <p className='text-gray-600'>
-          Precio: <span className='font-semibold'>${pricePerTicket}</span> por
-          unidad
-        </p>
-        <p className='text-gray-600'>Fecha final: {date} </p>
+
+        {total > 0 && (
+          <div className="mb-3">
+            <div className="mb-1 flex justify-between text-xs text-ink-500">
+              <span>
+                {sold} de {total} vendidos
+              </span>
+              <span>{pct}%</span>
+            </div>
+            <div
+              className="h-1.5 w-full overflow-hidden rounded-pill bg-ink-100"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Progreso de venta"
+            >
+              <div
+                className="h-full rounded-pill bg-brand-cta transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <p className="mt-auto text-sm text-ink-500">Fecha final: {date}</p>
       </div>
-      <RaffleDetailsButton id={id} price={pricePerTicket} />
-    </div>
+
+      <div className="px-4 pb-4">
+        <RaffleDetailsButton id={id} price={pricePerTicket} />
+      </div>
+    </article>
   );
 };
 

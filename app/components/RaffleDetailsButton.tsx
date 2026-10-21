@@ -1,18 +1,25 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-///import next navigation
+
 interface IRaffeDetailsButtonProps {
   id: string;
   price: number;
 }
-//this will recieve the id of the raffle and will redirect to the raffle details page
-const RaffleDetailsButton = ({ id, price }: IRaffeDetailsButtonProps) => {
-  //a button to go to the raffle/:id page with the id of the raffle and send it as parameter
+
+/**
+ * CTA into a raffle's detail page.
+ *
+ * Reworked 2026-10-20: previously declared `bg-blue-500` then overrode it with
+ * an inline `#355b6eff`, so the primary action on every storefront card
+ * rendered as dark teal and ignored the brand tokens. Now uses the shared
+ * brand-cta gradient and matches the ticket buttons elsewhere.
+ */
+const RaffleDetailsButton = ({ id }: IRaffeDetailsButtonProps) => {
   return (
     <Link
       href={`/raffle/${id}`}
-      className='bg-blue-500 text-white block text-center p-2 mx-3 rounded-lg mb-3' style={{ backgroundColor: '#355b6eff'}}
+      className="block rounded-pill bg-brand-cta px-4 py-2.5 text-center text-sm font-semibold text-white shadow-cta transition-transform hover:bg-brand-cta-hover active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
     >
       Ver Rifa
     </Link>
