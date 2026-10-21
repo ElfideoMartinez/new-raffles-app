@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 import Link from "next/link";
+import { formatPrice } from "@/app/utils/format";
 import { toast } from "nextjs-toast-notify";
 
 const UserCartPage = () => {
@@ -68,8 +69,8 @@ const UserCartPage = () => {
           <li key={ticket.raffleId}>
             <div className="ml-2">
               <h2>Rifa: {ticket.raffleName}</h2>
-              <p className="">Precio de boleto: ${ticket.raffleTotalPrice/ticket.ticketNumbers.length}</p>
-              <p className="pb-1">Precio total: ${ticket.raffleTotalPrice}</p>
+              <p className="">Precio de boleto: {formatPrice(ticket.raffleTotalPrice/ticket.ticketNumbers.length)}</p>
+              <p className="pb-1">Precio total: {formatPrice(ticket.raffleTotalPrice)}</p>
             </div>
             <ul>
               <li className='flex w-full justify-between'>
@@ -98,11 +99,11 @@ const UserCartPage = () => {
                       .removeItemFromCart(ticket.raffleId);
                   }}
                   className='bg-red-600 p-2 h-12 w-12 rounded-lg flex items-center justify-center mr-2'
-                  title="Borrar todos los boletos"
-                >
+                  aria-label="Borrar todos los boletos"
+                >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                   <img
                     src="/trash.png"
-                    alt="Quitar boleto"
+                    alt=""
                     className="filter invert"
                   />
                   {/* <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'>
@@ -121,8 +122,8 @@ const UserCartPage = () => {
               <p>Apuesta: {bet.betName}</p>
               <p>Equipo: {bet.team}</p>
               <p>Boletos: {bet.ticketNumbers}</p>
-              <p>Precio de boleto: ${bet.totalPrice/bet.ticketNumbers}</p>
-              <p>Precio total: ${bet.totalPrice}</p>
+              <p>Precio de boleto: {formatPrice(bet.totalPrice/bet.ticketNumbers)}</p>
+              <p>Precio total: {formatPrice(bet.totalPrice)}</p>
             </div>
             <div>
               <button
@@ -130,11 +131,11 @@ const UserCartPage = () => {
                   removeBet(bet.betId);
                 }}
                 className='bg-red-600 p-2 h-12 w-12 rounded-lg flex items-center justify-center mr-2 relative top-16 left-2'
-                title="Borrar apuesta"
-              >
+                aria-label="Borrar apuesta"
+              >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                 <img
                     src="/trash.png"
-                    alt="Quitar apuesta"
+                    alt=""
                     className="filter invert"
                   />
                 {/* <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'>
@@ -147,15 +148,22 @@ const UserCartPage = () => {
       </ul>
       {groupedTicketsArray.length > 0 || userCartBets.length > 0 ? (
         <div className='mx-2 mt-2'>
-          <p className='self-center text-center mb-2'>Monto total: ${totalRafflePrice + totalBetsPrice}</p>
+          <p className='self-center text-center mb-2'>Monto total: {formatPrice(totalRafflePrice + totalBetsPrice)}</p>
           <Link
             href='/checkout/transfer'
-            className='bg-yellow-500 text-white p-2 rounded-lg w-ful flex justify-center'
+            className='bg-yellow-500 text-white p-2 rounded-lg w-full flex justify-center'
           >
             Pago por transferencia
           </Link>
         </div>
-      ) : null}
+      ) : (
+        <div className="mx-2 mt-6 rounded-card border border-ink-100 bg-white p-10 text-center shadow-card">
+          <p className="text-lg font-semibold text-ink-900">Tu carrito está vacío</p>
+          <p className="mt-1 text-sm text-ink-500">
+            Elige boletos en una rifa activa para continuar.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

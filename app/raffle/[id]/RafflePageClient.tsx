@@ -8,6 +8,7 @@ import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
 import { FadeLoader } from "react-spinners";
 import { toast } from "nextjs-toast-notify";
+import { formatPrice } from "@/app/utils/format";
 
 interface IticketNumber {
   number: number | string
@@ -147,11 +148,15 @@ const RafflePageClient = ({
           🎯 ¡Dame un número!
         </button>
       </div>
-      <div className='bg-white shadow-lg rounded-lg overflow-hidden w-10/12'>
+      <div className='bg-white shadow-lg rounded-card overflow-hidden w-10/12'>
+        {/* Raw <img>: the URL comes from Firestore and next/image would need a
+            remotePatterns entry per storage host. object-cover fixes the
+            distortion caused by object-fill. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- see comment above */}
         <img
           src={raffleData.raffleImage}
-          alt='Raffle Image'
-          className='w-full h-64 object-fill'
+          alt={raffleData.awardName || raffleData.raffleName}
+          className='w-full h-64 object-cover'
         />
         <div className="text-black font-bold text-lg md:text-xl text-center pt-3 px-3 md:px-2">
           <p>Premio: {raffleData.awardName}</p>
@@ -163,7 +168,7 @@ const RafflePageClient = ({
           <div className="flex justify-center items-center rounded-xl bg-green-600 text-white font-bold text-3xl h-20 w-20 mt-3 shadow-lg">
             {raffleData.ticketWinner}
           </div>
-          <p className="text-black text-xl mt-2">Gracias por su participacion, Rifas Mtz se pondra en contacto con el ganador</p>
+          <p className="text-black text-xl mt-2">Gracias por tu participación, Rifas Mtz se pondrá en contacto con el ganador</p>
         </div>)}
         <div className={`p-4 text-center grid-cols-6 ${thereIsWinner ? 'cursor-not-allowed opacity-80 pointer-events-none' : ''}`}>
         {raffleData.data.map((ticket, index) => (      

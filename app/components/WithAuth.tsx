@@ -81,7 +81,12 @@ const withAuth = (Component: any) => {
         })
         .catch((err) => console.log("failed: ", err));
     }, []);
-    if (loading) return <p>Cargando...</p>;
+    if (loading)
+      return (
+        <p role="status" className="p-6 text-center text-sm text-ink-500">
+          Cargando…
+        </p>
+      );
     if (!authenticated) return null;
 
     return <Component {...props} />;

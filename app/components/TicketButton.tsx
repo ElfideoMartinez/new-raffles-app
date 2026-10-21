@@ -59,8 +59,16 @@ const TicketButton = ({
         }
         handleClick();
       }}
+      aria-pressed={!isUnavailable && !inTheCart ? isSelected : undefined}
+      aria-label={
+        isUnavailable
+          ? `Boleto ${ticketNumber} vendido`
+          : inTheCart
+          ? `Boleto ${ticketNumber}, ya en el carrito`
+          : `Boleto ${ticketNumber}`
+      }
       className={`m-1 text-white py-2 px-4 rounded 
-        ${isUnavailable ? "cursor-not-allowed opacity-50 bg-blue-500 capitalize" : ""}
+        ${isUnavailable ? "cursor-not-allowed opacity-50 bg-brand-500 capitalize" : ""}
         ${inTheCart ? "bg-yellow-400" : ""}
         ${!inTheCart && !isUnavailable && (isSelected ? "bg-yellow-400" : "bg-green-500")}
       `}

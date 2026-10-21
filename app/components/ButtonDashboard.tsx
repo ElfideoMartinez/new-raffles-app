@@ -6,7 +6,7 @@ interface ButtonDashboardProps {
 }
 export default function ButtonDashboard ({ buttonName, url}: ButtonDashboardProps) {
   return(
-    <Link href={url} className=" bg-blue-500 p-2 rounded-md px-4 w-3/4 sm:w-1/4 text-center">
+    <Link href={url} className="focus-ring bg-brand-600 px-4 py-2 w-full text-center text-white rounded-md sm:w-1/4 hover:bg-brand-700">
       {buttonName}
     </Link>
   )

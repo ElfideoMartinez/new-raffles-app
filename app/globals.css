@@ -9,8 +9,13 @@
   --color-ink-900: #0f172a;
   --color-ink-inverse: #ffffff;
   --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
   --color-brand-700: #1d4ed8;
   --color-accent-400: #2dd4bf;
+  --color-accent-500: #14b8a6;
+  /* Referenced by OfferStar's default fill. Was missing, so the star rendered
+     black (an invalid var() falls back to the initial fill). */
+  --color-warning-500: #f59e0b;
 
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -19,9 +24,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    /* No dark theme is designed yet: every surface is light and the tokens are
+       authoritative. Keep body text dark so it does not flip to white-on-white
+       in cart, purchases, terms and the bet list. */
+    --foreground-rgb: 0, 0, 0;
   }
 }
 
@@ -56,12 +62,23 @@ body {
   }
   
   .random-ticket-button:hover {
-    background: linear-gradient(135deg, #2563eb, #14b8a6); /* brand-600 → accent-500; not hoisted: Tailwind hover tokens */
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-accent-500));
     transform: scale(1.05);
   }
   
   .random-ticket-button:active {
     transform: scale(0.98);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* One focus treatment for keyboard users; outline colour and offset match
+     the CTA that already had a focus-visible ring (RaffleDetailsButton). */
+  .focus-ring {
+    outline: none;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-brand-700);
+    outline-offset: 2px;
   }
 }

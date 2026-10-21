@@ -35,7 +35,7 @@ const MainHeader = () => {
             </button>
           ) : (
             <button
-              className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'invisible' : ''}`}
+              className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
               aria-label="Regresar"
               onClick={() => {
                 router.back();
@@ -58,7 +58,7 @@ const MainHeader = () => {
             </span>
           </Link>
 
-          <div className={`flex h-10 w-10 items-center justify-center ${isCartIconAvailable ? 'invisible' : ''}`}>
+          <div className={`flex h-10 w-10 items-center justify-center ${isCartIconAvailable ? 'hidden' : ''}`}>
             <CartButton />
           </div>
         </div>

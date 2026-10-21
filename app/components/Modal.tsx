@@ -30,7 +30,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
             data:/blob: upload; next/image cannot optimise those. */}
         <img
           src={imageUrl}
-          alt="Enlarged"
+          alt="Comprobante ampliado"
           className="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-lg"
         />
       </div>

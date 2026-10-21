@@ -29,7 +29,7 @@ export default async function Home() {
               Rifas activas
             </h1>
             <p className="mt-1 text-sm text-ink-500">
-              Elige una rifa y compra tus boletos en linea.
+              Elige una rifa y compra tus boletos en línea.
             </p>
           </div>
           {raffles.length > 0 ? (

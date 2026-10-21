@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import RaffleDetailsButton from "./RaffleDetailsButton";
 import type { Raffle } from "@/app/config/types";
+import { formatDate, formatPrice } from "@/app/utils/format";
 
 export type ICardsProps = Raffle;
 
@@ -39,7 +40,9 @@ const Cards = ({
         {awardImage ? (
           <Image
             src={awardImage}
-            alt={title || "Rifa"}
+            /* Empty on purpose: the card already renders the title as <h2> right
+               below, so a text alt makes screen readers announce it twice. */
+            alt=""
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
@@ -54,7 +57,7 @@ const Cards = ({
           <span
             className={`absolute right-3 top-3 rounded-pill px-3 py-1 text-xs font-semibold ${
               isSoldOut
-                ? "bg-danger-500 text-white"
+                ? "bg-danger-700 text-white"
                 : "bg-white/95 text-ink-700 shadow-sm"
             }`}
           >
@@ -69,7 +72,7 @@ const Cards = ({
         </h2>
 
         <p className="mb-3 text-2xl font-extrabold text-ink-900">
-          ${pricePerTicket}
+          {formatPrice(pricePerTicket)}
           <span className="ml-1 text-sm font-medium text-ink-500">/ boleto</span>
         </p>
 
@@ -97,7 +100,7 @@ const Cards = ({
           </div>
         )}
 
-        <p className="mt-auto text-sm text-ink-500">Fecha final: {date}</p>
+        <p className="mt-auto text-sm text-ink-500">Fecha final: {formatDate(date)}</p>
       </div>
 
       <div className="px-4 pb-4">

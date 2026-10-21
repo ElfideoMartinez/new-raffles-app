@@ -1,4 +1,6 @@
+import { formatDateTime } from "./format";
+
+/** Kept for existing call sites; delegates to the shared es-MX formatter. */
 export function formatDateLocal(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleString();
+  return formatDateTime(dateString);
 }

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ClipLoader } from "react-spinners";
+import { formatDate, formatPrice } from "@/app/utils/format";
 
 interface IBetData {
   id: string;
@@ -41,10 +42,10 @@ export default async function BetsPage() {
       return (
         <main className='min-h-screen flex items-center justify-center'>
           <div className='text-center'>
-            <h1 className='text-2xl font-bold text-white mb-4'>
+            <h1 className='text-2xl font-bold text-ink-900 mb-4'>
               No hay apuestas disponibles
             </h1>
-            <p className='text-gray-400'>
+            <p className='text-ink-500'>
               Vuelve pronto para ver nuevas apuestas
             </p>
           </div>
@@ -60,7 +61,7 @@ export default async function BetsPage() {
       >
         <main className='min-h-screen p-4'>
           <div className='max-w-7xl mx-auto'>
-            <h1 className='text-3xl font-bold text-white text-center mb-8'>
+            <h1 className='text-3xl font-bold text-ink-900 text-center mb-8'>
               Apuestas Disponibles
             </h1>
 
@@ -78,9 +79,9 @@ export default async function BetsPage() {
     return (
       <main className='min-h-screen flex items-center justify-center'>
         <div className='text-red-500 text-center'>
-          <h1 className='text-2xl font-bold mb-4'>Error loading bets</h1>
+          <h1 className='text-2xl font-bold mb-4'>No se pudieron cargar las apuestas</h1>
           <p>{error.message}</p>
-          <p className='text-gray-400 mt-2'>Please try again later</p>
+          <p className='text-ink-500 mt-2'>Intenta de nuevo en un momento.</p>
         </div>
       </main>
     );
@@ -104,7 +105,7 @@ function BetCard({ bet }: { bet: IBetData }) {
         <div className='relative h-48 w-full'>
           <Image
             src={bet.image}
-            alt={bet.title}
+            alt=""
             fill
             className='object-cover'
           />
@@ -123,13 +124,13 @@ function BetCard({ bet }: { bet: IBetData }) {
         <div className='space-y-2 mb-4'>
           <div className='text-sm text-gray-400'>
             <span className='font-semibold '>Precio por boleto:</span>{" "}
-            <span className='text-white'>${bet.pricePerTicket}</span>
+            <span className='text-white'>{formatPrice(bet.pricePerTicket)}</span>
           </div>
 
           <div className='text-sm text-gray-400'>
             <span className='font-semibold'>Cierre:</span>{" "}
             <span className='text-white'>
-              {new Date(bet.date).toLocaleDateString()}
+              {formatDate(bet.date)}
             </span>
           </div>
         </div>

@@ -31,7 +31,7 @@ const ImageWithModal: React.FC<{ sale: Sale }> = ({ sale }) => {
         // data:/blob: URL; next/image cannot optimise those.
         <img
           src={imageToDisplay}
-          alt="payment"
+          alt="Comprobante de pago"
           onClick={() => handleImageClick(sale.paymentImage)}
           className="cursor-pointer w-16 h-24 mb-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
         />

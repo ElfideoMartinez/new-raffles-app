@@ -4,6 +4,7 @@ import { FadeLoader } from "react-spinners";
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
 import { toast } from "nextjs-toast-notify";
+import { formatPrice } from "@/app/utils/format";
 
 
 interface Sale {
@@ -148,7 +149,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
           </div>     
         ))}
       </div>
-      <div>Total de venta: ${sale.totalRafflePrice}</div>
+      <div>Total de venta: {formatPrice(sale.totalRafflePrice)}</div>
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
@@ -160,21 +161,21 @@ const SaleCard: React.FC<SaleCardProps> = ({
           <button
           onClick={handleAction}
           className={`w-full ${
-            isVerified ? "bg-red-500" : "bg-green-500"
+            isVerified ? "bg-danger-700" : "bg-success-700"
           } text-white p-2 rounded-md`}
           >
             {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
           </button>
           {sale.verified ? 
             <Link 
-            className="bg-green-500 p-2 rounded-md w-full text-center"
+            className="bg-success-700 p-2 rounded-md w-full text-center"
             href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msg}`}
             >
               Confirmar con Whatsapp
             </Link>
           : 
             <Link
-              className="bg-red-500 p-2 rounded-md w-full text-center"
+              className="bg-danger-700 p-2 rounded-md w-full text-center"
               href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msgFailed}`}
             >
               Notificar Problema
