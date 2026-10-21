@@ -102,7 +102,15 @@ const EditBetPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ idBet, bet }),
+          // Send teams back in the canonical {a,b} shape and omit server-owned
+          // odds/counters. updateBet merges, so anything omitted is preserved.
+          body: JSON.stringify({
+            idBet,
+            bet: {
+              ...bet,
+              teams: { a: bet.teams[0] || "", b: bet.teams[1] || "" },
+            },
+          }),
         }
       );
 
@@ -201,7 +209,12 @@ const EditBetPage = () => {
         date: result.betData.date || "",
         pricePerTicket: result.betData.pricePerTicket || "",
         initialPool: result.betData.initialPool || "",
-        teams: result.betData.teams || [],
+        // Canonical docs store teams as {a,b}; older ones as an array. The form
+        // edits a tuple, so normalise on load instead of letting a shape change
+        // reach the UI (bet.teams[0] was undefined for object-shaped docs).
+        teams: Array.isArray(result.betData.teams)
+          ? result.betData.teams
+          : [result.betData.teams?.a || "", result.betData.teams?.b || ""],
         betsTeamA: result.betData.betsTeamA || 0,
         betsTeamB: result.betData.betsTeamB || 0,
         isFinished: result.betData.isFinished || false,
