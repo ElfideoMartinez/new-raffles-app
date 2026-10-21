@@ -9,11 +9,17 @@ import {
   EmbeddedCheckoutProvider,
 } from "@stripe/react-stripe-js";
 import { useRouter } from "next/navigation";
-import { env } from "process";
 
-const stripePromise = loadStripe(
-  "pk_live_51OhNGHFa61udd4SXnw3EebSJfjIhzG2EwAwJLU6LKSguaAPkYjyw3R3cew2Q2r5a2PBMPsCB78SDdsCeKSL9xssS00If8jotey"
-);
+// Publishable key: safe to ship, but kept in config so test/live can differ.
+// The public fallback is the project's existing live publishable key, so a
+// missing env var cannot break the checkout page at build time or in prod.
+const PUBLISHABLE_KEY_FALLBACK =
+  "pk_live_51OhNGHFa61udd4SXnw3EebSJfjIhzG2EwAwJLU6LKSguaAPkYjyw3R3cew2Q2r5a2PBMPsCB78SDdsCeKSL9xssS00If8jotey";
+
+const publishableKey =
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || PUBLISHABLE_KEY_FALLBACK;
+
+const stripePromise = loadStripe(publishableKey);
 
 const CardCheckoutPage = () => {
   const router = useRouter();
