@@ -148,7 +148,7 @@ const RafflePageClient = ({
           🎯 ¡Dame un número!
         </button>
       </div>
-      <div className='bg-white shadow-lg rounded-card overflow-hidden w-10/12'>
+      <div className='bg-white shadow-lg rounded-md overflow-hidden w-10/12'>
         {/* Raw <img>: the URL comes from Firestore and next/image would need a
             remotePatterns entry per storage host. object-cover fixes the
             distortion caused by object-fill. */}
@@ -163,9 +163,9 @@ const RafflePageClient = ({
           <p>Descripción del premio: {raffleData.awardDescription}</p>
         </div>
         {thereIsWinner && (
-        <div className="flex flex-col items-center text-center mt-4 p-4 bg-gray-100 rounded-xl shadow-md">
+        <div className="flex flex-col items-center text-center mt-4 p-4 bg-gray-100 rounded-card shadow-md">
           <p className="text-black text-2xl font-semibold">🎉 Boleto Ganador 🎉</p>
-          <div className="flex justify-center items-center rounded-xl bg-green-600 text-white font-bold text-3xl h-20 w-20 mt-3 shadow-lg">
+          <div className="flex justify-center items-center rounded-pill bg-green-600 text-white font-bold text-3xl h-20 w-20 mt-3 shadow-lg">
             {raffleData.ticketWinner}
           </div>
           <p className="text-black text-xl mt-2">Gracias por tu participación, Rifas Mtz se pondrá en contacto con el ganador</p>

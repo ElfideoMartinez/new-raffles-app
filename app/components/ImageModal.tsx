@@ -33,7 +33,7 @@ const ImageWithModal: React.FC<{ sale: Sale }> = ({ sale }) => {
           src={imageToDisplay}
           alt="Comprobante de pago"
           onClick={() => handleImageClick(sale.paymentImage)}
-          className="cursor-pointer w-16 h-24 mb-2 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+          className="cursor-pointer w-16 h-24 mb-2 rounded-sm transition-all duration-300 ease-in-out transform hover:scale-105"
         />
       )}
       <Modal

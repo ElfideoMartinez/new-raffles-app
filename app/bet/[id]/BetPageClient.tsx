@@ -333,7 +333,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
 
     return (
       <div
-        className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-xl text-white shadow cursor-pointer transition p-4 ${color}
+        className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-card text-white shadow cursor-pointer transition p-4 ${color}
         ${
           disabled
             ? "bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none"
@@ -378,7 +378,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
           <span className='text-lg font-semibold'>{tickets}</span>
         </div>
 
-        <div className='mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center'>
+        <div className='mt-2 bg-yellow-300 text-green-900 rounded-sm px-3 py-1 text-sm font-semibold text-center'>
           Gana:
           <span className='cursor-pointer'>{winPerTicket.toFixed(2)}</span>
         </div>
@@ -396,7 +396,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
         <>
           {/* Main Image */}
           <img
-            className='mb-6 h-[33vh] w-full rounded-xl bg-cover bg-center shadow-lg'
+            className='mb-6 h-[33vh] w-full rounded-card bg-cover bg-center shadow-lg'
             src={realtimeBetData.image}
             alt={realtimeBetData.title}
           />
@@ -494,7 +494,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             </div>
             <div className='flex justify-start'>
               <button
-                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-lg shadow transition text-md sm:text-lg disabled:opacity-55
+                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-md sm:text-lg disabled:opacity-55
                 disabled:hover:bg-yellow-400 disabled:cursor-not-allowed'
                 disabled={totalTickets === 0}
                 onClick={addToCart}

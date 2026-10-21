@@ -15,7 +15,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
   children,
   isWinner = false,
 }) => (
-  <div className='bg-white text-black p-4 rounded-lg mb-4 shadow flex justify-between items-center'>
+  <div className='bg-white text-black p-4 rounded-card mb-4 shadow flex justify-between items-center'>
     <div>
       <div>
         <span className='text-3xl text-center ml-auto text-green-600 font-extrabold tracking-widest'>

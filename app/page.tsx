@@ -64,7 +64,7 @@ export default async function Home() {
           <p className="mt-2 text-sm text-ink-500">
             Intenta de nuevo en un momento.
           </p>
-          <p className="mt-3 rounded bg-danger-50 px-3 py-2 text-xs text-danger-700">
+          <p className="mt-3 rounded-sm bg-danger-50 px-3 py-2 text-xs text-danger-700">
             {message}
           </p>
         </div>

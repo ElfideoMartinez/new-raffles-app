@@ -100,7 +100,7 @@ function BetCard({ bet }: { bet: IBetData }) {
       : "0";
 
   return (
-    <div className='bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'>
+    <div className='bg-gray-800 rounded-card overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'>
       {bet.image && (
         <div className='relative h-48 w-full'>
           <Image
@@ -178,7 +178,7 @@ function BetCard({ bet }: { bet: IBetData }) {
         <div className='flex flex-col gap-2'>
           <Link
             href={`/bet/${bet.id}`}
-            className={`w-full text-center py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${
+            className={`w-full text-center py-2 px-4 rounded-card font-semibold transition-colors duration-300 ${
               bet.isFinished
                 ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"

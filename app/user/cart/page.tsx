@@ -76,7 +76,7 @@ const UserCartPage = () => {
               <li className='flex w-full justify-between'>
                 <ul className='flex flex-wrap gap-2'>
                   {ticket.ticketNumbers.map((number: number) => (
-                    <li key={number} className='p-2 rounded-lg bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-pointer hover:bg-red-500'
+                    <li key={number} className='p-2 rounded-card bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-pointer hover:bg-red-500'
                       onClick={() => {
                         useTicketStore.getState().removeTicketFromCart(ticket.raffleId, number);
                         toast.success('Boleto borrado',{
@@ -98,7 +98,7 @@ const UserCartPage = () => {
                       .getState()
                       .removeItemFromCart(ticket.raffleId);
                   }}
-                  className='bg-red-600 p-2 h-12 w-12 rounded-lg flex items-center justify-center mr-2'
+                  className='bg-red-600 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2'
                   aria-label="Borrar todos los boletos"
                 >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                   <img
@@ -130,7 +130,7 @@ const UserCartPage = () => {
                 onClick={() => {
                   removeBet(bet.betId);
                 }}
-                className='bg-red-600 p-2 h-12 w-12 rounded-lg flex items-center justify-center mr-2 relative top-16 left-2'
+                className='bg-red-600 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2 relative top-16 left-2'
                 aria-label="Borrar apuesta"
               >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                 <img
@@ -151,7 +151,7 @@ const UserCartPage = () => {
           <p className='self-center text-center mb-2'>Monto total: {formatPrice(totalRafflePrice + totalBetsPrice)}</p>
           <Link
             href='/checkout/transfer'
-            className='bg-yellow-500 text-white p-2 rounded-lg w-full flex justify-center'
+            className='bg-yellow-500 text-white p-2 rounded-card w-full flex justify-center'
           >
             Pago por transferencia
           </Link>

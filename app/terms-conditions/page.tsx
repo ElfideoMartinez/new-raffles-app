@@ -2,7 +2,7 @@
 const TermsConditionsPage = () => {
   return(
     <div className="flex flex-col justify-center mt-4 mx-4 items-center">
-      <div className="w-5/6 lg:w-2/3 bg-white text-black p-4 rounded-lg space-y-5">
+      <div className="w-5/6 lg:w-2/3 bg-white text-black p-4 rounded-card space-y-5">
         <p className="text-center text-xl">Terminos y Condiciones de Uso</p>
         <section className="">
           <p className="font-bold">*1. Introduccion*</p>

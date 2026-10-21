@@ -256,7 +256,7 @@ const CreateBet = () => {
                 onChange={handleChange}
                 required
                 placeholder='Ej: Real Madrid vs Barcelona'
-                className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
               />
             </div>
 
@@ -272,7 +272,7 @@ const CreateBet = () => {
                 required
                 rows={4}
                 placeholder='Describe los detalles de la apuesta...'
-                className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none'
+                className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none'
               />
             </div>
 
@@ -293,7 +293,7 @@ const CreateBet = () => {
                     step='0.01'
                     min='0'
                     placeholder='0.00'
-                    className='w-full pl-8 pr-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                    className='w-full pl-8 pr-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -308,7 +308,7 @@ const CreateBet = () => {
                   value={bet.date}
                   onChange={handleChange}
                   required
-                  className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                  className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
                 />
               </div>
             </div>
@@ -329,7 +329,7 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("a", e.target.value)}
                     required
                     placeholder='Nombre del primer equipo'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
                   />
                 </div>
 
@@ -343,7 +343,7 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("b", e.target.value)}
                     required
                     placeholder='Nombre del segundo equipo'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -365,7 +365,7 @@ const CreateBet = () => {
                       oddsTie: e.target.checked ? "" : undefined,
                     }));
                   }}
-                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm'
                 />
                 <label
                   htmlFor='enableTie'
@@ -392,7 +392,7 @@ const CreateBet = () => {
                     }}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all'
                   />
                 </div>
               )}
@@ -408,7 +408,7 @@ const CreateBet = () => {
                     onChange={handleChange}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
                   />
                 </div>
 
@@ -423,7 +423,7 @@ const CreateBet = () => {
                     onChange={handleChange}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -434,7 +434,7 @@ const CreateBet = () => {
               <label className='text-white block text-sm font-medium mb-2'>
                 Imagen de la Apuesta *
               </label>
-              <div className='border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-gray-500 transition-colors'>
+              <div className='border-2 border-dashed border-gray-600 rounded-card p-6 text-center hover:border-gray-500 transition-colors'>
                 <input
                   type='file'
                   name='betImage'
@@ -483,7 +483,7 @@ const CreateBet = () => {
               <button
                 disabled={isLoading || !isFormValid}
                 type='submit'
-                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100'
+                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-card font-semibold text-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100'
               >
                 {isLoading ? (
                   <div className='flex items-center justify-center'>

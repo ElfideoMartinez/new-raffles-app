@@ -30,7 +30,7 @@ const LoginPage = () => {
 
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-100'>
-      <div className='w-full max-w-md p-8 space-y-6 bg-white rounded shadow-lg'>
+      <div className='w-full max-w-md p-8 space-y-6 bg-white rounded-card shadow-lg'>
         <h2 className='text-black text-2xl font-bold text-center'>
           Iniciar sesión
         </h2>
@@ -45,7 +45,7 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500 bg-white '
+              className='w-full px-4 py-2 border rounded-sm text-black focus:outline-none focus:border-blue-500 bg-white '
             />
           </div>
           <div>
@@ -57,12 +57,12 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className='w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:border-blue-500 bg-white'
+              className='w-full px-4 py-2 border rounded-sm text-black focus:outline-none focus:border-blue-500 bg-white'
             />
           </div>
           <button
             type='submit'
-            className='w-full bg-brand-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300'
+            className='w-full bg-brand-600 text-white py-2 px-4 rounded-sm font-semibold hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300'
           >
             Iniciar sesión
           </button>

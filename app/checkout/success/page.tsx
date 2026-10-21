@@ -98,7 +98,7 @@ const SuccessPage = () => {
       <p>📧 Correo: ealejandramtzq04@gmail.com<br/>
          📞 Teléfono: 6391316226
       </p>
-      <Link href='../' className='p-2 mt-4 rounded-md' style={{ backgroundColor: "var(--color-brand-700)" }}>
+      <Link href='../' className='p-2 mt-4 rounded-card' style={{ backgroundColor: "var(--color-brand-700)" }}>
         Ir a inicio
       </Link>
     </div>

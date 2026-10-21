@@ -59,11 +59,11 @@ const PurchasesPage = () => {
       {isEmpty ? <h1 className="text-center">No hay compras aun</h1>: 
         <ul className="space-y-6">
           {purchases.map((group, index) => (
-            <li key={index} className="bg-slate-700 p-4 rounded-md">
+            <li key={index} className="bg-slate-700 p-4 rounded-card">
               <p className="text-sm text-gray-300 mb-2">📅 Compra realizada el: {new Date(group.date).toLocaleString()}</p>
               <ul className="space-y-3">
                 {group.raffles.map((raffle) => (
-                  <li key={`${raffle.raffleId}-${raffle.ticketNumbers.join(",")}`} className="bg-slate-600 p-3 rounded-md md:flex md:justify-between md:items-center">
+                  <li key={`${raffle.raffleId}-${raffle.ticketNumbers.join(",")}`} className="bg-slate-600 p-3 rounded-card md:flex md:justify-between md:items-center">
                     <section>
                       <strong>🎟 Rifa:</strong> {raffle.raffleName}<br />
                       <strong>Boletos:</strong> {raffle.ticketNumbers.join(", ")}<br />
@@ -74,7 +74,7 @@ const PurchasesPage = () => {
               </ul>
               <ul className="space-y-3 mt-3">
                 {group.bets.map((bet) => (
-                  <li key={`${bet.betId}`} className="bg-slate-600 p-3 rounded-md md:flex md:justify-between md:items-center">
+                  <li key={`${bet.betId}`} className="bg-slate-600 p-3 rounded-card md:flex md:justify-between md:items-center">
                     <section>
                       <strong>🎟 Apuesta:</strong> {bet.betName}<br />
                       <strong>Equipo:</strong> {bet.team}<br />

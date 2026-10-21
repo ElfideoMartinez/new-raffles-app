@@ -98,7 +98,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   const msgFailed = `¡Hola ${sale.name}! hubo un error al confirmar tu compra 😕 Si necesitas ayuda para completarla, estoy aquí para apoyarte 😊`
 
   return (
-    <div className='bg-slate-600 p-4 rounded-md'>
+    <div className='bg-slate-600 p-4 rounded-card'>
       {sale.paymentImage && (
         <ImageWithModal sale={sale} />
       )}
@@ -112,7 +112,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
             <div className="flex flex-wrap"> 
               Boletos vendidos:
               {raffle.ticketNumbers.map((tn) => (
-                <span key={tn} className='p-1 bg-blue-400 rounded-lg mr-1 ml-1'>
+                <span key={tn} className='p-1 bg-blue-400 rounded-card mr-1 ml-1'>
                   {tn}
                 </span>
               ))}
@@ -124,7 +124,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
-        <button className='bg-gray-400 text-white rounded-md p-2' disabled>
+        <button className='bg-gray-400 text-white rounded-card p-2' disabled>
           <FadeLoader color="var(--color-ink-inverse)" />
         </button>
       ) : (
@@ -133,20 +133,20 @@ const SaleCard: React.FC<SaleCardProps> = ({
           onClick={handleAction}
           className={`w-full ${
             isVerified ? "bg-danger-700" : "bg-success-700"
-          } text-white p-2 rounded-md`}
+          } text-white p-2 rounded-card`}
           >
             {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
           </button>
           {sale.verified ? 
             <Link 
-            className="bg-success-700 p-2 rounded-md w-full text-center"
+            className="bg-success-700 p-2 rounded-card w-full text-center"
             href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msg}`}
             >
               Confirmar con Whatsapp
             </Link>
           : 
             <Link
-              className="bg-danger-700 p-2 rounded-md w-full text-center"
+              className="bg-danger-700 p-2 rounded-card w-full text-center"
               href={`https://wa.me/52${sale.phone.replace("+52", "")}?text=${msgFailed}`}
             >
               Notificar Problema

@@ -179,7 +179,7 @@ export default function PlayPage() {
         <h1 className='text-2xl font-bold mb-2 mt-10'>Error</h1>
         <p className='text-red-500'>{error.message}</p>
         <button
-          className='mt-4 bg-blue-500 text-white px-4 py-2 rounded'
+          className='mt-4 bg-blue-500 text-white px-4 py-2 rounded-pill'
           onClick={createNewTicket}
         >
           Try Again
@@ -206,7 +206,7 @@ export default function PlayPage() {
           <p className='text-lg text-white font-semibold'>
             Muestra este código al cajero para activar tu boleto.
           </p>
-          <div className='bg-white rounded-lg shadow-lg p-8'>
+          <div className='bg-white rounded-card shadow-lg p-8'>
             <p className='text-4xl text-black font-bold text-center'>
               {ticket?.activationCode}
             </p>
@@ -219,7 +219,7 @@ export default function PlayPage() {
 
       {(ticket?.status === "active" || ticket?.status === "finnished") &&
         ticket.symbols && (
-          <div className='bg-white flex flex-col rounded-lg shadow-lg p-4 w-full'>
+          <div className='bg-white flex flex-col rounded-card shadow-lg p-4 w-full'>
             {scratchedCardsCount >= 6 ? (
               <p className='text-2xl text-blue-700 font-bold mb-4'>
                 {ticket.isWinner
@@ -248,7 +248,7 @@ export default function PlayPage() {
                     finishPercent={50}
                   >
                     <div
-                      className='flex items-center justify-center h-full w-full bg-slate-400 rounded-lg shadow-lg text-4xl sm:text-5xl select-none touch-none'
+                      className='flex items-center justify-center h-full w-full bg-slate-400 rounded-card shadow-lg text-4xl sm:text-5xl select-none touch-none'
                       style={{
                         userSelect: "none",
                         touchAction: "none",
@@ -276,7 +276,7 @@ export default function PlayPage() {
                   </p>
                 )}
                 <button
-                  className='mt-4 bg-blue-500 text-white px-4 py-2 w-max self-center rounded-md bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-700 transition-colors'
+                  className='mt-4 bg-blue-500 text-white px-4 py-2 w-max self-center rounded-card bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-700 transition-colors'
                   onClick={createNewTicket}
                 >
                   Jugar de nuevo

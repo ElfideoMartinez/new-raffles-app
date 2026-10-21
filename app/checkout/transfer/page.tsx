@@ -107,13 +107,13 @@ const CheckoutTransferPage = () => {
   const isEmailValid = emailRegex.test(email) && email.length < 50;
 
   return (
-    <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-lg'>
+    <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-card'>
       <h2 className='text-black text-2xl font-bold'>
         Pago por Transferencia
       </h2>
       
       {/* General Explanation */}
-      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-lg border border-blue-300'>       
+      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-card border border-blue-300'>       
         <p>
           Para completar su compra, realice una transferencia bancaria al número
           de cuenta a continuación. Asegúrese de pegar la clave del concepto de
@@ -122,7 +122,7 @@ const CheckoutTransferPage = () => {
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
             onClick={() => copyToClipboard("4152314135006792")}
-            className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+            className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-sm border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
           >
             4152314135006792
           </button>
@@ -135,7 +135,7 @@ const CheckoutTransferPage = () => {
 
       {/* Conditional Verification Message */}
       {ticketCount > 5 && (
-        <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-lg border border-yellow-400'>
+        <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-card border border-yellow-400'>
           <p>
             Nota: Dado que está comprando más de 5 boletos, se necesitará verificar
             su transferencia antes de que los boletos se confirmen como
@@ -151,7 +151,7 @@ const CheckoutTransferPage = () => {
         </p>
         <button
           onClick={() => copyToClipboard(paymentConceptKey)}
-          className='mt-2 text-xl text-black font-mono px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          className='mt-2 text-xl text-black font-mono px-4 py-2 bg-gray-100 rounded-sm border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
         >
           {paymentConceptKey}
         </button>
@@ -167,7 +167,7 @@ const CheckoutTransferPage = () => {
           type='text'
           value={name}
           onChange={(e) => handleName(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
           placeholder='Ingrese su nombre completo'
         />
       </div>
@@ -182,7 +182,7 @@ const CheckoutTransferPage = () => {
           type='tel'
           value={phone}
           onChange={(e) => handlePhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
           placeholder='Ingrese su número de teléfono'
         />
       </div>
@@ -197,7 +197,7 @@ const CheckoutTransferPage = () => {
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
           placeholder='Ingrese su correo electrónico (opcional)'
         />
       </div>
@@ -217,7 +217,7 @@ const CheckoutTransferPage = () => {
           type='file'
           accept='image/*'
           onChange={handleImageChange}
-          className='mt-2 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
         {isImageValid && (
           <p className='text-sm text-green-600'>
@@ -290,7 +290,7 @@ const CheckoutTransferPage = () => {
             });
           }
         }}
-        className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600 ${
+        className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-pill hover:bg-blue-600 ${
           !(isPhoneValid && isImageValid && isEmailValid && isNameValid) && "opacity-50 cursor-not-allowed"
         }`}
         disabled={!(isPhoneValid && isImageValid && isEmailValid && isNameValid)}

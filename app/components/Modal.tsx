@@ -31,7 +31,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
         <img
           src={imageUrl}
           alt="Comprobante ampliado"
-          className="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-lg"
+          className="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-card shadow-lg"
         />
       </div>
     </div>

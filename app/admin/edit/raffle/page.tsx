@@ -248,7 +248,7 @@ const EditRaffle = () => {
   const isValidRaffle = idRaffle != 'default';
   console.log('Rifa valida:',isValidRaffle)
   return(
-    <div className='max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-5'>
+    <div className='max-w-lg mx-auto bg-white p-6 rounded-card shadow-lg mt-5'>
       <h2 className='text-black text-2xl font-bold mb-6 text-center'>
         Editar rifa
       </h2>
@@ -258,7 +258,7 @@ const EditRaffle = () => {
             Rifas disponibles:
           </label>
           <select 
-            className="w-full py-2 px-3 text-gray-950 bg-white border rounded-lg focus:border-blue-500"
+            className="w-full py-2 px-3 text-gray-950 bg-white border rounded-sm focus:border-blue-500"
             onChange={(e) => handleChangeRaffle(e.target.value)}
           >
             <option value={'default'}>Selecciona una rifa</option>
@@ -278,7 +278,7 @@ const EditRaffle = () => {
                 value={raffle.title}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
               />
             {/* <div>
               <label className='text-black block text-sm font-medium mb-1'>
@@ -291,7 +291,7 @@ const EditRaffle = () => {
                 onChange={handleChange}
                 required
                 min='1'
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
               />
             </div> */}
             <div>
@@ -306,7 +306,7 @@ const EditRaffle = () => {
                 required
                 step='0.01'
                 min='0'
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
               />
             </div>
 
@@ -320,7 +320,7 @@ const EditRaffle = () => {
                 value={raffle.awardName}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
               />
             </div>
 
@@ -333,7 +333,7 @@ const EditRaffle = () => {
                 value={raffle.awardDescription}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
               />
             </div>
             <div>
@@ -346,7 +346,7 @@ const EditRaffle = () => {
                 value={raffle.date}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-lg text-gray-950 bg-white focus:outline-none focus:border-blue-500 mb-2'
+                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500 mb-2'
               />
             </div>
             <div>
@@ -354,7 +354,7 @@ const EditRaffle = () => {
                 Boleto ganador
               </label>
               <select 
-                className="py-2 px-3 text-gray-950 bg-white border rounded-lg focus:border-blue-500" 
+                className="py-2 px-3 text-gray-950 bg-white border rounded-sm focus:border-blue-500" 
                 name="ticketWinner"
                 value={raffle.ticketWinner}
                 onChange={handleChange}
@@ -391,7 +391,7 @@ const EditRaffle = () => {
           <button
             disabled={isLoading || !isValidRaffle}
             type='submit'
-            className={`w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold 
+            className={`w-full bg-blue-500 text-white py-2 px-4 rounded-card font-semibold 
               hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50
               `
             }

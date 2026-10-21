@@ -25,7 +25,7 @@ const AddToCartButton = ({ raffleId, raffleName ,rafflePrice }: IAddToCartButton
     //       addTicketsToCart(raffleId, rafflePrice);
     //     }}
     //     disabled={selectedTicketCount.length < 1}
-    //     className='disabled:bg-gray-500 flex items-center justify-center w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+    //     className='disabled:bg-gray-500 flex items-center justify-center w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-pill'
     //     >
     //       Agregar al carrito ({selectedTicketCount.length})
     //   </button>
@@ -42,7 +42,7 @@ const AddToCartButton = ({ raffleId, raffleName ,rafflePrice }: IAddToCartButton
         });
       }}
       disabled={selectedTicketCount.length < 1}
-      className='focus-ring disabled:bg-brand-300 flex items-center justify-center w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-4 rounded'
+      className='focus-ring disabled:bg-brand-300 flex items-center justify-center w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-4 rounded-pill'
     >
       Agregar al carrito ({selectedTicketCount.length})
     </button>

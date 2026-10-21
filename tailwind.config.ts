@@ -61,8 +61,18 @@ const config: Config = {
         "brand-cta": "linear-gradient(135deg, #3b82f6, #2dd4bf)",
         "brand-cta-hover": "linear-gradient(135deg, #2563eb, #14b8a6)",
       },
+      // Radius ladder (ratified 2026-10-21, A3b). Four semantic steps, not
+      // seven near-identical ones:
+      //   rounded-sm  0.5rem  — inputs, buttons, badges, chips, small controls
+      //   rounded-card 1rem   — cards, panels, modals, dropdowns
+      //   rounded-md  1.5rem  — feature containers / hero blocks (one step up)
+      //   rounded-pill 9999px — primary CTAs only (main buy/participate buttons)
+      // `.random-ticket-button` keeps its literal 1.5rem (= rounded-md) shape;
+      // the storefront pill CTAs keep rounded-pill. Do not add ad-hoc radii.
       borderRadius: {
+        sm: "0.5rem",
         card: "1rem",
+        md: "1.5rem",
         pill: "9999px",
       },
       boxShadow: {

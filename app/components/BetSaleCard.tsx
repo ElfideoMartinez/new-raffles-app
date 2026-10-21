@@ -109,7 +109,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
   const msgFailed = `¡Hola ${betSale.name}! hubo un error al confirmar tu compra 😕 Si necesitas ayuda para completarla, estoy aquí para apoyarte 😊`;
 
   return (
-    <div className='bg-slate-600 p-4 rounded-md'>
+    <div className='bg-slate-600 p-4 rounded-card'>
       {betSale.paymentImage && <ImageWithModal sale={betSale} />}
       {betSale.name && <div>Cliente: {betSale.name}</div>}
       <div>Email: {betSale.email}</div>
@@ -122,7 +122,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
             <p className='mt-1'>
               Equipo:{" "}
               <span
-                className={`px-3 py-1 rounded-md ${
+                className={`px-3 py-1 rounded-card ${
                   bet.letterTeam == "A" ? "bg-green-600" : "bg-red-600"
                 }`}
               >
@@ -139,7 +139,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
 
       {isLoading ? (
-        <button className='bg-gray-400 text-white rounded-md p-2' disabled>
+        <button className='bg-gray-400 text-white rounded-card p-2' disabled>
           <FadeLoader color="var(--color-ink-inverse)" />
         </button>
       ) : (
@@ -148,13 +148,13 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
             onClick={handleAction}
             className={`w-full ${
               isVerified ? "bg-danger-700" : "bg-success-700"
-            } text-white p-2 rounded-md`}
+            } text-white p-2 rounded-card`}
           >
             {isVerified ? "Rechazar Pago" : "Confirmar Pago"}
           </button>
           {betSale.verified ? (
             <Link
-              className='bg-success-700 p-2 rounded-md w-full text-center'
+              className='bg-success-700 p-2 rounded-card w-full text-center'
               href={`https://wa.me/52${betSale.phone.replace(
                 "+52",
                 ""
@@ -164,7 +164,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
             </Link>
           ) : (
             <Link
-              className='bg-danger-700 p-2 rounded-md w-full text-center'
+              className='bg-danger-700 p-2 rounded-card w-full text-center'
               href={`https://wa.me/52${betSale.phone.replace(
                 "+52",
                 ""
