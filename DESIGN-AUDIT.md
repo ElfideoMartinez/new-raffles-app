@@ -274,6 +274,11 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 
 These are **not** applied and must not be guessed.
 
+> **2026-10-21 — Daniel ratified A1a, A2a, A3b, A4a, A5a** (plus the B-series
+> implementation work). See **§4.1 Decision log** for the record of what was
+> decided and what shipped on branch `design/ratified-decisions`. The Q-text
+> below is preserved as the original framing; Q1–Q5 are now answered there.
+
 **Q1 — The `#355b6e` question.** It was the storefront CTA colour for ~22 months and was retired in `70b4d5f` without a stated rationale.
 Options: (a) confirm retirement, gradient stands; (b) reinstate as a distinct "deep teal" secondary/brand-accent colour (`#355b6e` fails AA with white at 6.9:1 — actually it *passes*; it would be your only fully-AA dark brand surface); (c) keep it only for modal chrome / success page.
 
@@ -294,6 +299,48 @@ Options: (a) confirm retirement, gradient stands; (b) reinstate as a distinct "d
 **Q7 — Emoji as UI icons.** 15 emoji in customer-facing chrome. Keep (matches the WhatsApp-native audience) or replace with a 16px icon set?
 
 **Q8 — Do `success`/`warning`/`danger` become the required semantic palette?** They're declared but unused; admin still uses stock `green-500`/`red-500`. Adopting them fixes F8 mechanically.
+
+### 4.1 Decision log (ratified)
+
+| # | Decision | Ratified choice | Status | Date | Shipped in |
+|---|---|---|---|---|---|
+| A1a | Text on the CTA gradient (was Q2) | Keep the gradient. Text **on gradient surfaces** becomes `ink-900` (#0f172a, 9.59:1 at the teal end). White stays on solid fills (`bg-danger-700 text-white` = 5.48:1). Requirement documented on the gradient tokens in `tailwind.config.ts`. | **ratified** | 2026-10-21 | `design: ratify A1a dark-on-gradient text` |
+| A2a | `#355b6e` (was Q1) | **Confirmed dead.** It stays retired; no code may re-introduce it. | **ratified** | 2026-10-21 | (verification only) |
+| A3b | Radius ladder (was Q3/Q4 of §2.2) | Four steps: `rounded-sm` 0.5rem (inputs/buttons/chips), `rounded-card` 1rem (cards/modals), `rounded-md` 1.5rem (feature containers), `rounded-pill` 9999px (primary CTAs). `.random-ticket-button` keeps its 1.5rem shape. | **ratified** | 2026-10-21 | `design: A3b radius ladder` |
+| A4a | Admin theme (was Q4 here) | **Light everywhere.** `admin/create/bet` and `admin/bets` converted as a palette swap (structure/behaviour untouched, hand-rolled EditBet modal restyled only). | **ratified** | 2026-10-21 | `design: A4a admin light surface` |
+| A5a | Currency format (was Q5) | **`$50`** — es-MX/MXN formatting, zero fraction digits, no visible currency suffix; grouping kept (`$1,250`). **Open tension:** the terms page copy still promises MXN while the UI no longer prints it; copy deliberately not changed. | **ratified** | 2026-10-21 | `feat: A5a $50 price format` |
+| B1derive | `tickets_left` | Computed server-side in `getAllRaffles` from the `tickets` collection (`sold === true` subtracted from `numberOfTickets`); no-ticket raffles report full stock. Capped N+1 (2 `count()` reads per raffle, max 50), cost documented in code. | **ratified** | 2026-10-21 | `feat: B1derive tickets_left in getAllRaffles` |
+| B2delete | Unauthenticated admin routes | `app/api/admin/**` deleted after grep proved zero callers. | **ratified** | 2026-10-21 | `chore: B2delete remove unauthenticated admin routes` |
+
+Still open from §4: **Q6 voice** (tú vs usted), **Q7 emoji icons**, and the
+terms-page/MXN wording flagged under A5a.
+
+### 4.2 Radius audit — before/after (A3b)
+
+152 radius utilities across 32 files in `app/**` were remapped 1:1 onto the
+ladder; no file gained or lost a radius declaration (the count per file is
+identical before and after — the change is which token each one uses).
+
+| File | Before | After |
+|---|---|---|
+| `app/admin/bets/page.tsx` | 21 | 21 |
+| `app/admin/create/bet/page.tsx` | 14 | 14 |
+| `app/checkout/transfer/page.tsx` | 10 | 10 |
+| `app/admin/edit/raffle/page.tsx` | 10 | 10 |
+| `app/admin/edit/bet/page.tsx` | 10 | 10 |
+| `app/admin/create/raffle/page.tsx` | 8 | 8 |
+| `app/admin/quickTickets/active/page.tsx` | 7 | 7 |
+| `app/components/SaleCard.tsx` / `BetSaleCard.tsx` / `app/bet/[id]/BetPageClient.tsx` | 6 each | 6 each |
+| `app/user/cart/page.tsx`, `app/quickTicket/play/page.tsx` | 5 each | 5 each |
+| 11 more files | 1–4 each | 1–4 each |
+| **Total** | **152** | **152** |
+| Distinct radii in use | `rounded`, `none`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `card`, `pill` + 1.5rem literal | `sm`, `card`, `md`, `pill` (+ the literal 1.5rem in `.random-ticket-button`) |
+
+Mapping rule used: `rounded`/`sm` → `sm`; `md`/`lg`/`xl`/`3xl` → `card`;
+`2xl` → `md`; inputs/buttons/CTAs/narrow badges → `sm` (primary CTAs → `pill`);
+cards/modals → `card`; hero/feature containers → `md`. No `rounded-[…]`
+utilities or inline `borderRadius` values existed in `app/**`.
+
 
 ---
 
