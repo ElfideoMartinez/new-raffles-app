@@ -23,6 +23,7 @@ interface IBetsData {
   tieBets?: number;
   teams: { a: string; b: string };
   isFinished: boolean;
+  totalBets?: number;
 }
 
 interface EditBetFormData {
@@ -178,7 +179,7 @@ function EditBetModal({
             </div>
           </div>
           <div>
-            Cuota Equipo A *
+            Favor Equipo A *
             <input
               type='text'
               value={formData.oddsTeamA || ""}
@@ -189,7 +190,7 @@ function EditBetModal({
             />
           </div>
           <div>
-            Cuota Equipo B *
+            Favor Equipo B *
             <input
               type='text'
               value={formData.oddsTeamB || ""}
@@ -237,7 +238,7 @@ function AdminBetCard({
   bet: IBetsData;
   onEdit: (bet: IBetsData) => void;
 }) {
-  const totalBets = bet.betsTeamA + bet.betsTeamB;
+  const totalBets = bet.betsTeamA + bet.betsTeamB + (bet.tieBets || 0);
   const teamAPercentage =
     totalBets > 0 ? ((bet.betsTeamA / totalBets) * 100).toFixed(1) : "0";
   const teamBPercentage =
@@ -286,6 +287,12 @@ function AdminBetCard({
             <span className='font-semibold'>Precio por boleto:</span>
             <span className='text-white'>${bet.pricePerTicket}</span>
           </div>
+          <div className='text-sm text-gray-400'>
+            <span className='font-semibold'>Total de apuestas:</span>
+            <span className='text-white'>
+              ${totalBets * parseFloat(bet.pricePerTicket)}
+            </span>
+          </div>
 
           <div className='text-sm text-gray-400'>
             <span className='font-semibold'>Fecha de cierre:</span>
@@ -313,6 +320,9 @@ function AdminBetCard({
           <div className='flex items-center justify-between'>
             <span className='text-sm font-medium text-green-400'>
               {bet.teams.a}
+              <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-full'>
+                ${bet.betsTeamA * parseFloat(bet.pricePerTicket)}
+              </span>
             </span>
             <span className='text-sm text-gray-300'>
               {bet.betsTeamA} Apuestas ({teamAPercentage}%)
@@ -322,11 +332,31 @@ function AdminBetCard({
           <div className='flex items-center justify-between'>
             <span className='text-sm font-medium text-red-400'>
               {bet.teams.b}
+              <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-full'>
+                ${bet.betsTeamB * parseFloat(bet.pricePerTicket)}
+              </span>
             </span>
             <span className='text-sm text-gray-300'>
               {bet.betsTeamB} Apuestas ({teamBPercentage}%)
             </span>
           </div>
+          {bet.tieBets !== undefined && (
+            <div className='flex items-center justify-between'>
+              <span className='text-sm font-medium text-yellow-400'>
+                Empate
+                <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-full'>
+                  ${bet.tieBets * parseFloat(bet.pricePerTicket)}
+                </span>
+              </span>
+              <span className='text-sm text-gray-300'>
+                {bet.tieBets} Apuestas (
+                {totalBets > 0
+                  ? ((bet.tieBets / totalBets) * 100).toFixed(1)
+                  : "0"}
+                %)
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Action buttons */}

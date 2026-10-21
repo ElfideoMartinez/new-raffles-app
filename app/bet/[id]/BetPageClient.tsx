@@ -8,6 +8,7 @@ import { realtimeDB } from "@/app/firebaseconfig";
 import { ref, onValue, off } from "firebase/database";
 
 interface BetRealtimeData {
+  oddsTie: any;
   betsTeamA: number;
   betsTeamB: number;
   createdAt: string;
@@ -57,6 +58,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     },
     tieBets: 0,
     title: "",
+    oddsTie: "",
   });
 
   // User selection state
@@ -126,58 +128,72 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   // Calculate odds with the specified formula
   const calculateOdds = useCallback(
     (team: "A" | "B" | "C") => {
+      console.log("Calculating odds...", realtimeBetData);
       const { betsTeamA, betsTeamB, tieBets } = realtimeBetData;
       const totalBets = betsTeamA + betsTeamB + tieBets;
+      console.log("Calculating odds for team:", team);
+      console.log("Bets Team A:", betsTeamA);
+      console.log("Bets Team B:", betsTeamB);
+      console.log("Tie Bets:", tieBets);
+      console.log("Total Bets:", totalBets);
 
       if (totalBets === 0) return "+100"; // neutral
 
       let teamBets = 0;
       switch (team) {
         case "A":
-          teamBets = betsTeamA;
+          teamBets = Number(betsTeamA);
           break;
         case "B":
-          teamBets = betsTeamB;
+          teamBets = Number(betsTeamB);
           break;
         case "C":
-          teamBets = tieBets;
+          teamBets = Number(tieBets);
           break;
       }
-
-      if (teamBets === 0) return "+999"; // sin apuestas en ese lado
+      if (teamBets === 0) return "+100"; // high odds for no bets
 
       // Probabilidad "real"
       const probability = teamBets / totalBets;
+      console.log("Raw Probability:", probability);
 
       // -------- Aplicar margen (vig) --------
-      // Aquí asumimos overround = 105% (5% margen)
-      const overround = 1.05;
+      // Aquí asumimos overround = 110% (10% margen)
+      const overround = 1.1;
       const adjustedProb = probability * overround;
-
+      console.log("Adjusted Probability:", adjustedProb);
       // Cuota decimal
       const decimalOdds = 1 / adjustedProb;
-
-      // -------- Convertir a American odds --------
-      let americanOdds;
-      if (decimalOdds >= 2.0) {
-        americanOdds = `+${Math.round((decimalOdds - 1) * 100)}`;
+      console.log("Decimal Odds:", decimalOdds);
+      // Convertir a American Odds
+      let americanOdds = 0;
+      if (decimalOdds >= 2) {
+        americanOdds = (decimalOdds - 1) * 100;
+        console.log("American Odds (Positive):", americanOdds);
+        return `+${americanOdds.toFixed(0)}`;
       } else {
-        americanOdds = `-${Math.round(100 / (decimalOdds - 1))}`;
+        console.log("Decimal Odds less than 2:", decimalOdds);
+        americanOdds = -100 / (decimalOdds - 1);
+        console.log("American Odds (Negative):", americanOdds);
+        return `${americanOdds.toFixed(0)}`;
       }
-
-      return americanOdds;
     },
     [realtimeBetData]
   );
 
   // Calculate winnings based on American odds
   const calculateAmericanOddsWinnings = useCallback(
-    (team: "A" | "B" | "C", betAmount: any) => {
+    (team: "A" | "B" | "C", betAmount: number) => {
       if (betAmount === 0) return 0;
 
       const odds = calculateOdds(team);
       const numericOdds = parseInt(odds.replace(/[+\-]/g, ""));
 
+      console.log(
+        "Calculating winnings for positive odds...",
+        numericOdds,
+        betAmount
+      );
       let winnings = 0;
       if (odds.startsWith("-")) {
         // Negative odds: bet amount needed to win $100
@@ -187,13 +203,13 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
         winnings = (numericOdds / 100) * betAmount;
       }
       console.log(
-        `Calculating winnings for team ${team} with odds ${odds} and bet amount ${betAmount}: ${winnings}`
+        "Total winnings calculated:",
+        winnings,
+        Number(betAmount),
+        "sumando betAmount:",
+        winnings + Number(betAmount)
       );
-      console.log(
-        "Total payout (winnings + original bet):",
-        winnings + betAmount
-      );
-      return winnings + betAmount; // Return total payout (winnings + original bet)
+      return winnings + Number(betAmount); // Return total payout (winnings + original bet)
     },
     [calculateOdds]
   );
@@ -272,6 +288,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       letterTeam: selectedLetterTeam,
       ticketNumbers: totalTickets,
       totalPrice: totalPrice,
+      clientReturns: potentialWinnings,
     });
 
     console.log("Cart updated:", userCartBets());
@@ -310,6 +327,9 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       teamKey,
       realtimeBetData.pricePerTicket
     );
+    if (teamKey === "C" && realtimeBetData.oddsTie) {
+      return null;
+    }
 
     return (
       <div
@@ -360,10 +380,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
 
         <div className='mt-2 bg-yellow-300 text-green-900 rounded px-3 py-1 text-sm font-semibold text-center'>
           Gana:
-          <span className='cursor-pointer'>
-            {winPerTicket.split(".")[0]}
-          </span>{" "}
-          Por boleto
+          <span className='cursor-pointer'>{winPerTicket.toFixed(2)}</span>
         </div>
       </div>
     );
@@ -395,7 +412,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             {realtimeBetData.description}
           </h2>
           <p className='mb-4 text-center text-sm text-gray-600'>
-            Apuesta por tu equipo favorito y gana más
+            Apuesta por tu equipo favorito y gana
           </p>
 
           {/* Price Star */}

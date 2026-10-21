@@ -16,6 +16,8 @@ interface IBet {
   };
   oddsTeamA: string;
   oddsTeamB: string;
+  oddsTie?: string | undefined;
+  totalBets: number;
 }
 
 interface BetFormData {
@@ -23,13 +25,14 @@ interface BetFormData {
   description: string;
   image: File | null;
   date: string;
-  pricePerTicket: string;
+  pricePerTicket: number;
   teams: {
     a: string;
     b: string;
   };
   oddsTeamA: string;
   oddsTeamB: string;
+  oddsTie?: string | undefined;
 }
 
 const CreateBet = () => {
@@ -39,10 +42,11 @@ const CreateBet = () => {
     description: "",
     image: null,
     date: "",
-    pricePerTicket: "",
+    pricePerTicket: 0,
     teams: { a: "", b: "" },
     oddsTeamA: "",
     oddsTeamB: "",
+    oddsTie: undefined, // Initialize tie odds as undefined
   });
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -101,7 +105,7 @@ const CreateBet = () => {
     try {
       console.log("Creating bet with data:", betData);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createBet`,
+        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createBet`,
         {
           method: "POST",
           headers: {
@@ -131,7 +135,7 @@ const CreateBet = () => {
       description: "",
       image: null,
       date: "",
-      pricePerTicket: "",
+      pricePerTicket: 0,
       teams: { a: "", b: "" },
       oddsTeamA: "",
       oddsTeamB: "",
@@ -163,7 +167,7 @@ const CreateBet = () => {
           title: bet.title.trim(),
           description: bet.description.trim(),
           date: bet.date,
-          pricePerTicket: parseFloat(bet.pricePerTicket),
+          pricePerTicket: bet.pricePerTicket,
           image: imageUrl,
           teams: {
             a: bet.teams.a.trim(),
@@ -171,6 +175,8 @@ const CreateBet = () => {
           },
           oddsTeamA: bet.oddsTeamA.trim(),
           oddsTeamB: bet.oddsTeamB.trim(),
+          oddsTie: bet.oddsTie?.trim() || undefined,
+          totalBets: 0,
         };
 
         console.log("Creating bet with data:", betData);
@@ -209,16 +215,14 @@ const CreateBet = () => {
       bet.title.trim() !== "" &&
       bet.description.trim() !== "" &&
       bet.date.trim() !== "" &&
-      bet.pricePerTicket.trim() !== "" &&
+      bet.pricePerTicket !== 0 &&
       bet.oddsTeamA.trim() !== "" &&
       bet.oddsTeamB.trim() !== "";
 
     const areTeamsValid =
       bet.teams.a.trim() !== "" && bet.teams.b.trim() !== "";
 
-    const isPriceValid =
-      !isNaN(parseFloat(bet.pricePerTicket)) &&
-      parseFloat(bet.pricePerTicket) > 0;
+    const isPriceValid = !isNaN(bet.pricePerTicket) && bet.pricePerTicket > 0;
 
     const hasImage = bet.image !== null;
 
@@ -351,6 +355,48 @@ const CreateBet = () => {
               <h3 className='text-white text-lg font-semibold mb-4'>
                 Cuotas Iniciales
               </h3>
+              <div className='flex items-center mb-4'>
+                <input
+                  id='enableTie'
+                  type='checkbox'
+                  checked={bet.oddsTie !== undefined}
+                  onChange={(e) => {
+                    setBet((prev) => ({
+                      ...prev,
+                      oddsTie: e.target.checked ? "" : undefined,
+                    }));
+                  }}
+                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                />
+                <label
+                  htmlFor='enableTie'
+                  className='ml-2 block text-white text-sm font-medium'
+                >
+                  ¿Permitir empate?
+                </label>
+              </div>
+              {bet.oddsTie !== undefined && (
+                <div className='mb-4'>
+                  <label className='text-white block text-sm font-medium mb-2'>
+                    Cuota Empate
+                  </label>
+                  <input
+                    type='text'
+                    name='oddsTie'
+                    value={bet.oddsTie}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setBet((prev) => ({
+                        ...prev,
+                        oddsTie: e.target.value,
+                      }));
+                    }}
+                    required
+                    placeholder='Ej: 30, 50, 100'
+                    className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all'
+                  />
+                </div>
+              )}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label className='text-white block text-sm font-medium mb-2'>
@@ -362,7 +408,7 @@ const CreateBet = () => {
                     value={bet.oddsTeamA}
                     onChange={handleChange}
                     required
-                    placeholder='Ej: +150, -200, +250'
+                    placeholder='Ej: 30, 50, 100'
                     className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
                   />
                 </div>
@@ -377,7 +423,7 @@ const CreateBet = () => {
                     value={bet.oddsTeamB}
                     onChange={handleChange}
                     required
-                    placeholder='Ej: -150, +200, -250'
+                    placeholder='Ej: 30, 50, 100'
                     className='w-full px-4 py-3 border border-gray-600 rounded-lg text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
                   />
                 </div>

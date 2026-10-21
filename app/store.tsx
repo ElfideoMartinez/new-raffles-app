@@ -16,6 +16,7 @@ interface IUserCartBets {
   letterTeam: string;
   ticketNumbers: number;
   totalPrice: number;
+  clientReturns?: number;
 }
 
 interface ITikets {
@@ -50,7 +51,11 @@ interface TicketState {
   paymentMethod: string;
   addTicket: (ticketNumber: number, raffleId: string) => void;
   removeTicket: (ticketNumber: number, raffleId: string) => void;
-  addTicketsToCart: (raffleId: string, price: number, raffleName: string) => void;
+  addTicketsToCart: (
+    raffleId: string,
+    price: number,
+    raffleName: string
+  ) => void;
   removeTicketFromCart: (raffleId: string, ticketNumber: number) => void;
   cleanCart: () => void;
   getItemsFromCart: () => Array<{
@@ -71,7 +76,7 @@ interface TicketState {
     letterTeam: string;
     ticketNumbers: number;
     totalPrice: number;
-  }>
+  }>;
   updateBet: (newBet: IUserCartBets) => void;
   getBetsFromCart: () => Array<{
     betId: string;
@@ -82,7 +87,7 @@ interface TicketState {
     totalPrice: number;
   }>;
   removeBetById: (betId: string) => void;
-  clearCartBets: () => void,
+  clearCartBets: () => void;
   getTicketInfoByBetId: (betId: string) => {
     ticketNumbers: number;
     letterTeam: string;
@@ -132,17 +137,21 @@ const useTicketStore = create<TicketState>()(
           const existingCartIndex = state.userCartStore.findIndex(
             (item) => item.raffleId === raffleId
           );
-      
+
           if (existingCartIndex !== -1) {
             const updatedCart = [...state.userCartStore];
             const combinedTickets = [
-              ...new Set([...updatedCart[existingCartIndex].ticketNumbers, ...ticketNumbers]),
+              ...new Set([
+                ...updatedCart[existingCartIndex].ticketNumbers,
+                ...ticketNumbers,
+              ]),
             ];
             updatedCart[existingCartIndex] = {
               ...updatedCart[existingCartIndex],
               ticketNumbers: combinedTickets,
               raffleTotalPrice: combinedTickets.length * price,
-              raffleName: updatedCart[existingCartIndex].raffleName || raffleName, 
+              raffleName:
+                updatedCart[existingCartIndex].raffleName || raffleName,
             };
             return {
               userCartStore: updatedCart,
@@ -152,11 +161,16 @@ const useTicketStore = create<TicketState>()(
               },
             };
           }
-      
+
           return {
             userCartStore: [
               ...state.userCartStore,
-              { raffleId, raffleName ,ticketNumbers, raffleTotalPrice: ticketNumbers.length * price },
+              {
+                raffleId,
+                raffleName,
+                ticketNumbers,
+                raffleTotalPrice: ticketNumbers.length * price,
+              },
             ],
             tickets: {
               ...state.tickets,
@@ -171,13 +185,13 @@ const useTicketStore = create<TicketState>()(
           const existingCartIndex = state.userCartStore.findIndex(
             (item) => item.raffleId === raffleId
           );
-      
+
           if (existingCartIndex !== -1) {
             const updatedCart = [...state.userCartStore];
-            const updatedTickets = updatedCart[existingCartIndex].ticketNumbers.filter(
-              (num) => num !== ticketNumber
-            );
-      
+            const updatedTickets = updatedCart[
+              existingCartIndex
+            ].ticketNumbers.filter((num) => num !== ticketNumber);
+
             if (updatedTickets.length === 0) {
               // Si ya no quedan boletos, eliminar la rifa del carrito
               updatedCart.splice(existingCartIndex, 1);
@@ -185,16 +199,19 @@ const useTicketStore = create<TicketState>()(
               updatedCart[existingCartIndex] = {
                 ...updatedCart[existingCartIndex],
                 ticketNumbers: updatedTickets,
-                raffleTotalPrice: updatedTickets.length * (updatedCart[existingCartIndex].raffleTotalPrice / updatedCart[existingCartIndex].ticketNumbers.length),
+                raffleTotalPrice:
+                  updatedTickets.length *
+                  (updatedCart[existingCartIndex].raffleTotalPrice /
+                    updatedCart[existingCartIndex].ticketNumbers.length),
               };
             }
-      
+
             return { userCartStore: updatedCart };
           }
           return {};
         });
       },
-        
+
       cleanCart: () => set({ userCartStore: [] }),
 
       getItemsFromCart: () => get().userCartStore,
@@ -222,18 +239,20 @@ const useTicketStore = create<TicketState>()(
         return ticketNumbers;
       },
       setPaymentMethod: (method) => set({ paymentMethod: method }),
-      
+
       updateBet: (newBet) => {
         const currentBets = get().userCartBets;
-        const existingIndex = currentBets.findIndex(b => b.betId === newBet.betId);
-      
+        const existingIndex = currentBets.findIndex(
+          (b) => b.betId === newBet.betId
+        );
+
         if (newBet.ticketNumbers <= 0) {
           // Eliminar si no hay boletos
           return set({
-            userCartBets: currentBets.filter(b => b.betId !== newBet.betId),
+            userCartBets: currentBets.filter((b) => b.betId !== newBet.betId),
           });
         }
-      
+
         if (existingIndex !== -1) {
           // Reemplazar toda la apuesta (incluye cambio de equipo)
           const updatedBets = [...currentBets];
@@ -244,7 +263,7 @@ const useTicketStore = create<TicketState>()(
           set({ userCartBets: [...currentBets, newBet] });
         }
       },
-      
+
       getBetsFromCart: () => get().userCartBets,
 
       removeBetById: (betId) => {

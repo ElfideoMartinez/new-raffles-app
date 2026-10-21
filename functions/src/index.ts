@@ -1461,13 +1461,6 @@ export const confirmRejectBetSale = functions.https.onRequest(
       return;
     }
 
-    interface IBetsSummary {
-      betId: string;
-      totalPrice: string;
-      ticketNumbers: number;
-      team: string; // 'A', 'B', o 'C'
-    }
-
     try {
       const data = req.body;
       console.log("data", data);
@@ -1496,93 +1489,65 @@ export const confirmRejectBetSale = functions.https.onRequest(
         });
         return;
       }
+      for (const bet of betSummary) {
+        const realTimeDbRef = rtdb.ref(`bets/${bet.betId}`);
+        const betSnapshot = await realTimeDbRef.once("value");
+        const betData = betSnapshot.val();
+        console.log("Bet data from Realtime DB:", betData);
 
-      const bets: IBetsSummary[] = betSummary;
-
-      const betSaleRef = db.collection("salesBets").doc(id);
-      const verifiedValue = action === "confirm";
-      await betSaleRef.update({ verified: verifiedValue });
-
-      const initialPoolKey = "initialPool";
-      const betsTeamAKey = "betsTeamA";
-      const betsTeamBKey = "betsTeamB";
-      const tieBetsKey = "tieBets";
-
-      const results = await Promise.all(
-        bets.map(async (betData) => {
-          try {
-            const docRef = db.collection("bets").doc(betData.betId);
-            const totalBetPrice = Number(betData.totalPrice);
-
-            if (isNaN(totalBetPrice)) {
-              throw new Error(`Invalid totalPrice for betId ${betData.betId}`);
-            }
-
-            const totalTickets = betData.ticketNumbers;
-            const poolDelta =
-              action === "reject" ? -totalBetPrice : totalBetPrice;
-            const ticketsDelta =
-              action === "reject" ? -totalTickets : totalTickets;
-
-            await db.runTransaction(async (transaction) => {
-              const doc = await transaction.get(docRef);
-
-              if (!doc.exists) {
-                throw new Error(
-                  `Documento con betId ${betData.betId} no existe.`
-                );
-              }
-
-              const data = doc.data();
-              const currentInitialPool = data?.[initialPoolKey] ?? 0;
-              const currentBetsTeamA = data?.[betsTeamAKey] ?? 0;
-              const currentBetsTeamB = data?.[betsTeamBKey] ?? 0;
-              const currentTieBets = data?.[tieBetsKey] ?? 0;
-
-              const newInitialPool = currentInitialPool + poolDelta;
-              let newBetsTeamA = currentBetsTeamA;
-              let newBetsTeamB = currentBetsTeamB;
-              let newTieBets = currentTieBets;
-
-              if (betData.team === "A") {
-                newBetsTeamA += ticketsDelta;
-              } else if (betData.team === "B") {
-                newBetsTeamB += ticketsDelta;
-              } else if (betData.team === "C") {
-                newTieBets += ticketsDelta;
-              } else {
-                throw new Error(
-                  `Invalid team value '${betData.team}' for betId ${betData.betId}`
-                );
-              }
-
-              transaction.update(docRef, {
-                [initialPoolKey]: newInitialPool,
-                [betsTeamAKey]: newBetsTeamA,
-                [betsTeamBKey]: newBetsTeamB,
-                [tieBetsKey]: newTieBets,
-              });
-            });
-
-            return { betId: betData.betId, success: true };
-          } catch (error) {
-            console.error(
-              `Error updating bet ${betData.betId} in transaction:`,
-              error
-            );
-            return {
-              betId: betData.betId,
-              success: false,
-              error: error instanceof Error ? error.message : String(error),
-            };
+        if (!betData) {
+          console.warn(`Bet with ID ${bet.betId} not found in Realtime DB`);
+          continue;
+        }
+        const updates: any = {};
+        console.log("Processing bet:", bet, "with action:", action);
+        if (action === "confirm") {
+          // Update salesBets document to mark it as verified
+          const saleRef = db.collection("salesBets").doc(id);
+          await saleRef.update({
+            verified: true,
+            clientReturns: betData.clientReturns || 0,
+          });
+          // Update bet statistics in Realtime Database
+          if (bet.team === "A") {
+            updates.betsTeamA =
+              Number(betData.oddsTeamA || 0) + bet.ticketNumbers;
+          } else if (bet.team === "B") {
+            updates.betsTeamB =
+              Number(betData.oddsTeamB || 0) + bet.ticketNumbers;
+          } else if (bet.team === "C") {
+            updates.tieBets = Number(betData.tieBets || 0) + bet.ticketNumbers;
           }
-        })
-      );
-
+          updates.totalBets = (betData.totalBets || 0) + bet.ticketNumbers;
+          await realTimeDbRef.update(updates);
+        } else if (action === "reject") {
+          const saleRef = db.collection("salesBets").doc(id);
+          await saleRef.update({
+            verified: false,
+            clientReturns: betData.clientReturns || 0,
+          });
+          if (bet.team === "A") {
+            updates.betsTeamA = Number(
+              (betData.oddsTeamA || 0) - bet.ticketNumbers
+            );
+          } else if (bet.team === "B") {
+            updates.betsTeamB = Number(
+              (betData.oddsTeamB || 0) - bet.ticketNumbers
+            );
+          } else if (bet.team === "C") {
+            updates.tieBets = Number(
+              (betData.tieBets || 0) - bet.ticketNumbers
+            );
+          }
+          updates.totalBets = Number(
+            (betData.totalBets || 0) - bet.ticketNumbers
+          );
+          await realTimeDbRef.update(updates);
+        }
+      }
       res.status(200).json({
         status: 200,
         message: "Bet sale processed successfully",
-        results,
       });
     } catch (err) {
       console.error("Error confirming bet sale:", err);
@@ -1647,7 +1612,7 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       teams: data.teams, // { a: string, b: string }
       oddsTeamA: data.oddsTeamA || "1.0",
       oddsTeamB: data.oddsTeamB || "1.0",
-      // Initialize betting statistics
+      oddsTie: data.oddsTie || undefined,
       betsTeamA: 0,
       betsTeamB: 0,
       tieBets: 0,

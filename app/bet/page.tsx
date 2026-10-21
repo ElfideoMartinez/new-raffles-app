@@ -22,13 +22,12 @@ interface IBetData {
 }
 export default async function BetsPage() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL;
-    console.log("Fetching bets from:", baseUrl);
-    console.log("Environment:", process.env.NODE_ENV);
-
-    const response = await fetch(`${baseUrl}/getAllBets`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllBets`,
+      {
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
       console.error(response);
@@ -36,7 +35,6 @@ export default async function BetsPage() {
     }
 
     const { result } = await response.json();
-    console.log("Bets result:", result);
 
     if (!result || result.length === 0) {
       return (
@@ -89,7 +87,6 @@ export default async function BetsPage() {
 }
 
 function BetCard({ bet }: { bet: IBetData }) {
-  console.log("Rendering BetCard for bet:", bet);
   const totalBets = bet.betsTeamA + bet.betsTeamB + (bet.tieBets || 0);
   const teamAPercentage =
     totalBets > 0 ? ((bet.betsTeamA / totalBets) * 100).toFixed(1) : "0";
