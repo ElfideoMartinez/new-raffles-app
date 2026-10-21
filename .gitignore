@@ -39,3 +39,9 @@ next-env.d.ts
 # firebase emulator logs
 firebase-debug.log
 firebase-debug.*.log
+
+# local mock fixtures — dev-only, never deploy (see mock/README note)
+# The server itself is committed so the design build is reproducible; nothing
+# in mock/ is imported by app code, and firebase.json's hosting ignore covers
+# **/node_modules/** only, so keep this out of any deploy by not listing it.
+/mock/*.log
