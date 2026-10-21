@@ -48,6 +48,31 @@ export function apiUrl(fnName: string): string {
   return `${functionsBaseUrl.replace(/\/+$/, "")}/${fnName.replace(/^\/+/, "")}`;
 }
 
+/**
+ * fetch() for admin-only Cloud Functions.
+ *
+ * Admin endpoints are plain HTTPS functions that now require the caller's
+ * Firebase ID token in `Authorization: Bearer <idToken>`; the token must carry
+ * the `admin === true` custom claim (functions/src/index.ts: assertAdmin).
+ *
+ * Throws if there is no signed-in user so callers fail loudly instead of the
+ * request silently 401ing.
+ */
+export async function authedApiFetch(
+  fnName: string,
+  init: RequestInit = {}
+): Promise<Response> {
+  const { auth } = await import("@/app/firebaseconfig");
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("Sign in as an administrator to use this endpoint.");
+  }
+  const idToken = await user.getIdToken();
+  const headers = new Headers(init.headers);
+  headers.set("Authorization", `Bearer ${idToken}`);
+  return fetch(apiUrl(fnName), { ...init, headers });
+}
+
 /** Build a quick-ticket function URL. */
 export function quickTicketUrl(path = ""): string {
   const base = quickTicketBaseUrl.replace(/\/+$/, "");

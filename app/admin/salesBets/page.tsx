@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from "@/app/config/api";
+import { apiUrl, authedApiFetch } from "@/app/config/api";
 import BetSaleCard from "@/app/components/BetSaleCard";
 import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
@@ -36,14 +36,7 @@ const BetsPage = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSalesBets`,
-        apiUrl("getSalesBets"),
-        {
-          method: "GET",
-          mode: "cors", // Important for cross-origin requests
-        }
-      );
+      const res = await authedApiFetch("getSalesBets", { method: "GET" });
       const data = await res.json();
       console.log(data);
       setSales(data.betSales);

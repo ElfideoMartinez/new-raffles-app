@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from "@/app/config/api";
+import { apiUrl, authedApiFetch } from "@/app/config/api";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -47,10 +47,7 @@ const EditRaffle = () => {
   const handleDeleteRaffle = async (raffleId: string) => {
     
     try{
-      const result = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/deleteRaffle`,
-        apiUrl("deleteRaffle"),
-        {
+      const result = await authedApiFetch("deleteRaffle", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json"
@@ -92,10 +89,7 @@ const EditRaffle = () => {
     if(downloadURL != '') raffle.awardImage = downloadURL;
 
     try{
-      const result = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/updateRaffle`,
-        apiUrl("updateRaffle"),
-        {
+      const result = await authedApiFetch("updateRaffle", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json"

@@ -1,5 +1,5 @@
 "use client";
-import { apiUrl } from "@/app/config/api";
+import { authedApiFetch } from "@/app/config/api";
 import WithAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { toast } from "nextjs-toast-notify";
@@ -105,9 +105,7 @@ const CreateBet = () => {
   const createNewBet = useCallback(async (betData: IBet) => {
     try {
       console.log("Creating bet with data:", betData);
-      const res = await fetch(
-        apiUrl("createBet"),
-        {
+      const res = await authedApiFetch("createBet", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

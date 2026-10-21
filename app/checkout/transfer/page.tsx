@@ -239,7 +239,6 @@ const CheckoutTransferPage = () => {
               const downloadURL = await getDownloadURL(storageRef);
               
               const data = await fetch(
-                //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
                 apiUrl("checkTransfer"),
                 {
                   method: "POST",

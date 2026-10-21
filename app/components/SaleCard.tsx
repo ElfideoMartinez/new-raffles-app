@@ -1,4 +1,4 @@
-import { apiUrl } from "@/app/config/api";
+import { apiUrl, authedApiFetch } from "@/app/config/api";
 import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import ImageWithModal from "./ImageModal";
@@ -47,10 +47,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       raffleTotalPrice: number;
     }[];
   }) => {
-    const res = await fetch(
-      //${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/confirmSale`,
-      apiUrl("confirmSale"),
-      {
+    const res = await authedApiFetch("confirmSale", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,10 +70,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
     }[];
   }) => {
     console.log("Rejecting payment", sale);
-    const res = await fetch(
-      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/rejectSale`,
-      apiUrl("rejectSale"),
-      {
+    const res = await authedApiFetch("rejectSale", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

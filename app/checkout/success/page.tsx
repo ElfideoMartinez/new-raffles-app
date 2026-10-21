@@ -1,5 +1,4 @@
 "use client";
-import { apiUrl } from "@/app/config/api";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
@@ -32,9 +31,9 @@ const SuccessPage = () => {
 
   console.log("Tickets", ticketCount);
   useEffect(() => {
-    // if(paymentMethod !== "transfer"){
-    //   markAsSold();
-    // }
+    // Ticket state is owned by the server: `stripeWebHook` marks tickets sold
+    // from the signed Stripe event, and transfer sales are confirmed by an
+    // admin. The client must not mark tickets sold.
     const count = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
     setTicketCount(count);
     saveSaleLocalStorage();
@@ -67,22 +66,6 @@ const SuccessPage = () => {
     localStorage.setItem("purchases", JSON.stringify(purchases));
   }
 
-  const markAsSold = async () => {
-    const promises = raffles.map((raffle) =>
-      fetch(apiUrl("success"), {
-        cache: "default",
-        method: "POST",
-        body: JSON.stringify({
-          raffleId: raffle.raffleId,
-          ticketNumbers: raffle.ticketNumbers,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-    );
-    await Promise.all(promises);
-  };
 
   if(!isHydrated){
     return(

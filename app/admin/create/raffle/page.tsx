@@ -1,5 +1,5 @@
 "use client";
-import { apiUrl } from "@/app/config/api";
+import { authedApiFetch } from "@/app/config/api";
 import withAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Link from "next/link";
@@ -107,10 +107,7 @@ const CreateRaffle = () => {
       ...raffle,
     }
 
-    const res = await fetch(
-      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createRaffle`,
-      apiUrl("createRaffle"),
-      {
+    const res = await authedApiFetch("createRaffle", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

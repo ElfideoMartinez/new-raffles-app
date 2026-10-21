@@ -1,6 +1,6 @@
 "use client";
 
-import { apiUrl } from "@/app/config/api";
+import { apiUrl, authedApiFetch } from "@/app/config/api";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import WithAuth from "@/app/components/WithAuth";
 import {
@@ -97,10 +97,7 @@ const EditBetPage = () => {
     if (downloadURL != "") bet.image = downloadURL;
 
     try {
-      const result = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/updateBet`,
-        apiUrl("updateBet"),
-        {
+      const result = await authedApiFetch("updateBet", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -206,10 +203,7 @@ const EditBetPage = () => {
 
   const handleDeleteRaffle = async () => {
     try {
-      const result = await fetch(
-        //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/deleteBet`,
-        apiUrl("deleteBet"),
-        {
+      const result = await authedApiFetch("deleteBet", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
