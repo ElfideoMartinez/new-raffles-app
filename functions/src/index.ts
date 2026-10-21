@@ -1,15 +1,104 @@
+import * as functionsV1 from "firebase-functions/v1";
 import * as functions from "firebase-functions";
+import { defineSecret } from "firebase-functions/params";
 import crypto from "crypto";
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
 import { getDatabase } from "firebase-admin/database";
 import { getRemoteConfig } from "firebase-admin/remote-config";
+import type express from "express";
 
 admin.initializeApp();
 const db = admin.firestore();
 const rtdb = getDatabase();
 const remoteConfig = getRemoteConfig();
 
+// ---------------------------------------------------------------------------
+// Secrets
+// ---------------------------------------------------------------------------
+// Stripe credentials are NEVER stored in source. They are declared here and
+// supplied at deploy time with:
+//   firebase functions:secrets:set STRIPE_SECRET_KEY
+//   firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
+// See SECURITY-ROTATION.md at the repo root. Any function that reads one of
+// these MUST list it in its `secrets: [...]` option, otherwise `.value()` is
+// empty at runtime.
+const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
+const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+
+// ---------------------------------------------------------------------------
+// Admin authorization
+// ---------------------------------------------------------------------------
+// Admin-only endpoints are plain HTTPS functions, so they are callable by
+// anyone who knows the URL. Every mutating/admin endpoint must therefore start
+// with `assertAdmin(authHeader)`.
+//
+// The identity is the Firebase ID token sent as `Authorization: Bearer <idToken>`
+// by the admin UI (see app/config/api.ts, authedApiFetch). The token must carry
+// the custom claim `admin === true`.
+//
+// OPERATIONAL NOTE: `firebase-functions` does not support adding secrets to an
+// already-deployed HTTP trigger in place. The first deploy after this change
+// may report a conflict for each affected function; see SECURITY-ROTATION.md
+// for the one-time remediation.
+async function assertAdmin(
+  authorizationHeader: string | undefined
+): Promise<void> {
+  const header = authorizationHeader || "";
+  const [scheme, token] = header.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Sign in as an administrator to use this endpoint."
+    );
+  }
+
+  let decoded: admin.auth.DecodedIdToken;
+  try {
+    decoded = await admin.auth().verifyIdToken(token);
+  } catch {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Invalid or expired session."
+    );
+  }
+
+  if (decoded.admin !== true) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Administrator privileges are required."
+    );
+  }
+}
+
+/**
+ * Run the admin check for an HTTP request. Returns true when the request was
+ * rejected and the caller must return immediately.
+ */
+async function rejectUnlessAdmin(
+  req: functionsV1.https.Request,
+  res: express.Response
+): Promise<boolean> {
+  try {
+    await assertAdmin(req.headers.authorization);
+    return false;
+  } catch (err) {
+    const denied =
+      err instanceof functions.https.HttpsError &&
+      err.code === "permission-denied";
+    const status = denied ? 403 : 401;
+    const message =
+      err instanceof functions.https.HttpsError
+        ? err.message
+        : "Authorization failed.";
+    res.status(status).json({ status, message });
+    return true;
+  }
+}
+
+// PUBLIC: invoked by the public site. Not part of the admin surface.
+// TODO(hardening): anyone can call this and spam pushes to every registered
+// device; needs an auth or rate-limit story. Tracked as an open question.
 export const sendPurchaseNotifications = functions.https.onRequest(
   async (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
@@ -78,6 +167,7 @@ export const sendPurchaseNotifications = functions.https.onRequest(
   }
 );
 
+// PUBLIC: quick-ticket play page. Not part of the admin surface.
 export const createQuickTicket = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -298,6 +388,7 @@ const getQuickTicketsSymbols = (winnerLevel: WinnerLevel): string[] => {
   }
 };
 
+// PUBLIC: read-only storefront data. No auth by design.
 export const getRaffleData = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -358,7 +449,9 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const markTicketsAsSold = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -418,7 +511,9 @@ const setTicketsAsSold = async (raffleId: string, ticketNumbers: number[]) => {
     }
   }
 };
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createSale = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -453,7 +548,9 @@ export const createSale = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const success = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   // Handle preflight OPTIONS request for CORS
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Origin", "*");
@@ -505,8 +602,78 @@ export const success = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const createCheckoutSession = functions.https.onRequest(
-  async (req, res) => {
+// PUBLIC: storefront checkout. Creates a Stripe Checkout session for the
+// customer's cart. The sale itself is written only by the signed webhook
+// (stripeWebHook), which is why nothing is persisted here.
+// ---------------------------------------------------------------------------
+// Server-side pricing
+// ---------------------------------------------------------------------------
+// The client cart sends [{ raffleId, ticketNumbers[] }]. We re-read each raffle
+// and value the cart at `pricePerTicket` x number of tickets. The client's own
+// total is treated as untrusted.
+
+interface PricedCart {
+  ok: true;
+  total: number;
+  ticketCount: number;
+  raffles: { raffleId: string; ticketNumbers: number[]; raffleTotalPrice: number }[];
+}
+interface PricingError {
+  ok: false;
+  message: string;
+}
+
+function toTicketNumbers(raw: unknown): number[] | null {
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const numbers = raw.map((n) => (typeof n === "string" ? Number(n) : n));
+  if (!numbers.every((n) => Number.isInteger(n) && n >= 0)) return null;
+  return numbers;
+}
+
+async function priceRaffleCart(rawRaffles: unknown): Promise<PricedCart | PricingError> {
+  if (!Array.isArray(rawRaffles) || rawRaffles.length === 0) {
+    return { ok: false, message: "No raffle items in cart." };
+  }
+
+  const seenRaffles = new Set<string>();
+  const raffles: PricedCart["raffles"] = [];
+  let total = 0;
+  let ticketCount = 0;
+
+  for (const item of rawRaffles) {
+    const raffleId = item && typeof item.raffleId === "string" ? item.raffleId : "";
+    if (!raffleId || seenRaffles.has(raffleId)) {
+      return { ok: false, message: "Invalid or duplicate raffle in cart." };
+    }
+    seenRaffles.add(raffleId);
+
+    const ticketNumbers = toTicketNumbers(item.ticketNumbers);
+    if (!ticketNumbers) {
+      return { ok: false, message: "Invalid ticket selection in cart." };
+    }
+
+    const raffleSnap = await db.collection("raffles").doc(raffleId).get();
+    if (!raffleSnap.exists) {
+      return { ok: false, message: "Raffle not found." };
+    }
+
+    const pricePerTicket = Number(raffleSnap.get("pricePerTicket"));
+    if (!Number.isFinite(pricePerTicket) || pricePerTicket <= 0) {
+      return { ok: false, message: "Raffle has no valid price." };
+    }
+
+    const raffleTotalPrice = pricePerTicket * ticketNumbers.length;
+    total += raffleTotalPrice;
+    ticketCount += ticketNumbers.length;
+    raffles.push({ raffleId, ticketNumbers, raffleTotalPrice });
+  }
+
+  return { ok: true, total, ticketCount, raffles };
+}
+
+export const createCheckoutSession = functionsV1
+  .runWith({ secrets: [STRIPE_SECRET_KEY] })
+  .https.onRequest(async (req, res) => {
     // Handle preflight requests
     if (req.method === "OPTIONS") {
       res.set("Access-Control-Allow-Origin", "*");
@@ -529,16 +696,28 @@ export const createCheckoutSession = functions.https.onRequest(
     }
 
     const data = req.body;
-    console.log(data);
 
-    const stripe = new Stripe(
-      "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"
-    );
+    const stripe = new Stripe(STRIPE_SECRET_KEY.value());
 
     try {
+      // Recompute the total from Firestore. The client's `total` is only a
+      // hint; `data.raffles` supplies (raffleId, ticketNumbers) pairs.
+      const priced = await priceRaffleCart(data.raffles);
+      if (!priced.ok) {
+        res.status(400).json({ status: 400, message: priced.message });
+        return;
+      }
+      if (typeof data.total === "number" && data.total !== priced.total) {
+        res.status(400).json({
+          status: 400,
+          message: "Cart total does not match the server's price.",
+        });
+        return;
+      }
+
       // Create a new price for the raffle ticket
       const newPrice = await stripe.prices.create({
-        unit_amount: data.total * 100, // converting to cents
+        unit_amount: Math.round(priced.total * 100), // converting to cents
         currency: "mxn",
         product_data: {
           name: "Monto total",
@@ -562,9 +741,9 @@ export const createCheckoutSession = functions.https.onRequest(
           enabled: true,
         },
         metadata: {
-          totalSalePrice: data.totalSalePrice,
-          ticketCount: data.ticketCount,
-          raffles: JSON.stringify(data.raffles),
+          totalSalePrice: String(priced.total),
+          ticketCount: String(priced.ticketCount),
+          raffles: JSON.stringify(priced.raffles),
         },
         return_url: isProduction
           ? "https://raffleapp-dbc1b.web.app/checkout/success"
@@ -587,6 +766,7 @@ export const createCheckoutSession = functions.https.onRequest(
   }
 );
 
+// PUBLIC: read-only storefront data. No auth by design.
 export const getAllRaffles = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -623,7 +803,9 @@ export const getAllRaffles = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const getSales = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -660,7 +842,9 @@ export const getSales = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const rejectSale = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -720,7 +904,9 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const confirmSale = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -777,7 +963,9 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createRaffle = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -833,7 +1021,9 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const checkTransfer = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1001,88 +1191,97 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const stripeWebHook = functions.https.onRequest(async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
-  // Manejar solicitud preflight (OPTIONS)
-  if (req.method === "OPTIONS") {
-    res.status(204).send(""); // Respuesta sin contenido para OPTIONS
-    return;
-  }
-
-  if (req.method !== "POST") {
-    res.status(405).send({ message: "Only POST requests are allowed" });
-    return;
-  }
-
-  const stripe = new Stripe(
-    "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"
-  );
-
-  const endpointSecret = "whsec_DfOQcGKNocindFHvASZb10mapc0nE7AF";
-
-  try {
-    const body = req.body;
-    console.log(body);
-
-    const infoRaffle = body.data.object.metadata;
-    const infoCustomer = body.data.object.customer_details;
-    const paymentIntent = body.data.object.payment_intent;
-    console.log("PaymentIntent: ", paymentIntent);
-
-    const sig = req.headers["stripe-signature"] as string;
-
-    let event: Stripe.Event;
-    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
-
-    if (event.type === "checkout.session.completed") {
-      interface Raffle {
-        raffleId: string;
-        raffleName: string;
-        ticketNumbers: number[];
-        raffleTotalPrice: number;
-      }
-      let raffles: Raffle[];
-      raffles = JSON.parse(infoRaffle.raffles);
-
-      // add to sales collection
-      const salesCollection = db.collection("sales");
-      await salesCollection.add({
-        payment_intent: paymentIntent || "",
-        name: infoCustomer.name || "",
-        phone: infoCustomer.phone || "",
-        email: infoCustomer.email || "",
-        ticketCount: infoRaffle.ticketCount || 0,
-        totalSalePrice: infoRaffle.totalSalePrice || 0,
-        raffles: raffles,
-        paymentMethod: "card",
-        verified: true,
-      });
-
-      await Promise.all(
-        raffles.map((raffle) =>
-          setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers)
-        )
-      );
+// PUBLIC: Stripe webhook. Not admin-authenticated; authenticity comes from the
+// Stripe signature over the raw body. No CORS headers: browsers never call it,
+// and allowing "*" only widened the attack surface.
+export const stripeWebHook = functionsV1
+  .runWith({ secrets: [STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET] })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ message: "Only POST requests are allowed" });
+      return;
     }
 
-    res.status(200).json({
-      status: 200,
-      message: "Webook working correctly",
-    });
-  } catch (err) {
-    console.error("Error in webhook:", err);
+    const sig = req.headers["stripe-signature"];
+    if (typeof sig !== "string" || !sig || !req.rawBody) {
+      res.status(400).json({ message: "Invalid webhook request." });
+      return;
+    }
 
-    res.status(500).json({
-      status: 500,
-      message: "Error in webhook:",
-    });
-  }
-});
+    // Verify BEFORE touching the payload. Nothing below may run on an
+    // unverified request, and failure must not echo the reason or the body.
+    let event: Stripe.Event;
+    try {
+      const stripe = new Stripe(STRIPE_SECRET_KEY.value());
+      event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        sig,
+        STRIPE_WEBHOOK_SECRET.value()
+      );
+    } catch (err) {
+      console.warn(
+        "Stripe webhook signature verification failed:",
+        err instanceof Error ? err.name : "unknown error"
+      );
+      res.status(400).json({ message: "Invalid webhook signature." });
+      return;
+    }
 
+    try {
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const infoRaffle = session.metadata || {};
+        const infoCustomer = session.customer_details;
+        const paymentIntent =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id;
+
+        interface Raffle {
+          raffleId: string;
+          raffleName: string;
+          ticketNumbers: number[];
+          raffleTotalPrice: number;
+        }
+        const raffles: Raffle[] = infoRaffle.raffles
+          ? JSON.parse(infoRaffle.raffles)
+          : [];
+
+        // add to sales collection
+        const salesCollection = db.collection("sales");
+        await salesCollection.add({
+          payment_intent: paymentIntent || "",
+          name: infoCustomer?.name || "",
+          phone: infoCustomer?.phone || "",
+          email: infoCustomer?.email || "",
+          ticketCount: Number(infoRaffle.ticketCount || 0),
+          totalSalePrice: Number(infoRaffle.totalSalePrice || 0),
+          raffles: raffles,
+          paymentMethod: "card",
+          verified: true,
+        });
+
+        await Promise.all(
+          raffles.map((raffle) =>
+            setTicketsAsSold(raffle.raffleId, raffle.ticketNumbers)
+          )
+        );
+      }
+
+      res.status(200).json({
+        status: 200,
+        message: "Webook working correctly",
+      });
+    } catch (err) {
+      // Log server-side only; never return internals to the caller.
+      console.error("Error processing Stripe webhook:", err);
+      res.status(500).json({ message: "Webhook processing failed." });
+    }
+  });
+
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const updateRaffle = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1121,7 +1320,9 @@ export const updateRaffle = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const deleteRaffle = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1173,6 +1374,7 @@ export const deleteRaffle = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// PUBLIC: read-only storefront data. No auth by design.
 export const getAllBets = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -1242,6 +1444,7 @@ export const getAllBets = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// PUBLIC: read-only storefront data. No auth by design.
 export const getBetData = functions.https.onRequest(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -1334,7 +1537,9 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const updateBet = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1369,7 +1574,9 @@ export const updateBet = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const deleteBet = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1404,7 +1611,9 @@ export const deleteBet = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const getSalesBets = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1442,8 +1651,10 @@ export const getSalesBets = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const confirmRejectBetSale = functions.https.onRequest(
   async (req, res) => {
+    if (await rejectUnlessAdmin(req, res)) return;
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1560,7 +1771,9 @@ export const confirmRejectBetSale = functions.https.onRequest(
   }
 );
 
+// ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createBet = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -1653,6 +1866,8 @@ export const createBet = functions.https.onRequest(async (req, res) => {
 });
 
 // Function to get Remote Config values
+// PUBLIC: read-only config used by the storefront UI. Do not put secrets in
+// Remote Config.
 export const getRemoteConfigValues = functions.https.onRequest(
   async (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
