@@ -809,10 +809,53 @@ export const getAllRaffles = functions.https.onRequest(async (req, res) => {
     const rafflesCollection = db.collection("raffles");
     const collectionSnapshot = await rafflesCollection.get();
 
+    // Tickets live in the top-level `tickets` collection as one doc per
+    // ticket: { number, raffle_id, sold: boolean, sold_to, verified }.
+    // Remaining stock = declared numberOfTickets - docs with sold === true.
+    //
+    // Cost: this is deliberately an N+1 (two grouped count reads per raffle)
+    // because Firestore has no GROUP BY and a single full `tickets` scan grows
+    // with lifetime sales, not with live raffles. The reads run in parallel and
+    // are capped at MAX_RAFFLES_WITH_STOCK so the endpoint cannot fan out
+    // without bound. At current scale (a handful of live raffles) that is a
+    // few count() reads per request.
+    //
+    // Raffles with no ticket docs (legacy/manual data) report the full
+    // numberOfTickets — never 0. If the raffle doc omits numberOfTickets the
+    // number of ticket docs is used as the total, and the result is clamped at
+    // 0 so an inconsistent sold count cannot produce a negative.
+    const MAX_RAFFLES_WITH_STOCK = 50;
+    const raffleDocs = collectionSnapshot.docs.slice(0, MAX_RAFFLES_WITH_STOCK);
+
+    const stockEntries = await Promise.all(
+      raffleDocs.map(async (doc) => {
+        const data = doc.data() as { numberOfTickets?: string | number };
+        const declared = Number(data.numberOfTickets);
+        const tickets = db.collection("tickets");
+        const [allTickets, soldTickets] = await Promise.all([
+          tickets.where("raffle_id", "==", doc.id).count().get(),
+          tickets
+            .where("raffle_id", "==", doc.id)
+            .where("sold", "==", true)
+            .count()
+            .get(),
+        ]);
+
+        const totalDocs = allTickets.data().count;
+        const sold = soldTickets.data().count;
+        const total =
+          Number.isFinite(declared) && declared > 0 ? declared : totalDocs;
+
+        return [doc.id, Math.max(total - sold, 0)] as const;
+      })
+    );
+    const ticketsLeftById = new Map(stockEntries);
+
     // Map the results, including the document ID
     const result = collectionSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      tickets_left: ticketsLeftById.get(doc.id),
     }));
 
     res.status(200).json({
