@@ -7,7 +7,7 @@ import { collection, getDoc, setDoc, addDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 const withAuth = (Component: any) => {
-  return (props: any) => {
+  const WithAuth = (props: any) => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [authenticated, setAuthenticated] = useState(false);
@@ -86,6 +86,10 @@ const withAuth = (Component: any) => {
 
     return <Component {...props} />;
   };
+  WithAuth.displayName = `withAuth(${
+    Component.displayName || Component.name || "Component"
+  })`;
+  return WithAuth;
 };
 
 export default withAuth;

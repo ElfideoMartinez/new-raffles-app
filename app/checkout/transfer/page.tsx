@@ -207,7 +207,7 @@ const CheckoutTransferPage = () => {
         <label htmlFor='image' className='text-black text-lg font-semibold'>
           Subir Imagen
         </label>
-        //add small desciption
+        {/* add small description */}
         <p className='text-sm text-gray-500'>
           Suba una imagen de su comprobante de transferencia. puede ser una foto
           o captura de pantalla.

@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals"
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "functions/lib/",
+    "tsconfig.tsbuildinfo"
+  ],
+  "rules": {
+    "@next/next/no-img-element": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-console": "warn",
+    "react/no-unescaped-entities": "warn"
+  },
+  "overrides": [
+    {
+      "files": [
+        "app/api/**/*.ts",
+        "app/**/page.tsx",
+        "app/layout.tsx"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

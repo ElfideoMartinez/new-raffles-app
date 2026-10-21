@@ -1,17 +1,9 @@
 import Image from "next/image";
 import React from "react";
 import RaffleDetailsButton from "./RaffleDetailsButton";
+import type { Raffle } from "@/app/config/types";
 
-interface ICardsProps {
-  id: string;
-  title: string;
-  name: string;
-  numberOfTickets: number;
-  tickets_left: number;
-  pricePerTicket: number;
-  date: string;
-  awardImage: string;
-}
+export type ICardsProps = Raffle;
 
 /**
  * Storefront raffle card.
@@ -28,16 +20,15 @@ interface ICardsProps {
  */
 const Cards = ({
   id,
-  name,
   title,
   numberOfTickets,
-  tickets_left,
+  ticketsLeft,
   pricePerTicket,
   date,
   awardImage,
 }: ICardsProps) => {
   const total = numberOfTickets || 0;
-  const left = typeof tickets_left === "number" ? tickets_left : null;
+  const left = typeof ticketsLeft === "number" ? ticketsLeft : null;
   const sold = left !== null && total > 0 ? total - left : 0;
   const pct = total > 0 ? Math.min(100, Math.round((sold / total) * 100)) : 0;
   const isSoldOut = left !== null && left <= 0;
@@ -48,7 +39,7 @@ const Cards = ({
         {awardImage ? (
           <Image
             src={awardImage}
-            alt={title || name || "Rifa"}
+            alt={title || "Rifa"}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
@@ -74,7 +65,7 @@ const Cards = ({
 
       <div className="flex flex-1 flex-col p-4">
         <h2 className="mb-1 text-lg font-bold leading-snug text-ink-900">
-          {title || name || "Event"}
+          {title || "Event"}
         </h2>
 
         <p className="mb-3 text-2xl font-extrabold text-ink-900">

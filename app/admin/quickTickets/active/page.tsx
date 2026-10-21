@@ -25,7 +25,7 @@ interface Ticket {
   winnerLevel?: string;
 }
 
-const page = () => {
+const QuickTicketsActivePage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTickets, setActiveTickets] = useState<any[]>([]);
   const [winnerTickets, setWinnerTickets] = useState<any[]>([]);
@@ -236,4 +236,4 @@ const page = () => {
   );
 };
 
-export default withAuth(page);
+export default withAuth(QuickTicketsActivePage);

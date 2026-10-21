@@ -1,13 +1,7 @@
 import { apiUrl } from "@/app/config/api";
-import Image from "next/image";
 import Cards from "./components/Cards";
 import { Suspense } from "react";
-
-interface IRaffleDataResponse {
-  data: number[];
-  price: string;
-  raffleImage: string;
-}
+import { toRaffle, type AllRafflesResponse } from "./config/types";
 
 export default async function Home() {
   try {
@@ -24,8 +18,8 @@ export default async function Home() {
       throw new Error(`Failed to fetch raffle data: ${response.statusText}`);
     }
 
-    const { result } = await response.json();
-    console.log("result", result);
+    const { result } = (await response.json()) as AllRafflesResponse;
+    const raffles = (Array.isArray(result) ? result : []).map(toRaffle);
 
     return (
       <Suspense fallback={<div>Cargando...</div>}>
@@ -38,10 +32,10 @@ export default async function Home() {
               Elige una rifa y compra tus boletos en linea.
             </p>
           </div>
-          {result && result.length > 0 ? (
+          {raffles.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {result.map((element: any, index: number) => (
-                <Cards key={element?.id ?? index} {...element} />
+              {raffles.map((raffle) => (
+                <Cards key={raffle.id} {...raffle} />
               ))}
             </div>
           ) : (
@@ -57,8 +51,10 @@ export default async function Home() {
         </main>
       </Suspense>
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error rendering Home page:", error);
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
     return (
       <main className="mt-16 flex items-center justify-center">
         <div className="max-w-md rounded-card border border-danger-500/20 bg-white p-8 text-center shadow-card">
@@ -69,7 +65,7 @@ export default async function Home() {
             Intenta de nuevo en un momento.
           </p>
           <p className="mt-3 rounded bg-danger-50 px-3 py-2 text-xs text-danger-700">
-            {error.message}
+            {message}
           </p>
         </div>
       </main>
