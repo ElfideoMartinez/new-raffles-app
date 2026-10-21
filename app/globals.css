@@ -50,7 +50,9 @@ body {
 @layer components {
   .random-ticket-button {
     background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-400));
-    color: white;
+    /* Ratified 2026-10-21 (A1a): dark text on the gradient for AA. White is
+       1.86:1 at the accent-400 end; ink-900 is 9.59:1. Do not revert. */
+    color: var(--color-ink-900);
     font-weight: bold;
     font-size: 1.1rem;
     padding: 0.75rem 1.5rem;

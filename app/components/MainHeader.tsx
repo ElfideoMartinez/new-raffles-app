@@ -23,7 +23,7 @@ const MainHeader = () => {
 
   return (
     <div className="relative">
-      <div className="sticky top-0 z-40 bg-gradient-to-b from-brand-500 to-accent-400 text-white shadow-sm">
+      <div className="sticky top-0 z-40 bg-gradient-to-b from-brand-500 to-accent-400 text-ink-900 shadow-sm">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4">
           {pathName === '/' ? (
             <button

@@ -19,7 +19,7 @@ const RaffleDetailsButton = ({ id }: IRaffeDetailsButtonProps) => {
   return (
     <Link
       href={`/raffle/${id}`}
-      className="block rounded-pill bg-brand-cta px-4 py-2.5 text-center text-sm font-semibold text-white shadow-cta transition-transform hover:bg-brand-cta-hover active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+      className="block rounded-pill bg-brand-cta px-4 py-2.5 text-center text-sm font-semibold text-ink-900 shadow-cta transition-transform hover:bg-brand-cta-hover active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
     >
       Ver Rifa
     </Link>

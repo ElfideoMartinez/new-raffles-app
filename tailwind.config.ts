@@ -51,6 +51,13 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         // Single source for the CTA gradient; replaces the duplicated
         // linear-gradient in globals.css.
+        //
+        // TEXT ON THESE GRADIENTS MUST BE `text-ink-900` (#0f172a), NOT white.
+        // Ratified 2026-10-21 (A1a): the gradient runs to accent-400, where
+        // white is 1.86:1 (fails AA at any size). ink-900 is 9.59:1 at the teal
+        // end and 8.0+:1 at the blue end. This applies only to text on a
+        // gradient surface; white stays correct on solid brand/danger/success
+        // fills (e.g. `bg-danger-700 text-white` passes at 5.48:1).
         "brand-cta": "linear-gradient(135deg, #3b82f6, #2dd4bf)",
         "brand-cta-hover": "linear-gradient(135deg, #2563eb, #14b8a6)",
       },
