@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
@@ -68,7 +69,7 @@ const SuccessPage = () => {
 
   const markAsSold = async () => {
     const promises = raffles.map((raffle) =>
-      fetch(`https://us-central1-raffleapp-dbc1b.cloudfunctions.net/success`, {
+      fetch(apiUrl("success"), {
         cache: "default",
         method: "POST",
         body: JSON.stringify({

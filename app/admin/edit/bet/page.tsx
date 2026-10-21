@@ -1,5 +1,6 @@
 "use client";
 
+import { apiUrl } from "@/app/config/api";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import WithAuth from "@/app/components/WithAuth";
 import {
@@ -45,7 +46,7 @@ const EditBetPage = () => {
       try {
         const response = await fetch(
           //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getAllBets`,
-          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllBets`,
+          apiUrl("getAllBets"),
           { cache: "no-store" }
         );
 
@@ -98,7 +99,7 @@ const EditBetPage = () => {
     try {
       const result = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/updateBet`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/updateBet`,
+        apiUrl("updateBet"),
         {
           method: "PATCH",
           headers: {
@@ -167,7 +168,7 @@ const EditBetPage = () => {
     try {
       const responseData = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getBetData`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getBetData`,
+        apiUrl("getBetData"),
         {
           cache: "no-store",
           method: "POST",
@@ -207,7 +208,7 @@ const EditBetPage = () => {
     try {
       const result = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/deleteBet`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/deleteBet`,
+        apiUrl("deleteBet"),
         {
           method: "DELETE",
           headers: {

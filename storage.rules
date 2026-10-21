@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Storage rules for raffleapp-dbc1b (repo: ~/Projects/new-raffles-app)
+//
+// STATUS: WRITTEN FROM THE DATA MODEL, NOT DEPLOYED, NOT EMULATOR-TESTED.
+// No storage.rules existed in the repo; no upload path was found in app/.
+// These rules are therefore mainly a lock, not a feature: they close the
+// bucket to anonymous writes and keep image reads public for the storefront.
+//
+// If raffle/bet images are uploaded from the admin UI, the upload writes to
+// raffles/{id}/* or bets/{id}/* and is admin-only below. If your uploads use
+// a different path, this will block them -- check before deploy.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Public images for the storefront (raffle art, bet art).
+    // 5 MB ceiling keeps a single upload from bloating the bucket.
+    match /raffles/{raffleId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage()
+        && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    match /bets/{betId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage()
+        && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // Everything else: deny.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import withAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Link from "next/link";
@@ -108,7 +109,7 @@ const CreateRaffle = () => {
 
     const res = await fetch(
       //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createRaffle`,
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createRaffle`,
+      apiUrl("createRaffle"),
       {
         method: "POST",
         headers: {

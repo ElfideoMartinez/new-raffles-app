@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import React, { useState, useEffect, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -36,7 +37,7 @@ const CardCheckoutPage = () => {
       try {
         const response = await fetch(
           //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/createCheckoutSession`,
-          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createCheckoutSession`,
+          apiUrl("createCheckoutSession"),
           {
             method: "POST",
             headers: {

@@ -1,4 +1,5 @@
 'use client'
+import { apiUrl } from "@/app/config/api";
 import BetSaleCard from "@/app/components/BetSaleCard";
 import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
@@ -37,7 +38,7 @@ const BetsPage = () => {
     try {
       const res = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSalesBets`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSalesBets`,
+        apiUrl("getSalesBets"),
         {
           method: "GET",
           mode: "cors", // Important for cross-origin requests

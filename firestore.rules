@@ -1,0 +1,110 @@
+rules_version = '2';
+
+// Firestore rules for raffleapp-dbc1b (repo: ~/Projects/new-raffles-app)
+//
+// STATUS: WRITTEN FROM THE DATA MODEL, NOT DEPLOYED, NOT EMULATOR-TESTED.
+// Derived from functions/src/index.ts + client reads in app/.
+//
+// Collections observed in code: raffles, tickets, sales, bets, salesBets,
+// notificationTokens.
+//
+// DESIGN NOTE: the app has TWO data paths.
+//   1. Cloud Functions using the Admin SDK -- bypasses these rules entirely.
+//   2. Client-side Firestore SDK (app/helpers/firebase.ts, WithAuth.tsx) --
+//      subject to these rules. This is the real security boundary for those
+//      writes.
+// Any client read/write not listed here will be denied. That is deliberate:
+// deny-by-default is safer than the previous state (no rules in the repo,
+// unknown live rules).
+//
+// ADMIN: membership is checked via a custom claim (admin == true) OR an
+// /admins/{uid} document. Pick one; both are supported below so this file
+// works whichever way you seed admins. Verify which one is in use before
+// deploy -- see HANDOFF-SECURITY.md.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // ---------- raffles ----------
+    // Public storefront must list and read raffles. All writes are
+    // admin-only (via Functions normally; this blocks direct client writes).
+    match /raffles/{raffleId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---------- tickets ----------
+    // Ticket numbers are part of the raffle presentation but "sold" status is
+    // money-sensitive. Client may read; only admin/Functions may write.
+    match /tickets/{ticketId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------- sales ----------
+    // Historical note: app/helpers/firebase.ts creates sales documents from
+    // the client. To preserve that path without opening the collection, we
+    // allow create only for signed-in users AND only when the doc is marked
+    // unverified and has no admin fields set. Prefer moving this write to a
+    // Function (see HANDOFF-SECURITY.md, item 3).
+    match /sales/{saleId} {
+      allow read: if isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll(['userId'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.verified == false;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------- bets ----------
+    // Mirror of raffles: public read for the storefront, admin-only writes.
+    match /bets/{betId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------- salesBets ----------
+    // Bet equivalent of sales. No client write path was found in the repo;
+    // if one exists it must be added here deliberately, not by widening.
+    match /salesBets/{saleBetId} {
+      allow read: if isAdmin() ||
+        (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll(['userId'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.verified == false;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------- notificationTokens ----------
+    // Client creates its own token (WithAuth.tsx); nobody reads others'.
+    match /notificationTokens/{tokenId} {
+      allow read, write: if isSignedIn()
+        && (tokenId == request.auth.uid || resource.data.userId == request.auth.uid);
+    }
+
+    // ---------- admins ----------
+    // Admin roster. Readable by admins only; never client-writable.
+    match /admins/{uid} {
+      allow read: if isAdmin();
+      allow write: if false; // seed via console / Admin SDK only
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

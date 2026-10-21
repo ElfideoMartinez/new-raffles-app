@@ -1,3 +1,4 @@
+import { apiUrl } from "@/app/config/api";
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,7 +24,7 @@ interface IBetData {
 export default async function BetsPage() {
   try {
     const response = await fetch(
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllBets`,
+      apiUrl("getAllBets"),
       {
         cache: "no-store",
       }

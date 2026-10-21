@@ -1,5 +1,6 @@
 "use client";
 
+import { quickTicketUrl } from "@/app/config/api";
 import { useEffect, useState, useRef } from "react";
 import { onValue, ref, set, off } from "firebase/database";
 import { realtimeDB } from "../../firebaseconfig"; // Adjust the import path as needed
@@ -73,7 +74,7 @@ export default function PlayPage() {
     try {
       // Call backend to create a new ticket
       const response = await fetch(
-        `https://createquickticket-3ve3qo4dga-uc.a.run.app`,
+        quickTicketUrl(),
         {
           method: "GET",
           headers: {

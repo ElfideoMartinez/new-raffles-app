@@ -1,3 +1,4 @@
+import { apiUrl } from "@/app/config/api";
 import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import ImageWithModal from "./ImageModal";
@@ -48,7 +49,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
   }) => {
     const res = await fetch(
       //${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/confirmSale`,
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/confirmSale`,
+      apiUrl("confirmSale"),
       {
         method: "POST",
         headers: {
@@ -74,7 +75,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
     console.log("Rejecting payment", sale);
     const res = await fetch(
       //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/rejectSale`,
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/rejectSale`,
+      apiUrl("rejectSale"),
       {
         method: "POST",
         headers: {

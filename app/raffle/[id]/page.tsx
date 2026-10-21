@@ -1,5 +1,6 @@
 // app/raffle/[id]/RafflePageServer.tsx
 
+import { apiUrl } from "@/app/config/api";
 import React, { Suspense, createContext } from "react";
 import RafflePageClient from "./RafflePageClient";
 import { FadeLoader } from "react-spinners";
@@ -18,7 +19,7 @@ async function fetchRaffleData(id: string): Promise<IRaffleDataResponse> {
   try {
     const responseData = await fetch(
       //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`,
-      `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getRaffleData`,
+      apiUrl("getRaffleData"),
       {
         cache: "no-store",
         method: "POST",

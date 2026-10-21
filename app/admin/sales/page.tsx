@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import SaleCard from "@/app/components/SaleCard";
 import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
@@ -34,7 +35,7 @@ const SalesPage = () => {
     try {
       const res = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getSales`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getSales`,
+        apiUrl("getSales"),
         {
           method: "GET",
           mode: "cors", // Important for cross-origin requests

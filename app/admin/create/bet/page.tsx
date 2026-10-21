@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import WithAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { toast } from "nextjs-toast-notify";
@@ -105,7 +106,7 @@ const CreateBet = () => {
     try {
       console.log("Creating bet with data:", betData);
       const res = await fetch(
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/createBet`,
+        apiUrl("createBet"),
         {
           method: "POST",
           headers: {

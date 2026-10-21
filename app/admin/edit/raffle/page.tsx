@@ -1,4 +1,5 @@
 'use client'
+import { apiUrl } from "@/app/config/api";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -48,7 +49,7 @@ const EditRaffle = () => {
     try{
       const result = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/deleteRaffle`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/deleteRaffle`,
+        apiUrl("deleteRaffle"),
         {
           method: "DELETE",
           headers: {
@@ -93,7 +94,7 @@ const EditRaffle = () => {
     try{
       const result = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/updateRaffle`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/updateRaffle`,
+        apiUrl("updateRaffle"),
         {
           method: "PATCH",
           headers: {
@@ -160,7 +161,7 @@ const EditRaffle = () => {
     try{
       const responseData = await fetch(
         //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getRaffleData`,
-        `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getRaffleData`,
+        apiUrl("getRaffleData"),
         {
           cache: "no-store",
           method: "POST",
@@ -202,7 +203,7 @@ const EditRaffle = () => {
       try {
         const response = await fetch(
           //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getAllRaffles`,
-          `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/getAllRaffles`,
+          apiUrl("getAllRaffles"),
           {cache: "no-store",}
         );
 

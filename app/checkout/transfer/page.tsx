@@ -1,4 +1,5 @@
 "use client";
+import { apiUrl } from "@/app/config/api";
 import useTicketStore from "@/app/store";
 import { storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
@@ -239,7 +240,7 @@ const CheckoutTransferPage = () => {
               
               const data = await fetch(
                 //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/checkTransfer`,
-                `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/checkTransfer`,
+                apiUrl("checkTransfer"),
                 {
                   method: "POST",
                   headers: {
