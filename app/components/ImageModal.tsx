@@ -27,6 +27,8 @@ const ImageWithModal: React.FC<{ sale: Sale }> = ({ sale }) => {
   return (
     <div>
       {sale.paymentImage && (
+        // eslint-disable-next-line @next/next/no-img-element -- source may be a
+        // data:/blob: URL; next/image cannot optimise those.
         <img
           src={imageToDisplay}
           alt="payment"

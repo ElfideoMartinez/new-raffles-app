@@ -11,7 +11,9 @@ const DeleteRaffleModal = ({ idRaffle, isAvailable, onDelete }: { idRaffle: stri
         className='bg-red-500 p-2 h-12 w-12 rounded-lg flex items-center justify-center hover:bg-red-600'
         onClick={() => setIsOpen(true)}
       >
-        <img src="/trash.png" className="filter invert" alt="Eliminar"/>
+        {/* eslint-disable-next-line @next/next/no-img-element -- 24px static
+          icon; next/image would add a request hop for no gain. */}
+        <img src="/trash.png" className="filter invert" alt="Eliminar" />
       </button>
 
       {/* Modal */}

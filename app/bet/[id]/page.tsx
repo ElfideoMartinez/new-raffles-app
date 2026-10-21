@@ -9,7 +9,7 @@ const BetPageServer = async ({ params }: { params: { id: string } }) => {
     <Suspense
       fallback={
         <div className='flex justify-center items-center mt-5'>
-          <FadeLoader color='#ffffff' />
+          <FadeLoader color="var(--color-ink-inverse)" />
         </div>
       }
     >

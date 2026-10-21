@@ -22,10 +22,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white text-2xl font-bold focus:outline-none p-1 m-1 rounded-full"
-          style={{ backgroundColor: '#355b6eff'}}
+          style={{ backgroundColor: "var(--color-brand-700)"}}
         >
           &times;
         </button>
+        {/* eslint-disable-next-line @next/next/no-img-element -- may be a
+            data:/blob: upload; next/image cannot optimise those. */}
         <img
           src={imageUrl}
           alt="Enlarged"

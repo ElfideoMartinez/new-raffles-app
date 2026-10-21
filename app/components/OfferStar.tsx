@@ -14,9 +14,9 @@ interface OfferStarProps {
 const OfferStar: React.FC<OfferStarProps> = ({
   text,
   size = 85,
-  fillColor = "#facc15",
-  textColor = "#000000",
-  strokeColor = "#000000",
+  fillColor = "var(--color-warning-500)",
+  textColor = "var(--color-ink-900)",
+  strokeColor = "var(--color-ink-900)",
   spikes = 24,
   innerRatio = 0.8,
 }) => {

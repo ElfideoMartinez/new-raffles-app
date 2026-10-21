@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 :root {
+  /* Brand tokens mirrored from tailwind.config.ts so inline props
+     (spinner colours, style={{backgroundColor}}) can reference the same
+     values instead of hard-coded hex. Keep in sync with the Tailwind theme. */
+  --color-ink-900: #0f172a;
+  --color-ink-inverse: #ffffff;
+  --color-brand-500: #3b82f6;
+  --color-brand-700: #1d4ed8;
+  --color-accent-400: #2dd4bf;
+
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -34,7 +43,7 @@ body {
 
 @layer components {
   .random-ticket-button {
-    background: linear-gradient(135deg, #3b82f6, #2dd4bf); /* blue-500 to teal-400 */
+    background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-400));
     color: white;
     font-weight: bold;
     font-size: 1.1rem;
@@ -47,7 +56,7 @@ body {
   }
   
   .random-ticket-button:hover {
-    background: linear-gradient(135deg, #2563eb, #14b8a6); /* slightly darker on hover */
+    background: linear-gradient(135deg, #2563eb, #14b8a6); /* brand-600 → accent-500; not hoisted: Tailwind hover tokens */
     transform: scale(1.05);
   }
   

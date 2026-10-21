@@ -55,7 +55,7 @@ export default async function BetsPage() {
     return (
       <Suspense
         fallback={
-          <ClipLoader color='#ffffff' size={50} className='mx-auto mt-20' />
+          <ClipLoader color="var(--color-ink-inverse)" size={50} className='mx-auto mt-20' />
         }
       >
         <main className='min-h-screen p-4'>

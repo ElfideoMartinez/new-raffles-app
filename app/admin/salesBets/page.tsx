@@ -83,7 +83,7 @@ const BetsPage = () => {
       </div>
       {loading ? (
         <div className="flex justify-center items-center w-full h-64">
-          <FadeLoader color='#ffffff'/>
+          <FadeLoader color="var(--color-ink-inverse)"/>
         </div>
       ):(
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>

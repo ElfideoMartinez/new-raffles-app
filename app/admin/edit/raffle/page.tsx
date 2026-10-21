@@ -252,7 +252,7 @@ const EditRaffle = () => {
             ))}
           </select>
         </div>
-        {isLoadingRaffle ? <div className="flex justify-center pt-2"><FadeLoader color="#000000"/></div> : 
+        {isLoadingRaffle ? <div className="flex justify-center pt-2"><FadeLoader color="var(--color-ink-900)"/></div> : 
           <div>
             <label className='text-black block text-sm font-medium mb-1'>
                 Titulo de la Rifa:

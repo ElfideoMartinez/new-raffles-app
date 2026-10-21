@@ -61,7 +61,7 @@ const RafflePageClient = ({
     console.log('tickets desde pagina de rifa',tickets)
   },[tickets])
 
-  if (!isHydrated) return <div className="flex justify-center items-center mt-5"><FadeLoader color='#ffffff'/></div>
+  if (!isHydrated) return <div className="flex justify-center items-center mt-5"><FadeLoader color="var(--color-ink-inverse)"/></div>
 
   const thereIsWinner = raffleData.ticketWinner != '' && raffleData.ticketWinner != '.';
   

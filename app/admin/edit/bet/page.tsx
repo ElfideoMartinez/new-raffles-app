@@ -311,7 +311,7 @@ const EditBetPage = () => {
         </div>
         {isLoadingBet ? (
           <div className='flex justify-center pt-2'>
-            <FadeLoader color='#000000' />
+            <FadeLoader color="var(--color-ink-900)" />
           </div>
         ) : (
           <div>
