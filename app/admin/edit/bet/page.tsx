@@ -107,25 +107,36 @@ const EditBetPage = () => {
       );
 
       if (!result.ok) {
-        console.log(result);
-        throw new Error(result.statusText);
+        console.error("updateBet failed:", result.status, result.statusText);
+        throw new Error(
+          `updateBet failed with status ${result.status}: ${result.statusText}`
+        );
       }
+      cleanBet();
+      setNewImage(null);
+      resetForm();
+      toast.success(`Apuesta actualizada correctamente`, {
+        duration: 2000,
+        progress: false,
+        position: "top-right",
+        transition: "popUp",
+        icon: "",
+        sound: false,
+      });
+      setUpdatedBetsData((prev) => !prev);
     } catch (e) {
-      console.log(e);
+      console.error("Error al actualizar la apuesta:", e);
+      toast.error(`Error al actualizar la apuesta. Inténtalo de nuevo.`, {
+        duration: 2000,
+        progress: false,
+        position: "top-right",
+        transition: "popUp",
+        icon: "",
+        sound: false,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-    cleanBet();
-    setNewImage(null);
-    resetForm();
-    toast.success(`Apuesta actualizada correctamente`, {
-      duration: 2000,
-      progress: false,
-      position: "top-right",
-      transition: "popUp",
-      icon: "",
-      sound: false,
-    });
-    setUpdatedBetsData((prev) => !prev);
   };
 
   const uploadBetImage = async (file: File, betId: string) => {
@@ -213,11 +224,22 @@ const EditBetPage = () => {
       );
 
       if (!result.ok) {
-        console.log(result);
-        throw new Error(result.statusText);
+        console.error("deleteBet failed:", result.status, result.statusText);
+        throw new Error(
+          `deleteBet failed with status ${result.status}: ${result.statusText}`
+        );
       }
     } catch (e) {
       console.error(e);
+      toast.error(`Error al borrar la apuesta. Inténtalo de nuevo.`, {
+        duration: 2000,
+        progress: false,
+        position: "top-right",
+        transition: "popUp",
+        icon: "",
+        sound: false,
+      });
+      return;
     }
     toast.success(`Apuesta borrada correctamente`, {
       duration: 2000,

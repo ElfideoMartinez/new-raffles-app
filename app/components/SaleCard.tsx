@@ -1,4 +1,4 @@
-import { apiUrl, authedApiFetch } from "@/app/config/api";
+import { authedApiFetch } from "@/app/config/api";
 import React, { Suspense, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import ImageWithModal from "./ImageModal";
@@ -39,65 +39,40 @@ const SaleCard: React.FC<SaleCardProps> = ({
   setSalesFunction,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const confirmPayment = async (sale: {
-    id: string;
-    raffles: {
-      raffleId: string;
-      raffleName: string;
-      ticketNumbers: number[];
-      raffleTotalPrice: number;
-    }[];
-  }) => {
-    const res = await authedApiFetch("confirmSale", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: sale.id,
-          raffles: sale.raffles,
-        }),
-      }
-    );
-    const data = await res.json();
-  };
-  const rejectPayment = async (sale: {
-    id: string;
-    raffles: {
-      raffleId: string;
-      raffleName: string;
-      ticketNumbers: number[];
-      raffleTotalPrice: number;
-    }[];
-  }) => {
-    console.log("Rejecting payment", sale);
-    const res = await authedApiFetch("rejectSale", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: sale.id,
-          raffles: sale.raffles,
-        }),
-      }
-    );
+  /**
+   * Resolves only when the function accepted the change. Any non-2xx response
+   * (401 missing/expired token, 403 non-admin, 500 ticket update failure) is
+   * thrown so the caller cannot flip the card to "confirmed" on a failed write.
+   */
+  const confirmOrRejectPayment = async (
+    fnName: "confirmSale" | "rejectSale"
+  ) => {
+    const res = await authedApiFetch(fnName, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: sale.id,
+        raffles: sale.raffles,
+      }),
+    });
+    if (!res.ok) {
+      console.error(`${fnName} failed:`, res.status, res.statusText);
+      throw new Error(`${fnName} failed with status ${res.status}`);
+    }
   };
   const handleAction = async () => {
     try {
       setIsLoading(true);
-      if (isVerified) {
-        await rejectPayment(sale);
-      } else {
-        await confirmPayment(sale);
-      }
-      setIsLoading(false);
+      await confirmOrRejectPayment(isVerified ? "rejectSale" : "confirmSale");
       setSalesFunction((prevSales: any) =>
         prevSales.map((s: { id: string; verified: any }) =>
           s.id === sale.id ? { ...s, verified: !s.verified } : s
         )
       );
     } catch (error) {
+      // State is untouched: the card keeps showing what the server still has.
       toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde.`,{
         duration: 2000,
         progress: false,
@@ -106,12 +81,8 @@ const SaleCard: React.FC<SaleCardProps> = ({
         icon: '',
         sound: false,
       });
+    } finally {
       setIsLoading(false);
-      setSalesFunction((prevSales: any) =>
-        prevSales.map((s: { id: string; verified: any }) =>
-          s.id === sale.id ? { ...s, verified: !s.verified } : s
-        )
-      );
     }
   };
 

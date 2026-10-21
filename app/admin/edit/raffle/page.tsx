@@ -45,7 +45,6 @@ const EditRaffle = () => {
   };
 
   const handleDeleteRaffle = async (raffleId: string) => {
-    
     try{
       const result = await authedApiFetch("deleteRaffle", {
           method: "DELETE",
@@ -57,11 +56,22 @@ const EditRaffle = () => {
       )
 
       if (!result.ok) {
-        console.log(result);
-        throw new Error(result.statusText);
+        console.error("deleteRaffle failed:", result.status, result.statusText);
+        throw new Error(
+          `deleteRaffle failed with status ${result.status}: ${result.statusText}`
+        );
       }
     }catch(e){
       console.error(e);
+      toast.error(`Error al borrar la rifa. Inténtalo de nuevo.`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+      return;
     }
     toast.success(`Rifa borrada correctamente`,{
       duration: 2000,
@@ -99,25 +109,36 @@ const EditRaffle = () => {
       )
 
       if (!result.ok) {
-        console.log(result);
-        throw new Error(result.statusText);
+        console.error("updateRaffle failed:", result.status, result.statusText);
+        throw new Error(
+          `updateRaffle failed with status ${result.status}: ${result.statusText}`
+        );
       }
+      cleanRaffle();
+      setNewImage(null)
+      resetForm();
+      toast.success(`Rifa actualizada correctamente`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+      setUpdatedRafflesData((prev) => !prev);
     }catch(e){
-      console.log(e);
+      console.error("Error al actualizar la rifa:", e);
+      toast.error(`Error al actualizar la rifa. Inténtalo de nuevo.`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-    cleanRaffle();
-    setNewImage(null)
-    resetForm();
-    toast.success(`Rifa actualizada correctamente`,{
-      duration: 2000,
-      progress: false,
-      position: 'top-right',
-      transition: 'popUp',
-      icon: '',
-      sound: false,
-    });
-    setUpdatedRafflesData((prev) => !prev);
   }
 
   const uploadRaffleImage = async (file: File, raffleId: string) => {

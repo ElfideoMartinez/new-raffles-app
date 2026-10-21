@@ -4,6 +4,7 @@ import ImageWithModal from "./ImageModal";
 import Link from "next/link";
 import { toast } from "nextjs-toast-notify";
 import { formatPrice } from "@/app/utils/format";
+import { authedApiFetch } from "@/app/config/api";
 
 interface IBetsSale {
   id: string;
@@ -37,47 +38,50 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const confirmOrRejectPayment = async (action: string) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/confirmRejectBetSale`,
-      // `https://us-central1-raffleapp-dbc1b.cloudfunctions.net/confirmRejectBetSale`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: betSale.id,
-          action: action,
-          betSummary: betSale.bets.map((bet) => ({
-            betId: bet.betId,
-            totalPrice: bet.totalPrice,
-            ticketNumbers: bet.ticketNumbers,
-            team: bet.letterTeam,
-            betName: bet.betName,
-            clientReturns: betSale.clientReturns,
-          })),
-        }),
-      }
-    );
-    const data = await res.json();
+  /**
+   * Resolves only when the function accepted the change. Any non-2xx response
+   * (401 missing/expired token, 403 non-admin, 500 update failure) is thrown so
+   * the caller cannot flip the card to "confirmed" on a failed write.
+   */
+  const confirmOrRejectPayment = async (action: "confirm" | "reject") => {
+    const res = await authedApiFetch("confirmRejectBetSale", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: betSale.id,
+        action: action,
+        betSummary: betSale.bets.map((bet) => ({
+          betId: bet.betId,
+          totalPrice: bet.totalPrice,
+          ticketNumbers: bet.ticketNumbers,
+          team: bet.letterTeam,
+          betName: bet.betName,
+          clientReturns: betSale.clientReturns,
+        })),
+      }),
+    });
+    if (!res.ok) {
+      console.error(
+        `confirmRejectBetSale (${action}) failed:`,
+        res.status,
+        res.statusText
+      );
+      throw new Error(`confirmRejectBetSale failed with status ${res.status}`);
+    }
   };
-
   const handleAction = async () => {
     try {
       setIsLoading(true);
-      if (isVerified) {
-        await confirmOrRejectPayment("reject");
-      } else {
-        await confirmOrRejectPayment("confirm");
-      }
-      setIsLoading(false);
+      await confirmOrRejectPayment(isVerified ? "reject" : "confirm");
       setSalesFunction((prevSales: any) =>
         prevSales.map((s: { id: string; verified: any }) =>
           s.id === betSale.id ? { ...s, verified: !s.verified } : s
         )
       );
     } catch (error) {
+      // State is untouched: the card keeps showing what the server still has.
       toast.error(
         `Error al completar la compra. Inténtalo de nuevo más tarde.`,
         {
@@ -89,12 +93,8 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
           sound: false,
         }
       );
+    } finally {
       setIsLoading(false);
-      setSalesFunction((prevSales: any) =>
-        prevSales.map((s: { id: string; verified: any }) =>
-          s.id === betSale.id ? { ...s, verified: !s.verified } : s
-        )
-      );
     }
   };
 

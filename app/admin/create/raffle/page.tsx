@@ -77,17 +77,30 @@ const CreateRaffle = () => {
     };
 
     console.log("Objeto Plano",raffleData);
-    createNewRaffle(raffleData);
-    resetForm();
-    setIsLoading(false);
-    toast.success(`Rifa creada exitosamente`,{
-      duration: 2000,
-      progress: false,
-      position: 'top-right',
-      transition: 'popUp',
-      icon: '',
-      sound: false,
-    });
+    try {
+      await createNewRaffle(raffleData);
+      resetForm();
+      toast.success(`Rifa creada exitosamente`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+    } catch (error) {
+      console.error("Error al crear la rifa:", error);
+      toast.error(`Error al crear la rifa. Inténtalo de nuevo.`,{
+        duration: 2000,
+        progress: false,
+        position: 'top-right',
+        transition: 'popUp',
+        icon: '',
+        sound: false,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   const uploadRaffleImage = async (file: File, raffleId: string) => {
     const storage = getStorage();
@@ -116,8 +129,10 @@ const CreateRaffle = () => {
       }
     );
     if (!res.ok) {
-      console.log(res);
-      throw new Error(res.statusText);
+      console.error("createRaffle failed:", res.status, res.statusText);
+      throw new Error(
+        `createRaffle failed with status ${res.status}: ${res.statusText}`
+      );
     }
     const data = await res.json();
     console.log(data);

@@ -1758,13 +1758,15 @@ export const confirmRejectBetSale = functions.https.onRequest(
             verified: true,
             clientReturns: betData.clientReturns || 0,
           });
-          // Update bet statistics in Realtime Database
+          // Update bet statistics in Realtime Database.
+          // These are stake counts (= tickets bought), never odds; odds are the
+          // strings oddsTeamA/oddsTeamB and must not be added here.
           if (bet.team === "A") {
             updates.betsTeamA =
-              Number(betData.oddsTeamA || 0) + bet.ticketNumbers;
+              Number(betData.betsTeamA || 0) + bet.ticketNumbers;
           } else if (bet.team === "B") {
             updates.betsTeamB =
-              Number(betData.oddsTeamB || 0) + bet.ticketNumbers;
+              Number(betData.betsTeamB || 0) + bet.ticketNumbers;
           } else if (bet.team === "C") {
             updates.tieBets = Number(betData.tieBets || 0) + bet.ticketNumbers;
           }
@@ -1778,11 +1780,11 @@ export const confirmRejectBetSale = functions.https.onRequest(
           });
           if (bet.team === "A") {
             updates.betsTeamA = Number(
-              (betData.oddsTeamA || 0) - bet.ticketNumbers
+              (betData.betsTeamA || 0) - bet.ticketNumbers
             );
           } else if (bet.team === "B") {
             updates.betsTeamB = Number(
-              (betData.oddsTeamB || 0) - bet.ticketNumbers
+              (betData.betsTeamB || 0) - bet.ticketNumbers
             );
           } else if (bet.team === "C") {
             updates.tieBets = Number(
