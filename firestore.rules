@@ -95,6 +95,14 @@ service cloud.firestore {
         && (tokenId == request.auth.uid || resource.data.userId == request.auth.uid);
     }
 
+    // ---------- adminWriteLog ----------
+    // Audit trail for admin-only Cloud Functions. Written by the Admin SDK
+    // (which bypasses rules); read-only for admins, never client-writable.
+    match /adminWriteLog/{entryId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // ---------- admins ----------
     // Admin roster. Readable by admins only; never client-writable.
     match /admins/{uid} {

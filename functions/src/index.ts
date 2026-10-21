@@ -71,6 +71,27 @@ async function assertAdmin(
   }
 }
 
+/** Append an audit entry for a successful admin mutation (best effort). */
+async function logAdminAction(
+  authorizationHeader: string | undefined,
+  action: string,
+  detail: unknown
+): Promise<void> {
+  try {
+    const header = authorizationHeader || "";
+    const token = header.split(" ")[1];
+    const decoded = token ? await admin.auth().verifyIdToken(token) : null;
+    await db.collection("adminWriteLog").add({
+      uid: decoded ? decoded.uid : null,
+      action,
+      detail: JSON.parse(JSON.stringify(detail ?? {})),
+      at: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn("adminWriteLog failed:", action, err);
+  }
+}
+
 /**
  * Run the admin check for an HTTP request. Returns true when the request was
  * rejected and the caller must return immediately.
@@ -468,6 +489,10 @@ export const markTicketsAsSold = functions.https.onRequest(async (req, res) => {
     const { raffleId, ticketNumbers } = data;
 
     await setTicketsAsSold(raffleId, ticketNumbers);
+    await logAdminAction(req.headers.authorization, "markTicketsAsSold", {
+      raffleId,
+      ticketNumbers,
+    });
 
     res.status(200).json({
       status: 200,
@@ -889,6 +914,7 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
     const saleUpdatePromise = salesDocRef.update({ verified: false });
 
     await Promise.all([...updatePromises, saleUpdatePromise]);
+    await logAdminAction(req.headers.authorization, "rejectSale", { id: data.id });
 
     res.status(200).json({
       status: 200,
@@ -948,6 +974,7 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
     batch.update(saleRef, { verified: true });
 
     await batch.commit();
+    await logAdminAction(req.headers.authorization, "confirmSale", { id: data.id });
 
     res.status(200).json({
       status: 200,
@@ -1008,6 +1035,11 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
       batch.set(ticketRef, ticket);
     });
     await batch.commit();
+    await logAdminAction(req.headers.authorization, "createRaffle", {
+      id: docRef.id,
+      title: body.title,
+      numberOfTickets: body.numberOfTickets,
+    });
 
     res.status(200).json({
       message: "Raffle created successfully",
@@ -1305,6 +1337,9 @@ export const updateRaffle = functions.https.onRequest(async (req, res) => {
       .collection("raffles")
       .doc(body.idRaffle)
       .set(body.raffle, { merge: true });
+    await logAdminAction(req.headers.authorization, "updateRaffle", {
+      id: body.idRaffle,
+    });
 
     res.status(200).json({
       status: 200,
@@ -1359,6 +1394,10 @@ export const deleteRaffle = functions.https.onRequest(async (req, res) => {
     console.log(
       `Se eliminaron ${snapshot.size} ticket(s) con raffle_id: ${body.idRaffle}`
     );
+    await logAdminAction(req.headers.authorization, "deleteRaffle", {
+      id: body.idRaffle,
+      ticketsDeleted: snapshot.size,
+    });
 
     res.status(200).json({
       status: 200,
