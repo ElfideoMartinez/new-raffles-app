@@ -229,24 +229,24 @@ const CreateBet = () => {
   }, [bet]);
 
   return (
-    <div className='min-h-screen bg-gray-900 py-8 px-4'>
+    <div className='min-h-screen bg-white py-8 px-4'>
       <div className='max-w-2xl mx-auto'>
         {/* Header */}
-        <div className='bg-gray-800 rounded-t-lg p-6 border-b border-gray-700'>
-          <h2 className='text-white text-3xl font-bold text-center'>
+        <div className='bg-white rounded-t-card p-6 border-b border-ink-100 shadow-card'>
+          <h2 className='text-ink-900 text-3xl font-bold text-center'>
             Crear Nueva Apuesta
           </h2>
-          <p className='text-gray-400 text-center mt-2'>
+          <p className='text-ink-500 text-center mt-2'>
             Completa todos los campos para crear una nueva apuesta
           </p>
         </div>
 
         {/* Form */}
-        <div className='bg-gray-800 rounded-b-lg p-6 shadow-2xl'>
+        <div className='bg-white rounded-b-card p-6 shadow-card border border-t-0 border-ink-100'>
           <form ref={formRef} onSubmit={handleSubmit} className='space-y-6'>
             {/* Title */}
             <div>
-              <label className='text-white block text-sm font-medium mb-2'>
+              <label className='text-ink-700 block text-sm font-medium mb-2'>
                 Título de la Apuesta *
               </label>
               <input
@@ -256,13 +256,13 @@ const CreateBet = () => {
                 onChange={handleChange}
                 required
                 placeholder='Ej: Real Madrid vs Barcelona'
-                className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className='text-white block text-sm font-medium mb-2'>
+              <label className='text-ink-700 block text-sm font-medium mb-2'>
                 Descripción de la Apuesta *
               </label>
               <textarea
@@ -272,18 +272,18 @@ const CreateBet = () => {
                 required
                 rows={4}
                 placeholder='Describe los detalles de la apuesta...'
-                className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none'
+                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none'
               />
             </div>
 
             {/* Price and Date Row */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
-                <label className='text-white block text-sm font-medium mb-2'>
+                <label className='text-ink-700 block text-sm font-medium mb-2'>
                   Precio por Ticket *
                 </label>
                 <div className='relative'>
-                  <span className='absolute left-3 top-3 text-gray-400'>$</span>
+                  <span className='absolute left-3 top-3 text-ink-500'>$</span>
                   <input
                     type='number'
                     name='pricePerTicket'
@@ -293,13 +293,13 @@ const CreateBet = () => {
                     step='0.01'
                     min='0'
                     placeholder='0.00'
-                    className='w-full pl-8 pr-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                    className='w-full pl-8 pr-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
                   />
                 </div>
               </div>
 
               <div>
-                <label className='text-white block text-sm font-medium mb-2'>
+                <label className='text-ink-700 block text-sm font-medium mb-2'>
                   Fecha de Cierre *
                 </label>
                 <input
@@ -308,19 +308,19 @@ const CreateBet = () => {
                   value={bet.date}
                   onChange={handleChange}
                   required
-                  className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all'
+                  className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
                 />
               </div>
             </div>
 
             {/* Teams Section */}
             <div>
-              <h3 className='text-white text-lg font-semibold mb-4'>
+              <h3 className='text-ink-900 text-lg font-semibold mb-4'>
                 Equipos Participantes
               </h3>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <label className='text-white block text-sm font-medium mb-2'>
+                  <label className='text-ink-700 block text-sm font-medium mb-2'>
                     Equipo A *
                   </label>
                   <input
@@ -329,12 +329,12 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("a", e.target.value)}
                     required
                     placeholder='Nombre del primer equipo'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-success-500 focus:ring-2 focus:ring-success-500/20 transition-all'
                   />
                 </div>
 
                 <div>
-                  <label className='text-white block text-sm font-medium mb-2'>
+                  <label className='text-ink-700 block text-sm font-medium mb-2'>
                     Equipo B *
                   </label>
                   <input
@@ -343,7 +343,7 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("b", e.target.value)}
                     required
                     placeholder='Nombre del segundo equipo'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-danger-500 focus:ring-2 focus:ring-danger-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -351,7 +351,7 @@ const CreateBet = () => {
 
             {/* Odds Section */}
             <div>
-              <h3 className='text-white text-lg font-semibold mb-4'>
+              <h3 className='text-ink-900 text-lg font-semibold mb-4'>
                 Cuotas Iniciales
               </h3>
               <div className='flex items-center mb-4'>
@@ -365,18 +365,18 @@ const CreateBet = () => {
                       oddsTie: e.target.checked ? "" : undefined,
                     }));
                   }}
-                  className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm'
+                  className='h-4 w-4 text-brand-600 focus:ring-brand-500 border-ink-300 rounded-sm'
                 />
                 <label
                   htmlFor='enableTie'
-                  className='ml-2 block text-white text-sm font-medium'
+                  className='ml-2 block text-ink-700 text-sm font-medium'
                 >
                   ¿Permitir empate?
                 </label>
               </div>
               {bet.oddsTie !== undefined && (
                 <div className='mb-4'>
-                  <label className='text-white block text-sm font-medium mb-2'>
+                  <label className='text-ink-700 block text-sm font-medium mb-2'>
                     Cuota Empate
                   </label>
                   <input
@@ -392,13 +392,13 @@ const CreateBet = () => {
                     }}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-warning-500 focus:ring-2 focus:ring-warning-500/20 transition-all'
                   />
                 </div>
               )}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <label className='text-white block text-sm font-medium mb-2'>
+                  <label className='text-ink-700 block text-sm font-medium mb-2'>
                     Cuota Equipo A *
                   </label>
                   <input
@@ -408,12 +408,12 @@ const CreateBet = () => {
                     onChange={handleChange}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-success-500 focus:ring-2 focus:ring-success-500/20 transition-all'
                   />
                 </div>
 
                 <div>
-                  <label className='text-white block text-sm font-medium mb-2'>
+                  <label className='text-ink-700 block text-sm font-medium mb-2'>
                     Cuota Equipo B *
                   </label>
                   <input
@@ -423,7 +423,7 @@ const CreateBet = () => {
                     onChange={handleChange}
                     required
                     placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-gray-600 rounded-sm text-white bg-gray-700 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-danger-500 focus:ring-2 focus:ring-danger-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -431,10 +431,10 @@ const CreateBet = () => {
 
             {/* Image Upload */}
             <div>
-              <label className='text-white block text-sm font-medium mb-2'>
+              <label className='text-ink-700 block text-sm font-medium mb-2'>
                 Imagen de la Apuesta *
               </label>
-              <div className='border-2 border-dashed border-gray-600 rounded-card p-6 text-center hover:border-gray-500 transition-colors'>
+              <div className='border-2 border-dashed border-ink-300 rounded-card p-6 text-center hover:border-brand-500 transition-colors'>
                 <input
                   type='file'
                   name='betImage'
@@ -445,7 +445,7 @@ const CreateBet = () => {
                   id='image-upload'
                 />
                 <label htmlFor='image-upload' className='cursor-pointer'>
-                  <div className='text-gray-400 mb-2'>
+                  <div className='text-ink-500 mb-2'>
                     <svg
                       className='mx-auto h-12 w-12 mb-2'
                       stroke='currentColor'
@@ -469,7 +469,7 @@ const CreateBet = () => {
               </div>
               <p className='text-sm mt-2 text-center'>
                 <span
-                  className={bet.image ? "text-green-400" : "text-gray-400"}
+                  className={bet.image ? "text-success-700" : "text-ink-500"}
                 >
                   {bet.image
                     ? "✓ Imagen cargada correctamente"
@@ -483,7 +483,7 @@ const CreateBet = () => {
               <button
                 disabled={isLoading || !isFormValid}
                 type='submit'
-                className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-card font-semibold text-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100'
+                className='w-full bg-brand-cta hover:bg-brand-cta-hover text-ink-900 py-4 px-6 rounded-sm font-semibold text-lg shadow-cta hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] disabled:hover:scale-100'
               >
                 {isLoading ? (
                   <div className='flex items-center justify-center'>
@@ -516,7 +516,7 @@ const CreateBet = () => {
 
             {/* Form Status */}
             {!isFormValid && (
-              <div className='text-center text-gray-400 text-sm'>
+              <div className='text-center text-ink-500 text-sm'>
                 * Completa todos los campos obligatorios para continuar
               </div>
             )}

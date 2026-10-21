@@ -83,12 +83,12 @@ function EditBetModal({
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <div className='bg-gray-800 rounded-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
+      <div className='bg-white rounded-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
         <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-xl font-bold text-white'>Editar Apuesta</h2>
+          <h2 className='text-xl font-bold text-ink-900'>Editar Apuesta</h2>
           <button
             onClick={onClose}
-            className='text-gray-400 hover:text-white text-2xl'
+            className='text-ink-500 hover:text-ink-900 text-2xl'
           >
             ×
           </button>
@@ -96,33 +96,33 @@ function EditBetModal({
 
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
-            <label className='block text-sm font-medium text-gray-300 mb-1'>
+            <label className='block text-sm font-medium text-ink-700 mb-1'>
               Título
             </label>
             <input
               type='text'
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
               required
             />
           </div>
 
           <div>
-            <label className='block text-sm font-medium text-gray-300 mb-1'>
+            <label className='block text-sm font-medium text-ink-700 mb-1'>
               Descripción
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500 h-24'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500 h-24'
               required
             />
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
-              <label className='block text-sm font-medium text-gray-300 mb-1'>
+              <label className='block text-sm font-medium text-ink-700 mb-1'>
                 Precio por boleto
               </label>
               <input
@@ -132,48 +132,48 @@ function EditBetModal({
                 onChange={(e) =>
                   handleInputChange("pricePerTicket", e.target.value)
                 }
-                className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className='block text-sm font-medium text-gray-300 mb-1'>
+            <label className='block text-sm font-medium text-ink-700 mb-1'>
               Fecha de cierre
             </label>
             <input
               type='datetime-local'
               value={formData.date}
               onChange={(e) => handleInputChange("date", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
               required
             />
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
-              <label className='block text-sm font-medium text-gray-300 mb-1'>
+              <label className='block text-sm font-medium text-ink-700 mb-1'>
                 Equipo A
               </label>
               <input
                 type='text'
                 value={formData.teams.a}
                 onChange={(e) => handleTeamChange(0, e.target.value)}
-                className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-gray-300 mb-1'>
+              <label className='block text-sm font-medium text-ink-700 mb-1'>
                 Equipo B
               </label>
               <input
                 type='text'
                 value={formData.teams.b}
                 onChange={(e) => handleTeamChange(1, e.target.value)}
-                className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
@@ -184,7 +184,7 @@ function EditBetModal({
               type='text'
               value={formData.oddsTeamA || ""}
               onChange={(e) => handleInputChange("oddsTeamA", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
               required
               placeholder='Ejemplo: -120, +110'
             />
@@ -195,18 +195,18 @@ function EditBetModal({
               type='text'
               value={formData.oddsTeamB || ""}
               onChange={(e) => handleInputChange("oddsTeamB", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
               required
               placeholder='Ejemplo: -120, +110'
             />
           </div>
-          <div className='text-xs text-gray-400'>
+          <div className='text-xs text-ink-500'>
             Link de imagen (opcional):
             <input
               type='text'
               value={formData.image || ""}
               onChange={(e) => handleInputChange("image", e.target.value)}
-              className='w-full p-2 rounded-sm bg-gray-700 text-white border border-gray-600 focus:border-blue-500'
+              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
               placeholder='URL de la imagen'
             />
           </div>
@@ -214,13 +214,13 @@ function EditBetModal({
             <button
               type='button'
               onClick={onClose}
-              className='flex-1 px-4 py-2 bg-gray-600 text-white rounded-sm hover:bg-gray-700 transition-colors'
+              className='flex-1 px-4 py-2 bg-ink-100 text-ink-900 rounded-sm hover:bg-ink-300 transition-colors'
             >
               Cancelar
             </button>
             <button
               type='submit'
-              className='flex-1 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-colors'
+              className='flex-1 px-4 py-2 bg-brand-600 text-white rounded-sm hover:bg-brand-700 transition-colors'
             >
               Guardar cambios
             </button>
@@ -261,7 +261,7 @@ function AdminBetCard({
   };
 
   return (
-    <div className='bg-gray-800 rounded-card overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'>
+    <div className='bg-white rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-shadow duration-300 border border-ink-100'>
       {bet.image && (
         <div className='relative h-48 w-full'>
           <Image
@@ -274,40 +274,40 @@ function AdminBetCard({
       )}
 
       <div className='p-4'>
-        <h3 className='text-xl font-bold text-white mb-2 line-clamp-2'>
+        <h3 className='text-xl font-bold text-ink-900 mb-2 line-clamp-2'>
           🎯 {bet.title}
         </h3>
 
-        <p className='text-gray-300 text-sm mb-3 line-clamp-3'>
+        <p className='text-ink-700 text-sm mb-3 line-clamp-3'>
           {bet.description}
         </p>
 
         <div className='space-y-2 mb-4'>
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Precio por boleto:</span>
-            <span className='text-white'>${bet.pricePerTicket}</span>
+            <span className='text-ink-900'>${bet.pricePerTicket}</span>
           </div>
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Total de apuestas:</span>
-            <span className='text-white'>
+            <span className='text-ink-900'>
               ${totalBets * parseFloat(bet.pricePerTicket)}
             </span>
           </div>
 
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Fecha de cierre:</span>
-            <span className='text-white'>
+            <span className='text-ink-900'>
               {new Date(bet.date).toLocaleDateString()}
             </span>
           </div>
 
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Estado:</span>
             <span
               className={`ml-1 px-2 py-1 rounded-pill text-xs ${
                 bet.isFinished
-                  ? "bg-red-600 text-white"
-                  : "bg-green-600 text-white"
+                  ? "bg-danger-700 text-white"
+                  : "bg-success-700 text-white"
               }`}
             >
               {bet.isFinished ? "Finalizada" : "Activa"}
@@ -318,37 +318,37 @@ function AdminBetCard({
         {/* Teams and betting stats */}
         <div className='space-y-2 mb-4'>
           <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-green-400'>
+            <span className='text-sm font-medium text-success-700'>
               {bet.teams.a}
-              <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-pill'>
+              <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
                 ${bet.betsTeamA * parseFloat(bet.pricePerTicket)}
               </span>
             </span>
-            <span className='text-sm text-gray-300'>
+            <span className='text-sm text-ink-700'>
               {bet.betsTeamA} Apuestas ({teamAPercentage}%)
             </span>
           </div>
 
           <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-red-400'>
+            <span className='text-sm font-medium text-danger-700'>
               {bet.teams.b}
-              <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-pill'>
+              <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
                 ${bet.betsTeamB * parseFloat(bet.pricePerTicket)}
               </span>
             </span>
-            <span className='text-sm text-gray-300'>
+            <span className='text-sm text-ink-700'>
               {bet.betsTeamB} Apuestas ({teamBPercentage}%)
             </span>
           </div>
           {bet.tieBets !== undefined && (
             <div className='flex items-center justify-between'>
-              <span className='text-sm font-medium text-yellow-400'>
+              <span className='text-sm font-medium text-warning-700'>
                 Empate
-                <span className='ml-2 bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-pill'>
+                <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
                   ${bet.tieBets * parseFloat(bet.pricePerTicket)}
                 </span>
               </span>
-              <span className='text-sm text-gray-300'>
+              <span className='text-sm text-ink-700'>
                 {bet.tieBets} Apuestas (
                 {totalBets > 0
                   ? ((bet.tieBets / totalBets) * 100).toFixed(1)
@@ -364,7 +364,7 @@ function AdminBetCard({
           <Link
             target='_blank'
             href={`${process.env.NEXT_PUBLIC_BASE_URL}/bet/${bet.id}`}
-            className='block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-sm font-semibold transition-colors duration-300'
+            className='block w-full text-center py-2 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-sm font-semibold transition-colors duration-300'
           >
             Ver Apuesta
           </Link>
@@ -372,7 +372,7 @@ function AdminBetCard({
           <div className='grid grid-cols-2 gap-2'>
             <button
               onClick={() => onEdit(bet)}
-              className='w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-white rounded-sm font-semibold transition-colors duration-300'
+              className='w-full py-2 px-4 bg-warning-500 text-ink-900 hover:bg-warning-700 hover:text-white rounded-sm font-semibold transition-colors duration-300'
             >
               Editar
             </button>
@@ -381,7 +381,7 @@ function AdminBetCard({
               onClick={() =>
                 copyToClipboard(`https://raffleapp-dbc1b.web.app/bet/${bet.id}`)
               }
-              className='w-full py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-sm font-semibold transition-colors duration-300'
+              className='w-full py-2 px-4 bg-ink-100 text-ink-900 hover:bg-ink-300 rounded-sm font-semibold transition-colors duration-300'
             >
               Copiar Link
             </button>
@@ -493,13 +493,13 @@ export default function BetsPage() {
   return (
     <div className='min-h-screen p-4'>
       <div className='max-w-7xl mx-auto'>
-        <h2 className='text-3xl font-bold text-white text-center mb-8'>
+        <h2 className='text-3xl font-bold text-ink-900 text-center mb-8'>
           Administrar Apuestas
         </h2>
         <div className='flex justify-center mb-4'>
           <Link
             href={`${process.env.NEXT_PUBLIC_BASE_URL}/admin/create/bet`}
-            className='px-4 py-2 bg-blue-600 hover:bg-green-700 text-white rounded-sm font-semibold transition-colors duration-300'
+            className='focus-ring px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-sm font-semibold transition-colors duration-300'
           >
             + Crear Nueva Apuesta
           </Link>
@@ -509,7 +509,7 @@ export default function BetsPage() {
             <FadeLoader color="var(--color-ink-inverse)" />
           </div>
         ) : dataBet.length === 0 ? (
-          <div className='text-center text-gray-400 mt-20'>
+          <div className='text-center text-ink-500 mt-20'>
             <p>No hay apuestas disponibles</p>
           </div>
         ) : (
