@@ -480,7 +480,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
                 🎟️ <span id='cartTickets'>{totalTickets}</span> boletos
               </span>
               <div>
-                <span className='text-white font-semibold text-md text-start'>
+                <span className='text-white font-semibold text-base text-start'>
                   🏆 Gana hasta:{" "}
                   <span id='cartWinnings' className='ml-8 sm:ml-0'>
                     $
@@ -494,7 +494,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             </div>
             <div className='flex justify-start'>
               <button
-                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-md sm:text-lg disabled:opacity-55
+                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-base sm:text-lg disabled:opacity-55
                 disabled:hover:bg-yellow-400 disabled:cursor-not-allowed'
                 disabled={totalTickets === 0}
                 onClick={addToCart}
