@@ -301,7 +301,7 @@ as a new item surfaced by the e2e work.
 | # | What remains |
 |---|---|
 | F3 | FIXED 2026-10-22: base `button/a/[role=button]:focus-visible` recipe added in `@layer components` (globals.css); `.focus-ring` stays for opt-in use. |
-| F18 | `formatDate`/`formatPrice` helpers exist and are used on the storefront, but `admin/bets/page.tsx:300` and `user/purchases/page.tsx:63` still call `toLocaleDateString`/`toLocaleString`, which follow the browser locale. |
+| F18 | RESOLVED 2026-10-22: both call sites now use `formatDate`/`formatDateTime`; grep confirms 0 `toLocaleDateString`/`toLocaleString` remain in `app/`. |
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
 | F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
 

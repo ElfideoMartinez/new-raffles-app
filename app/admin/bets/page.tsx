@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import { onValue, ref, set, update } from "firebase/database";
 import { realtimeDB } from "@/app/firebaseconfig";
+import { formatDate } from "@/app/utils/format";
 
 interface IBetsData {
   id: string;
@@ -297,7 +298,7 @@ function AdminBetCard({
           <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Fecha de cierre:</span>
             <span className='text-ink-900'>
-              {new Date(bet.date).toLocaleDateString()}
+              {formatDate(bet.date)}
             </span>
           </div>
 

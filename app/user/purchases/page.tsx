@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
+import { formatDateTime } from "@/app/utils/format";
 
 interface IRaffle {
   raffleId: string;
@@ -60,7 +61,7 @@ const PurchasesPage = () => {
         <ul className="space-y-6">
           {purchases.map((group, index) => (
             <li key={index} className="bg-slate-700 p-4 rounded-card">
-              <p className="text-sm text-gray-300 mb-2">📅 Compra realizada el: {new Date(group.date).toLocaleString()}</p>
+              <p className="text-sm text-gray-300 mb-2">📅 Compra realizada el: {formatDateTime(group.date)}</p>
               <ul className="space-y-3">
                 {group.raffles.map((raffle) => (
                   <li key={`${raffle.raffleId}-${raffle.ticketNumbers.join(",")}`} className="bg-slate-600 p-3 rounded-card md:flex md:justify-between md:items-center">
