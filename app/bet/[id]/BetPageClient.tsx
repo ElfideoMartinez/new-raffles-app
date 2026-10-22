@@ -494,7 +494,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             </div>
             <div className='flex justify-start'>
               <button
-                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-base sm:text-lg disabled:opacity-55
+                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-base sm:text-lg disabled:opacity-50
                 disabled:hover:bg-yellow-400 disabled:cursor-not-allowed'
                 disabled={totalTickets === 0}
                 onClick={addToCart}
