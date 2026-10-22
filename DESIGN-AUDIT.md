@@ -255,7 +255,6 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 | F28 | medium | `TicketButton.tsx:62-66` | Four colour meanings (blue=sold, yellow=in cart, yellow=selected, green=available) with yellow meaning two things. | Sold → `ink-300` + strikethrough; selected → `brand-600`; in-cart → same with a dot. | **Judgement**. |
 | F29 | medium | `MainHeader.tsx:16-17` | `isCartIconAvailable` is true on `/checkout/success` → cart icon hidden exactly when it would be empty; nav elements `invisible` (still focusable/announced). | `hidden` instead of `invisible`, or render conditionally. | **Mechanical** (a11y). |
 | F30 | nit | `bet/[id]:483,497` | `text-md` does not exist → no-op. Bet bar renders at inherited 16px. | `text-base`. | **Mechanical**. |
-| F31 | nit | `cart:153` | `w-ful` typo → no-op. | `w-full`. | **Mechanical**. |
 | F32 | nit | `edit/raffle:369`, `edit/bet:448` | `cursor-none` (invalid Tailwind class) intending "not-allowed". | `cursor-not-allowed`. | **Mechanical**. |
 | F33 | nit | `bet/[id]:498` | `disabled:opacity-55` — not in Tailwind's scale (55 ≠ 50/60) → silently dropped. | `disabled:opacity-50`. | **Mechanical**. |
 | F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set → the flat bg is dead code. | Remove `bg-blue-500`. | **Mechanical**. |
@@ -286,6 +285,7 @@ as a new item surfaced by the e2e work.
 | F13 | `.random-ticket-button:hover` uses `var(--color-brand-600)` / `var(--color-accent-500)`. |
 | F40 | `Cards.tsx:45` image is `alt=""` (title renders as the adjacent `<h2>`). |
 | F30 | `BetPageClient.tsx:483,497` `text-md` replaced with `text-base`; verified by grep (no `text-md` remains). |
+| F31 | `user/cart/page.tsx:154` checkout CTA is `w-full`; grep confirms no `w-ful` typo remains anywhere in `app/`. |
 
 ### Partially fixed (5) — still needs work
 
@@ -322,7 +322,6 @@ as a new item surfaced by the e2e work.
 | F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F31 | nit | `user/cart/page.tsx` | `w-ful` typo → no-op. | `w-full`. |
 | F32 | nit | `admin/edit/bet:483`, `admin/edit/raffle:390` | `cursor-none` (invalid) intending not-allowed. | `cursor-not-allowed`. |
 | F33 | nit | `bet/[id]/BetPageClient.tsx:497` | `disabled:opacity-55` not in the scale → silently dropped. | `disabled:opacity-50`. |
 | F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set. | Remove `bg-blue-500`. |
