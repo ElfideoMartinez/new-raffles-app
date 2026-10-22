@@ -257,7 +257,7 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 | F30 | nit | `bet/[id]:483,497` | `text-md` does not exist → no-op. Bet bar renders at inherited 16px. | `text-base`. | **Mechanical**. |
 | F32 | nit | `edit/raffle:369`, `edit/bet:448` | `cursor-none` (invalid Tailwind class) intending "not-allowed". | `cursor-not-allowed`. | **Mechanical**. |
 | F33 | nit | `bet/[id]:498` | `disabled:opacity-55` — not in Tailwind's scale (55 ≠ 50/60) → silently dropped. | `disabled:opacity-50`. | **Mechanical**. |
-| F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set → the flat bg is dead code. | Remove `bg-blue-500`. | **Mechanical**. |
+| F34 | nit | `quickTicket/play:279` (audit originally cited `bet/[id]:171`, which is now clean) | `bg-gradient-to-r` + `bg-blue-500` both set → flat bg is dead code. | Remove `bg-blue-500`. | **Mechanical**. |
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the only focus cue on the close button. | Remove it; add the shared focus recipe. | **Mechanical**. |
 | F36 | nit | `DeleteRaffleModal.tsx:16`, cart ×2, header ×2 | PNG icons recoloured with `filter: invert` — breaks if the asset has any colour. | Replace with inline SVG `currentColor` (cart already has the svg commented out). | **Judgement** (asset work). |
 | F37 | nit | `accessibility` ×3 only (`aria-label`) | Only 3 `aria-label`s in the whole app. | See component patterns. | — |
@@ -324,7 +324,7 @@ as a new item surfaced by the e2e work.
 | F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set. | Remove `bg-blue-500`. |
+| F34 | `quickTicket/play/page.tsx:279` `bg-blue-500` removed (gradient `from-blue-500 to-green-500` kept); the originally cited `bet/[id]:171` no longer contains the pair. |
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the close button's only focus cue. | Remove; add the shared recipe. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
