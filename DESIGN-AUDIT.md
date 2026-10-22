@@ -270,6 +270,76 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 
 ---
 
+## 3b. Reconciled status — 2026-10-21 (verified against code)
+
+Every finding below was re-checked by reading the current source, not taken on
+trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
+as a new item surfaced by the e2e work.
+
+### Already fixed (5)
+
+| # | Evidence |
+|---|---|
+| F1 | `RaffleDetailsButton.tsx:22` uses `text-ink-900` on `brand-cta`; requirement recorded on the gradient tokens in `tailwind.config.ts`. |
+| F6 | `--color-warning-500: #f59e0b` exists in `:root`; `OfferStar.tsx:17` reads it. |
+| F8 | `SaleCard`/`BetSaleCard` confirm/reject use `bg-success-700` / `bg-danger-700`. |
+| F13 | `.random-ticket-button:hover` uses `var(--color-brand-600)` / `var(--color-accent-500)`. |
+| F40 | `Cards.tsx:45` image is `alt=""` (title renders as the adjacent `<h2>`). |
+
+### Partially fixed (5) — still needs work
+
+| # | What remains |
+|---|---|
+| F2 / F39 | The dark block no longer flips text to white (white-on-white is gone), but the `-rgb` scaffold vars (`--foreground-rgb`, `--background-start-rgb`) are still in `globals.css`. Delete them and set `body { color: theme(ink-900) }`. |
+| F3 | Only `RaffleDetailsButton` and `CartButton` carry a `focus-visible` ring. The shared base recipe in `@layer components` does not exist, so most buttons still fail WCAG 2.4.7. |
+| F18 | `formatDate`/`formatPrice` helpers exist and are used on the storefront, but `admin/bets/page.tsx:300` and `user/purchases/page.tsx:63` still call `toLocaleDateString`/`toLocaleString`, which follow the browser locale. |
+| F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
+| F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
+
+### Still open (30)
+
+| # | Sev | Location | What's wrong | Fix |
+|---|---|---|---|---|
+| F3 | blocker | most buttons | No shared keyboard focus recipe (see partial above). | Base rule in `@layer components`. |
+| F4 | blocker | `user/cart/page.tsx:67,80,96,130`, `bet/[id]/BetPageClient.tsx:335-343` | `<div onClick>` / `<li onClick>`: not focusable, no role. | `<button>`/`<a>`, or `role="button" tabIndex={0} onKeyDown`. |
+| F5 | high | `user/cart/page.tsx:153` | `bg-yellow-500 text-white` = 1.92:1 on the only path to checkout. | `bg-warning-500 text-ink-900` (8.31:1) or `bg-brand-600 text-white` (5.17:1). |
+| F7 | high | 8 spinner sites (`admin/bets:509`, `admin/sales:76`, `admin/salesBets:79`, `user/purchases:50`, `SaleCard:128`, `BetSaleCard:143`, `bet/[id]/page:12`, `bet/page:59`) | `color="var(--color-ink-inverse)"` = white spinner on a white card, invisible. | `var(--color-brand-700)`. |
+| F9 | high | `raffle/[id]/RafflePageClient.tsx:156` | Raw `<img>`: it DOES have `object-cover` + fixed `h-64` now (the old `object-fill` distortion is gone), but no aspect ratio and no `next/image`. | Lower severity than written: artwork is no longer distorted. Add `aspect-[4/3]` or leave. |
+| F10 | high | `bet/page.tsx:103,116,127,132` | `bg-gray-800` cards with white text inside the light layout. | Storefront card recipe (`bg-white rounded-card shadow-card border-ink-100`). |
+| F11 | high | `Modal.tsx`, `DeleteRaffleModal.tsx`, `admin/bets` EditBetModal | No `role="dialog"`, no `aria-modal`, no Esc, no focus trap, no scroll lock. | Shared `Dialog` primitive. |
+| F12 | high | `admin/sales`, `admin/salesBets` | Tabs signalled by colour only; no `role="tablist"`/`aria-selected`. | ARIA roles + underline indicator. |
+| F14 | high | `tailwind.config.ts:85-93` vs `layout.tsx:6` | `fontFamily.sans` is the system stack while the app loads Inter. `font-sans` would be a lie. | `sans: ['var(--font-inter)', ...system]` and pass `variable: "--font-inter"`. |
+| F24 | high | `user/cart/page.tsx:67,118` | `w-screen` inside the `max-w-7xl` container → horizontal scroll on wide screens. | `w-full`. |
+| F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159` | English leaked into customer-visible screens ("Ticket ID", "No ticket found", "Please try again later", "Set Active"). | Translate the customer-facing strings. |
+| **F23** | **high** | `raffle/[id]/page.tsx:18-62` | **NEW.** `fetchRaffleData` catches every error and returns empty strings / `data: []`, so a bad or unexpected response renders a valid-looking but empty raffle page ("Premio:" with nothing after it) instead of an error. Hit three times during the e2e work. | Return an `error` flag and render the existing storefront error card; do not let the catch produce a plausible page. |
+| F15 | medium | 4 radii families in live use | Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b. | Re-map to the A3b ladder. |
+| F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | Two primary-button shapes live. A3b ratified keeping 1.5rem, so this is intentional — but it still reads as drift on screen. | Confirm as intended (then close) or unify. |
+| F17 | medium | `globals.css:57` | `font-size: 1.1rem` is the only raw font size outside Tailwind. | `text-lg`. |
+| F19 | medium | `admin/bets:288,293,324,336,348` | Prices interpolated as `$${value}` / `parseFloat(...)` instead of `formatPrice`. | Route through `formatPrice`. |
+| F20 | medium | `layout.tsx:10` (+ others) | Missing accents: metadata description says "linea". | `línea`; finish the accent pass. |
+| F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). |
+| F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
+| F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
+| F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
+| F30 | nit | `bet/[id]/BetPageClient.tsx:483,497` | `text-md` does not exist → no-op. | `text-base`. |
+| F31 | nit | `user/cart/page.tsx` | `w-ful` typo → no-op. | `w-full`. |
+| F32 | nit | `admin/edit/bet:483`, `admin/edit/raffle:390` | `cursor-none` (invalid) intending not-allowed. | `cursor-not-allowed`. |
+| F33 | nit | `bet/[id]/BetPageClient.tsx:497` | `disabled:opacity-55` not in the scale → silently dropped. | `disabled:opacity-50`. |
+| F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set. | Remove `bg-blue-500`. |
+| F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the close button's only focus cue. | Remove; add the shared recipe. |
+| F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
+| F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
+| F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
+
+### Suggested fixed sets
+
+- **Accessibility pass (blockers):** F3, F4, F35, plus F29's `isCartIconAvailable`.
+- **Invisible-primary-action pass:** F5, F7 — both are "the main thing you need to click is barely visible".
+- **Zero-risk typo pass:** F30, F31, F32, F33, F34 — all silently-dropped classes.
+- **F23 first among highs:** it is the one that hides real failures instead of merely looking wrong.
+
+---
+
 ## 4. Decisions needing a human
 
 These are **not** applied and must not be guessed.
