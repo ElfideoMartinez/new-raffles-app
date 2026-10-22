@@ -288,6 +288,7 @@ as a new item surfaced by the e2e work.
 | F31 | `user/cart/page.tsx:154` checkout CTA is `w-full`; grep confirms no `w-ful` typo remains anywhere in `app/`. |
 | F32 | `admin/edit/bet:483` and `admin/edit/raffle:390` now use `cursor-not-allowed`; grep confirms no `cursor-none` remains in `app/` (tsc clean). |
 | F33 | `bet/[id]/BetPageClient.tsx:497` `disabled:opacity-55` replaced with `disabled:opacity-50`; grep confirms no `opacity-55` remains in `app/`. |
+| F5 | `user/cart/page.tsx:154` checkout CTA is now `bg-brand-600 text-white` (was `bg-yellow-500 text-white`, 1.92:1); grep confirms no `bg-yellow-500` remains in the page. |
 
 ### Partially fixed (5) — still needs work
 

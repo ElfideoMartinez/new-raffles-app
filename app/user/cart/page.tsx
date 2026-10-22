@@ -151,7 +151,7 @@ const UserCartPage = () => {
           <p className='self-center text-center mb-2'>Monto total: {formatPrice(totalRafflePrice + totalBetsPrice)}</p>
           <Link
             href='/checkout/transfer'
-            className='bg-yellow-500 text-white p-2 rounded-card w-full flex justify-center'
+            className='bg-brand-600 text-white p-2 rounded-card w-full flex justify-center'
           >
             Pago por transferencia
           </Link>
