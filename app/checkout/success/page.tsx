@@ -31,8 +31,7 @@ const SuccessPage = () => {
 
   console.log("Tickets", ticketCount);
   useEffect(() => {
-    // Ticket state is owned by the server: `stripeWebHook` marks tickets sold
-    // from the signed Stripe event, and transfer sales are confirmed by an
+    // Ticket state is owned by the server: transfer sales are confirmed by an
     // admin. The client must not mark tickets sold.
     const count = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
     setTicketCount(count);
