@@ -288,6 +288,7 @@ as a new item surfaced by the e2e work.
 | F31 | `user/cart/page.tsx:154` checkout CTA is `w-full`; grep confirms no `w-ful` typo remains anywhere in `app/`. |
 | F32 | `admin/edit/bet:483` and `admin/edit/raffle:390` now use `cursor-not-allowed`; grep confirms no `cursor-none` remains in `app/` (tsc clean). |
 | F33 | `bet/[id]/BetPageClient.tsx:497` `disabled:opacity-55` replaced with `disabled:opacity-50`; grep confirms no `opacity-55` remains in `app/`. |
+| F34 | `quickTicket/play/page.tsx:279` keeps only `bg-gradient-to-r from-blue-500 to-green-500`; the dead `bg-blue-500` was removed (grep confirms no stacked `bg-blue-500` beside a gradient). |
 | F5 | `user/cart/page.tsx:154` checkout CTA is now `bg-brand-600 text-white` (was `bg-yellow-500 text-white`, 1.92:1); grep confirms no `bg-yellow-500` remains in the page. |
 | F7 | All 10 loader sites (8 listed + `raffle/[id]/page:110`, `RafflePageClient.tsx:65`) switched from `var(--color-ink-inverse)` to `var(--color-brand-700)` (#1d4ed8, verified in globals.css); grep confirms none remain. tsc clean. |
 
