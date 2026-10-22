@@ -49,3 +49,9 @@ firebase-debug.*.log
 # production env: real values live on the machine / CI, never in git
 .env.production
 .env.development
+
+# playwright artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

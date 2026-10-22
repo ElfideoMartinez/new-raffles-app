@@ -121,19 +121,44 @@ const salesBets = [
   },
 ];
 
+/**
+ * Ticket list for a detail page. Raffle detail renders one button per entry in
+ * `data`, so an empty array hides the whole ticket grid (and the "Agregar al
+ * carrito" flow behind it). Sold-out raffles legitimately have none.
+ */
+function mockTickets(item) {
+  const total = Number(item.numberOfTickets) || 20;
+  const left = typeof item.tickets_left === "number" ? item.tickets_left : total;
+  if (left === 0) return [];
+  const shown = Math.min(total, 12);
+  return Array.from({ length: shown }, (_, i) => ({
+    ticketNumber: i + 1,
+    isSold: i >= Math.min(shown, total - left),
+  }));
+}
+
 const routes = {
   // `result` is the raffle ARRAY itself (app/config/types.ts AllRafflesResponse)
   getAllRaffles: () => raffles,
+  // Detail endpoints are read FLAT by the app (`result.raffleData`,
+  // `result.data`), not through a nested `result` key — see
+  // app/raffle/[id]/page.tsx. Returning {raffle} silently produced an empty
+  // detail page because the page's catch swallows the resulting TypeError.
+  // FLAT response, deliberately bypassing envelope(). Verified against the
+  // deployed function (POST getRaffleData -> {"data":null} at top level, no
+  // ok/result wrapper), and app/raffle/[id]/page.tsx reads `result.data` /
+  // `result.raffleData` directly. Wrapping these in `result` made the page
+  // render an empty "Premio:" because its catch swallows the TypeError.
   getRaffleData: (body, url) => {
     const id = url.searchParams.get("id") || body?.id || "mock-raffle-1";
     const raffle = raffles.find((r) => r.id === id) || raffles[0];
-    return { raffle, tickets: [] };
+    return { __raw: { raffleData: raffle, data: mockTickets(raffle) } };
   },
   getAllBets: () => ({ bets }),
   getBetData: (body, url) => {
     const id = url.searchParams.get("id") || body?.id || "mock-bet-1";
     const bet = bets.find((b) => b.id === id) || bets[0];
-    return { bet, tickets: [] };
+    return { __raw: { betData: bet, data: mockTickets(bet) } };
   },
   getSalesBets: () => ({ betSales: salesBets }),
   confirmRejectBetSale: (body) => ({ ok: true, id: body?.id ?? null, action: body?.action ?? null }),
@@ -155,6 +180,12 @@ const routes = {
  * the storefront renders "no active raffles".
  */
 function envelope(payload) {
+  // `__raw` opts a route out of the wrapper: some functions answer flat (see
+  // getRaffleData, verified against the deployed endpoint). Do not "normalise"
+  // those into {ok,result} — the app reads them at the top level.
+  if (payload && typeof payload === "object" && "__raw" in payload) {
+    return payload.__raw;
+  }
   if (payload && typeof payload === "object" && "result" in payload) {
     return { ok: true, ...payload };
   }
