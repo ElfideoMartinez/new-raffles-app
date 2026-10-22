@@ -275,7 +275,7 @@ Every finding below was re-checked by reading the current source, not taken on
 trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
 as a new item surfaced by the e2e work.
 
-### Already fixed (11)
+### Already fixed (14)
 
 | # | Evidence |
 |---|---|
@@ -290,6 +290,9 @@ as a new item surfaced by the e2e work.
 | F33 | `bet/[id]/BetPageClient.tsx:497` `disabled:opacity-55` replaced with `disabled:opacity-50`; grep confirms no `opacity-55` remains in `app/`. |
 | F34 | `quickTicket/play/page.tsx:279` keeps only `bg-gradient-to-r from-blue-500 to-green-500`; the dead `bg-blue-500` was removed (grep confirms no stacked `bg-blue-500` beside a gradient). |
 | F5 | `user/cart/page.tsx:154` checkout CTA is now `bg-brand-600 text-white` (was `bg-yellow-500 text-white`, 1.92:1); grep confirms no `bg-yellow-500` remains in the page. |
+| F22 | `@media (prefers-reduced-motion: reduce)` guard added to globals.css (approved 2026-10-22). |
+| F35 | `Modal.tsx` close button `focus:outline-none` removed; base focus ring now applies. |
+| F23 | `fetchRaffleData` returns an `error` flag and `RafflePageServer` renders a danger-styled error card instead of a plausible empty page (verified in app/raffle/[id]/page.tsx). |
 | F7 | All 10 loader sites (8 listed + `raffle/[id]/page:110`, `RafflePageClient.tsx:65`) switched from `var(--color-ink-inverse)` to `var(--color-brand-700)` (#1d4ed8, verified in globals.css); grep confirms none remain. tsc clean. |
 
 ### Partially fixed (5) — still needs work
@@ -302,7 +305,7 @@ as a new item surfaced by the e2e work.
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
 | F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
 
-### Still open (24)
+### Still open (21)
 
 | # | Sev | Location | What's wrong | Fix |
 |---|---|---|---|---|
@@ -315,17 +318,14 @@ as a new item surfaced by the e2e work.
 | F14 | high | `tailwind.config.ts:85-93` vs `layout.tsx:6` | `fontFamily.sans` is the system stack while the app loads Inter. `font-sans` would be a lie. | `sans: ['var(--font-inter)', ...system]` and pass `variable: "--font-inter"`. |
 | F24 | high | `user/cart/page.tsx:67,118` | `w-screen` inside the `max-w-7xl` container → horizontal scroll on wide screens. | `w-full`. |
 | F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159` | English leaked into customer-visible screens ("Ticket ID", "No ticket found", "Please try again later", "Set Active"). | Translate the customer-facing strings. |
-| **F23** | **high** | `raffle/[id]/page.tsx:18-62` | **NEW.** `fetchRaffleData` catches every error and returns empty strings / `data: []`, so a bad or unexpected response renders a valid-looking but empty raffle page ("Premio:" with nothing after it) instead of an error. Hit three times during the e2e work. | Return an `error` flag and render the existing storefront error card; do not let the catch produce a plausible page. |
 | F15 | medium | 4 radii families in live use | Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b. | Re-map to the A3b ladder. |
 | F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | Two primary-button shapes live. A3b ratified keeping 1.5rem, so this is intentional — but it still reads as drift on screen. | Confirm as intended (then close) or unify. |
 | F17 | medium | `globals.css:57` | `font-size: 1.1rem` is the only raw font size outside Tailwind. | `text-lg`. |
 | F19 | medium | `admin/bets:288,293,324,336,348` | Prices interpolated as `$${value}` / `parseFloat(...)` instead of `formatPrice`. | Route through `formatPrice`. |
 | F20 | medium | `layout.tsx:10` (+ others) | Missing accents: metadata description says "linea". | `línea`; finish the accent pass. |
 | F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). |
-| F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F35 | `Modal.tsx:24` `focus:outline-none` removed; close button now shows the base focus ring. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
 | F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
