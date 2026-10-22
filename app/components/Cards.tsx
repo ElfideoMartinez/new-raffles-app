@@ -35,7 +35,7 @@ const Cards = ({
   const isSoldOut = left !== null && left <= 0;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-card border border-ink-100 bg-white shadow-card transition-shadow hover:shadow-card-hover">
+    <article className="group flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-card border border-ink-100 bg-white shadow-card transition-shadow hover:shadow-card-hover">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-ink-100">
         {awardImage ? (
           <Image
@@ -67,7 +67,7 @@ const Cards = ({
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h2 className="mb-1 text-lg font-bold leading-snug text-ink-900">
+        <h2 className="mb-1 break-words text-lg font-bold leading-snug text-ink-900">
           {title || "Event"}
         </h2>
 
@@ -104,7 +104,16 @@ const Cards = ({
       </div>
 
       <div className="px-4 pb-4">
-        <RaffleDetailsButton id={id} price={pricePerTicket} />
+        {isSoldOut ? (
+          <span
+            aria-disabled="true"
+            className="block cursor-not-allowed rounded-pill border border-ink-100 bg-ink-100 px-4 py-2.5 text-center text-sm font-semibold text-ink-500"
+          >
+            Agotada
+          </span>
+        ) : (
+          <RaffleDetailsButton id={id} price={pricePerTicket} />
+        )}
       </div>
     </article>
   );
