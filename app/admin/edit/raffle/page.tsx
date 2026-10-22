@@ -387,7 +387,7 @@ const EditRaffle = () => {
             </div>
           </div>
         }
-        <div className={`flex gap-1 ${!isValidRaffle ? 'opacity-50 cursor-none' : ''}`}>
+        <div className={`flex gap-1 ${!isValidRaffle ? 'opacity-50 cursor-not-allowed' : ''}`}>
           <button
             disabled={isLoading || !isValidRaffle}
             type='submit'

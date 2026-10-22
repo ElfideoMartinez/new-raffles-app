@@ -480,7 +480,7 @@ const EditBetPage = () => {
 
         <div
           className={`flex gap-1 ${
-            !isValidBet ? "opacity-50 cursor-none" : ""
+            !isValidBet ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           <button

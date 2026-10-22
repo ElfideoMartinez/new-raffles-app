@@ -286,6 +286,7 @@ as a new item surfaced by the e2e work.
 | F40 | `Cards.tsx:45` image is `alt=""` (title renders as the adjacent `<h2>`). |
 | F30 | `BetPageClient.tsx:483,497` `text-md` replaced with `text-base`; verified by grep (no `text-md` remains). |
 | F31 | `user/cart/page.tsx:154` checkout CTA is `w-full`; grep confirms no `w-ful` typo remains anywhere in `app/`. |
+| F32 | `admin/edit/bet:483` and `admin/edit/raffle:390` now use `cursor-not-allowed`; grep confirms no `cursor-none` remains in `app/` (tsc clean). |
 
 ### Partially fixed (5) — still needs work
 
@@ -297,7 +298,7 @@ as a new item surfaced by the e2e work.
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
 | F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
 
-### Still open (29)
+### Still open (28)
 
 | # | Sev | Location | What's wrong | Fix |
 |---|---|---|---|---|
@@ -322,7 +323,6 @@ as a new item surfaced by the e2e work.
 | F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F32 | nit | `admin/edit/bet:483`, `admin/edit/raffle:390` | `cursor-none` (invalid) intending not-allowed. | `cursor-not-allowed`. |
 | F33 | nit | `bet/[id]/BetPageClient.tsx:497` | `disabled:opacity-55` not in the scale → silently dropped. | `disabled:opacity-50`. |
 | F34 | nit | `bet/[id]:171` | `bg-gradient-to-r` + `bg-blue-500` both set. | Remove `bg-blue-500`. |
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the close button's only focus cue. | Remove; add the shared recipe. |
