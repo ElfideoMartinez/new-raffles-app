@@ -83,4 +83,27 @@ body {
     outline: 2px solid var(--color-brand-700);
     outline-offset: 2px;
   }
+
+  /* F3: base keyboard-focus recipe so EVERY button/link shows a visible
+     focus ring, not just the components that already had .focus-ring. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--color-brand-700);
+    outline-offset: 2px;
+  }
 }
+
+/* F22: honour prefers-reduced-motion for the transitions/animations added
+   across the app (card hovers, CTA scales). Standard guard. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

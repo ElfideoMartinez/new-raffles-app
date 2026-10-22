@@ -297,12 +297,12 @@ as a new item surfaced by the e2e work.
 | # | What remains |
 |---|---|
 | F2 / F39 | The dark block no longer flips text to white (white-on-white is gone), but the `-rgb` scaffold vars (`--foreground-rgb`, `--background-start-rgb`) are still in `globals.css`. Delete them and set `body { color: theme(ink-900) }`. |
-| F3 | Only `RaffleDetailsButton` and `CartButton` carry a `focus-visible` ring. The shared base recipe in `@layer components` does not exist, so most buttons still fail WCAG 2.4.7. |
+| F3 | FIXED 2026-10-22: base `button/a/[role=button]:focus-visible` recipe added in `@layer components` (globals.css); `.focus-ring` stays for opt-in use. |
 | F18 | `formatDate`/`formatPrice` helpers exist and are used on the storefront, but `admin/bets/page.tsx:300` and `user/purchases/page.tsx:63` still call `toLocaleDateString`/`toLocaleString`, which follow the browser locale. |
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
 | F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
 
-### Still open (26)
+### Still open (24)
 
 | # | Sev | Location | What's wrong | Fix |
 |---|---|---|---|---|
@@ -325,7 +325,7 @@ as a new item surfaced by the e2e work.
 | F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the close button's only focus cue. | Remove; add the shared recipe. |
+| F35 | `Modal.tsx:24` `focus:outline-none` removed; close button now shows the base focus ring. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
 | F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
