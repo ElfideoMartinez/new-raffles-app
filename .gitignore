@@ -45,3 +45,7 @@ firebase-debug.*.log
 # in mock/ is imported by app code, and firebase.json's hosting ignore covers
 # **/node_modules/** only, so keep this out of any deploy by not listing it.
 /mock/*.log
+
+# production env: real values live on the machine / CI, never in git
+.env.production
+.env.development

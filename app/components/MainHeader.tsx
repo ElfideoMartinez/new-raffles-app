@@ -24,10 +24,10 @@ const MainHeader = () => {
   return (
     <div className="relative">
       <div className="sticky top-0 z-40 bg-gradient-to-b from-brand-500 to-accent-400 text-ink-900 shadow-sm">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4">
           {pathName === '/' ? (
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
               aria-label="Abrir menu"
               onClick={() => setMenuOpen(!menuOpen)}
             >
@@ -35,7 +35,7 @@ const MainHeader = () => {
             </button>
           ) : (
             <button
-              className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
               aria-label="Regresar"
               onClick={() => {
                 router.back();
@@ -45,7 +45,7 @@ const MainHeader = () => {
             </button>
           )}
 
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex min-w-0 items-center gap-2">
             <Image
               className="h-10 w-10 rounded-full ring-2 ring-white/40"
               src="/icon.jpg"
@@ -53,12 +53,12 @@ const MainHeader = () => {
               width={40}
               height={40}
             />
-            <span className="hidden text-base font-bold tracking-tight sm:block">
+            <span className="hidden truncate text-base font-bold tracking-tight sm:block">
               Rifas Mtz
             </span>
           </Link>
 
-          <div className={`flex h-10 w-10 items-center justify-center ${isCartIconAvailable ? 'hidden' : ''}`}>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center ${isCartIconAvailable ? 'hidden' : ''}`}>
             <CartButton />
           </div>
         </div>
