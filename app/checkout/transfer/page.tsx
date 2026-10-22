@@ -1,7 +1,7 @@
 "use client";
 import { apiUrl } from "@/app/config/api";
 import useTicketStore from "@/app/store";
-import { storage } from "@/app/firebaseconfig";
+import { auth, storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
@@ -238,38 +238,49 @@ const CheckoutTransferPage = () => {
               await uploadBytes(storageRef, image as any);
               const downloadURL = await getDownloadURL(storageRef);
               
-              const data = await fetch(
-                apiUrl("checkTransfer"),
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    name,
-                    phone,
-                    email,
-                    paymentConceptKey,
-                    ticketCount,
-                    allTickets,
-                    raffles,
-                    bets,
-                    totalBetsPrice: totalBetsPrice,
-                    totalRafflePrice: totalRafflePrice,
-                    totalSalePrice: totalRafflePrice+totalBetsPrice,                    
-                    paymentImage: downloadURL,
-                  }),
-                }
-              );
-              const result = await data.json();
+              // The sale is created by the server (createTransferSale), which
+              // recomputes the totals, checks the tickets are still available
+              // and decides `verified`. The client only sends the contact
+              // details, the cart and the receipt image. The ID token is
+              // optional: it is sent when a customer happens to be signed in
+              // so the sale can be linked to their account.
+              const user = auth.currentUser;
+              const idToken = user ? await user.getIdToken() : null;
+              const res = await fetch(apiUrl("createTransferSale"), {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+                },
+                body: JSON.stringify({
+                  name,
+                  phone,
+                  email,
+                  paymentConceptKey,
+                  raffles,
+                  bets,
+                  paymentImage: downloadURL,
+                }),
+              });
+              const result = await res.json().catch(() => null);
+              if (!res.ok) {
+                throw new Error(
+                  (result && typeof result.message === "string" && result.message) ||
+                    "No pudimos registrar tu compra."
+                );
+              }
               setIsLoading(false);
               setPaymentMethod("transfer");
 
-              //got to success page
+              // Only a confirmed server write moves the customer on.
               router.push("/checkout/success");
             } catch (error) {
               console.error("Error al completar la compra:", error);
-              toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde`,{
+              const detail =
+                error instanceof Error && error.message
+                  ? error.message
+                  : "Inténtalo de nuevo más tarde.";
+              toast.error(`No pudimos registrar tu compra. ${detail}`,{
                 duration: 2000,
                 progress: false,
                 position: 'top-right',

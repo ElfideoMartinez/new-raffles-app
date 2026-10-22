@@ -53,19 +53,16 @@ service cloud.firestore {
     }
 
     // ---------- sales ----------
-    // Historical note: app/helpers/firebase.ts creates sales documents from
-    // the client. To preserve that path without opening the collection, we
-    // allow create only for signed-in users AND only when the doc is marked
-    // unverified and has no admin fields set. Prefer moving this write to a
-    // Function (see HANDOFF-SECURITY.md, item 3).
+    // Sales are money. Every writer is now a Cloud Function using the Admin
+    // SDK (createTransferSale for bank transfers, the Stripe webhook for
+    // cards), which bypasses these rules. Clients only read their own rows;
+    // no client create/update/delete path exists any more.
+    // (The dead app/helpers/firebase.ts `addNewSale` helper was already denied
+    // by the old rule because it wrote verified: true.)
     match /sales/{saleId} {
       allow read: if isAdmin() ||
         (isSignedIn() && resource.data.userId == request.auth.uid);
-      allow create: if isSignedIn()
-        && request.resource.data.keys().hasAll(['userId'])
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.verified == false;
-      allow update, delete: if isAdmin();
+      allow create, update, delete: if false;
     }
 
     // ---------- bets ----------

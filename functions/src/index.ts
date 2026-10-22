@@ -1086,6 +1086,454 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// PUBLIC: customer-facing bank-transfer checkout.
+//
+// WHY THIS IS NOT ADMIN-GUARDED
+// Its only caller is app/checkout/transfer/page.tsx, which every customer
+// reaches from the public cart. The previous flow called the admin-only
+// `checkTransfer` from that page: no ID token was sent, every purchase got a
+// 401, and the page redirected to the success screen anyway. Admin-guarding the
+// customer path is what broke it, so trust here comes from server-side
+// validation instead of a role (same model as `createCheckoutSession`):
+//   - `verified`, the totals and the ticket sale state are decided here;
+//   - prices are recomputed from the raffle/bet documents, never from the body;
+//   - ticket numbers must exist and be unsold, checked inside a transaction,
+//     so the transfer path cannot double-sell;
+//   - the client only contributes what it legitimately owns: contact details
+//     and the uploaded receipt URL.
+// A signed-in customer's ID token is optional and only recorded as `userId`.
+const TRANSFER_AUTO_CONFIRM_LIMIT = 5;
+const MAX_TRANSFER_LINE_ITEMS = 20;
+const MAX_TICKETS_PER_LINE = 50;
+// Firestore allows at most 30 values in an `in` filter; stay well under it.
+const TICKET_QUERY_CHUNK = 10;
+
+interface TransferRaffleLine {
+  raffleId: string;
+  raffleName: string;
+  pricePerTicket: number;
+  ticketNumbers: number[];
+  raffleTotalPrice: number;
+}
+
+interface TransferBetLine {
+  betId: string;
+  betName: string;
+  team: string;
+  letterTeam: string;
+  ticketNumbers: number;
+  totalPrice: number;
+}
+
+function transferPrice(value: unknown): number | null {
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+      ? Number(value)
+      : NaN;
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function transferCount(value: unknown): number | null {
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+      ? Number(value)
+      : NaN;
+  return Number.isInteger(n) && n >= 0 ? n : null;
+}
+
+function transferBadRequest(message: string): functions.https.HttpsError {
+  return new functions.https.HttpsError("invalid-argument", message);
+}
+
+function transferConflict(message: string): functions.https.HttpsError {
+  return new functions.https.HttpsError("failed-precondition", message);
+}
+
+export const createTransferSale = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).json({ status: 405, message: "Method Not Allowed" });
+    return;
+  }
+
+  try {
+    const body = (req.body ?? {}) as Record<string, unknown>;
+
+    // Optional identity: recorded for reconciliation, not required for a sale.
+    let userId: string | null = null;
+    const authorization = req.headers.authorization;
+    if (authorization) {
+      const [scheme, token] = authorization.split(" ");
+      if (scheme !== "Bearer" || !token) {
+        res.status(401).json({
+          status: 401,
+          message: "Invalid or expired session.",
+        });
+        return;
+      }
+      try {
+        userId = (await admin.auth().verifyIdToken(token)).uid;
+      } catch {
+        res.status(401).json({
+          status: 401,
+          message: "Invalid or expired session.",
+        });
+        return;
+      }
+    }
+
+    // ----- contact details (the part the client legitimately owns) -----
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    if (name.length < 5 || name.length > 50) {
+      throw transferBadRequest("Ingresa tu nombre completo (5 a 50 caracteres).");
+    }
+
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    if (!/^\d{10}$/.test(phone)) {
+      throw transferBadRequest("Ingresa un número de teléfono de 10 dígitos.");
+    }
+
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    if (
+      email !== "" &&
+      (email.length > 50 ||
+        !/^[a-zA-Z0-9]+([._+-]?[a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,10})+$/.test(
+          email
+        ))
+    ) {
+      throw transferBadRequest("Ingresa un correo electrónico válido.");
+    }
+
+    const paymentConceptKey =
+      typeof body.paymentConceptKey === "string"
+        ? body.paymentConceptKey.trim()
+        : "";
+    if (!/^\d{16}$/.test(paymentConceptKey)) {
+      throw transferBadRequest("La clave del concepto de pago no es válida.");
+    }
+
+    const paymentImage =
+      typeof body.paymentImage === "string" ? body.paymentImage.trim() : "";
+    if (!/^https:\/\/\S+$/.test(paymentImage) || paymentImage.length > 2048) {
+      throw transferBadRequest("Sube una imagen de tu comprobante de transferencia.");
+    }
+
+    const rawRaffles = Array.isArray(body.raffles) ? body.raffles : [];
+    const rawBets = Array.isArray(body.bets) ? body.bets : [];
+    if (rawRaffles.length === 0 && rawBets.length === 0) {
+      throw transferBadRequest("Tu carrito está vacío.");
+    }
+    if (
+      rawRaffles.length > MAX_TRANSFER_LINE_ITEMS ||
+      rawBets.length > MAX_TRANSFER_LINE_ITEMS
+    ) {
+      throw transferBadRequest("Tu carrito tiene demasiados artículos.");
+    }
+
+    // ----- raffles: price and availability are derived server-side -----
+    const raffleLines: TransferRaffleLine[] = [];
+    for (const entry of rawRaffles) {
+      const item = (entry ?? {}) as Record<string, unknown>;
+      const raffleId = typeof item.raffleId === "string" ? item.raffleId.trim() : "";
+      if (!raffleId) throw transferBadRequest("Falta el identificador de la rifa.");
+
+      const numbersRaw = Array.isArray(item.ticketNumbers) ? item.ticketNumbers : [];
+      const ticketNumbers: number[] = [];
+      for (const value of numbersRaw) {
+        const number = transferCount(value);
+        if (number === null || number > 1000000) {
+          throw transferBadRequest("Número de boleto inválido.");
+        }
+        if (!ticketNumbers.includes(number)) ticketNumbers.push(number);
+      }
+      if (ticketNumbers.length === 0 || ticketNumbers.length > MAX_TICKETS_PER_LINE) {
+        throw transferBadRequest(
+          `Selecciona entre 1 y ${MAX_TICKETS_PER_LINE} boletos por rifa.`
+        );
+      }
+
+      const raffleSnap = await db.collection("raffles").doc(raffleId).get();
+      if (!raffleSnap.exists) {
+        throw transferBadRequest("Una de las rifas ya no está disponible.");
+      }
+      const raffleData = raffleSnap.data() as {
+        title?: unknown;
+        pricePerTicket?: unknown;
+        numberOfTickets?: unknown;
+      };
+
+      // The body's price is ignored; this is the only price that counts.
+      const pricePerTicket = transferPrice(raffleData.pricePerTicket);
+      if (pricePerTicket === null) {
+        throw transferConflict("No pudimos validar el precio de la rifa.");
+      }
+
+      const declaredTickets = transferCount(raffleData.numberOfTickets);
+      if (declaredTickets !== null) {
+        const outOfRange = ticketNumbers.filter((n) => n >= declaredTickets);
+        if (outOfRange.length > 0) {
+          throw transferBadRequest("Número de boleto inválido.");
+        }
+      }
+
+      raffleLines.push({
+        raffleId,
+        raffleName:
+          typeof raffleData.title === "string" ? raffleData.title : "",
+        pricePerTicket,
+        ticketNumbers,
+        raffleTotalPrice: pricePerTicket * ticketNumbers.length,
+      });
+    }
+
+    // ----- bets: same rule, price read from the bet document -----
+    const betLines: TransferBetLine[] = [];
+    for (const entry of rawBets) {
+      const item = (entry ?? {}) as Record<string, unknown>;
+      const betId = typeof item.betId === "string" ? item.betId.trim() : "";
+      if (!/^[A-Za-z0-9_-]{1,128}$/.test(betId)) {
+        throw transferBadRequest("Identificador de apuesta inválido.");
+      }
+
+      const letterTeam =
+        typeof item.letterTeam === "string" ? item.letterTeam.trim().toUpperCase() : "";
+      if (letterTeam !== "A" && letterTeam !== "B" && letterTeam !== "C") {
+        throw transferBadRequest("Selecciona un equipo válido para la apuesta.");
+      }
+
+      const tickets = transferCount(item.ticketNumbers);
+      if (tickets === null || tickets < 1 || tickets > 1000) {
+        throw transferBadRequest("Cantidad de boletos de apuesta inválida.");
+      }
+
+      let betDoc = await db.collection("bets").doc(betId).get();
+      let betData: Record<string, unknown> | undefined = betDoc.exists
+        ? (betDoc.data() as Record<string, unknown>)
+        : undefined;
+      if (!betData) {
+        // Bets created through `createBet` live in RTDB under the public id.
+        const snapshot = await rtdb.ref(`bets/${betId}`).once("value");
+        const value = snapshot.val();
+        if (value && typeof value === "object") {
+          betData = value as Record<string, unknown>;
+        }
+      }
+      if (!betData) {
+        throw transferBadRequest("Una de las apuestas ya no está disponible.");
+      }
+
+      const pricePerTicket = transferPrice(betData.pricePerTicket);
+      if (pricePerTicket === null) {
+        throw transferConflict("No pudimos validar el precio de la apuesta.");
+      }
+
+      const teams = (betData.teams ?? {}) as Record<string, unknown>;
+      const teamName =
+        letterTeam === "A"
+          ? teams.a
+          : letterTeam === "B"
+          ? teams.b
+          : "Empate";
+
+      betLines.push({
+        betId,
+        betName: typeof betData.title === "string" ? betData.title : "",
+        team: typeof teamName === "string" ? teamName : "",
+        letterTeam,
+        ticketNumbers: tickets,
+        totalPrice: pricePerTicket * tickets,
+      });
+    }
+
+    const ticketCount = raffleLines.reduce(
+      (total, line) => total + line.ticketNumbers.length,
+      0
+    );
+    const totalRafflePrice = raffleLines.reduce(
+      (total, line) => total + line.raffleTotalPrice,
+      0
+    );
+    const totalBetsPrice = betLines.reduce(
+      (total, line) => total + line.totalPrice,
+      0
+    );
+    const totalSalePrice = totalRafflePrice + totalBetsPrice;
+
+    // Small transfers are auto-confirmed (same rule the old handler applied);
+    // anything larger waits for an admin, and the client cannot influence it.
+    const autoConfirm =
+      ticketCount > 0 && ticketCount <= TRANSFER_AUTO_CONFIRM_LIMIT;
+
+    // Resolve the ticket documents up front so the transaction only has to
+    // re-read documents it can lock.
+    const ticketRefs: admin.firestore.DocumentReference[] = [];
+    for (const line of raffleLines) {
+      for (let i = 0; i < line.ticketNumbers.length; i += TICKET_QUERY_CHUNK) {
+        const chunk = line.ticketNumbers.slice(i, i + TICKET_QUERY_CHUNK);
+        const snapshot = await db
+          .collection("tickets")
+          .where("raffle_id", "==", line.raffleId)
+          .where("number", "in", chunk)
+          .get();
+        const found = new Set(
+          snapshot.docs.map((doc) => transferCount(doc.get("number")))
+        );
+        const missing = chunk.filter((number) => !found.has(number));
+        if (missing.length > 0) {
+          throw transferConflict(
+            `El boleto ${missing.join(", ")} de "${line.raffleName}" ya no está disponible.`
+          );
+        }
+        snapshot.docs.forEach((doc) => ticketRefs.push(doc.ref));
+      }
+    }
+
+    // The payment concept key is chosen by the browser but is unique per
+    // attempt, so it doubles as the idempotency key for retries: a double tap
+    // cannot record the same transfer twice.
+    const saleRef = db.collection("sales").doc(`transfer_${paymentConceptKey}`);
+    const salesBetsRef = db
+      .collection("salesBets")
+      .doc(`transfer_${paymentConceptKey}`);
+    const verified = autoConfirm;
+
+    let duplicate = false;
+    await db.runTransaction(async (transaction) => {
+      const existing = await transaction.get(saleRef);
+      if (existing.exists) {
+        duplicate = true;
+        return;
+      }
+
+      if (ticketRefs.length > 0) {
+        const ticketSnaps = await transaction.getAll(...ticketRefs);
+        for (const snap of ticketSnaps) {
+          if (!snap.exists) {
+            throw transferConflict("Uno de los boletos ya no está disponible.");
+          }
+          if (snap.get("sold") === true) {
+            throw transferConflict(
+              `El boleto ${snap.get("number")} ya fue vendido. Elige otro.`
+            );
+          }
+        }
+        // Tickets are only marked sold when this sale is auto-confirmed; for
+        // larger transfers an admin confirms, exactly as the UI promises.
+        if (autoConfirm) {
+          ticketSnaps.forEach((snap) =>
+            transaction.update(snap.ref, { sold: true })
+          );
+        }
+      }
+
+      if (raffleLines.length > 0) {
+        transaction.set(saleRef, {
+          userId,
+          source: "transfer",
+          paymentMethod: "transfer",
+          name,
+          phone,
+          email,
+          paymentConceptKey,
+          paymentImage,
+          raffles: raffleLines,
+          ticketCount,
+          totalRafflePrice,
+          totalSalePrice,
+          verified,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (betLines.length > 0) {
+        transaction.set(salesBetsRef, {
+          userId,
+          paymentMethod: "transfer",
+          name,
+          phone,
+          email,
+          paymentConceptKey,
+          paymentImage,
+          bets: betLines,
+          totalBetsPrice,
+          totalSalePrice,
+          verified: false, // bets are always confirmed by an admin
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    });
+
+    // Best effort: tell the admins a transfer is waiting for confirmation.
+    if (!duplicate) {
+      try {
+        const tokensSnapshot = await db.collection("notificationTokens").get();
+        const tokens: string[] = [];
+        tokensSnapshot.forEach((doc) => {
+          const token = doc.get("token");
+          if (typeof token === "string" && token) tokens.push(token);
+        });
+        if (tokens.length > 0) {
+          await admin.messaging().sendEachForMulticast({
+            tokens,
+            notification: {
+              title: "Nueva compra por transferencia",
+              body: `Nueva compra por $${totalSalePrice} (${ticketCount} boletos) de ${name}. Favor de confirmar ASAP.`,
+            },
+          });
+        }
+      } catch (error) {
+        console.warn("Transfer sale notification failed:", error);
+      }
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: duplicate
+        ? "La compra ya estaba registrada."
+        : "Sale created successfully",
+      saleId: raffleLines.length > 0 ? saleRef.id : null,
+      saleBetId: betLines.length > 0 ? salesBetsRef.id : null,
+      duplicate,
+      verified,
+      ticketCount,
+      totalSalePrice,
+    });
+  } catch (err) {
+    if (err instanceof functions.https.HttpsError) {
+      const status =
+        err.code === "invalid-argument"
+          ? 400
+          : err.code === "failed-precondition"
+          ? 409
+          : err.code === "unauthenticated"
+          ? 401
+          : 500;
+      res.status(status).json({ status, message: err.message });
+      return;
+    }
+    console.error("Error creating transfer sale:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Error creating sale",
+    });
+  }
+});
+
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const updateRaffle = functions.https.onRequest(async (req, res) => {
   if (await rejectUnlessAdmin(req, res)) return;
