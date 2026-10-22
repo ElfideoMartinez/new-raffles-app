@@ -125,7 +125,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
         <button className='bg-gray-400 text-white rounded-card p-2' disabled>
-          <FadeLoader color="var(--color-ink-inverse)" />
+          <FadeLoader color="var(--color-brand-700)" />
         </button>
       ) : (
         <div className="w-full flex flex-col gap-2 sm:flex-row mt-2">

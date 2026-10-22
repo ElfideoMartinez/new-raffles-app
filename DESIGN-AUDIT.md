@@ -275,7 +275,7 @@ Every finding below was re-checked by reading the current source, not taken on
 trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
 as a new item surfaced by the e2e work.
 
-### Already fixed (5)
+### Already fixed (11)
 
 | # | Evidence |
 |---|---|
@@ -289,6 +289,7 @@ as a new item surfaced by the e2e work.
 | F32 | `admin/edit/bet:483` and `admin/edit/raffle:390` now use `cursor-not-allowed`; grep confirms no `cursor-none` remains in `app/` (tsc clean). |
 | F33 | `bet/[id]/BetPageClient.tsx:497` `disabled:opacity-55` replaced with `disabled:opacity-50`; grep confirms no `opacity-55` remains in `app/`. |
 | F5 | `user/cart/page.tsx:154` checkout CTA is now `bg-brand-600 text-white` (was `bg-yellow-500 text-white`, 1.92:1); grep confirms no `bg-yellow-500` remains in the page. |
+| F7 | All 10 loader sites (8 listed + `raffle/[id]/page:110`, `RafflePageClient.tsx:65`) switched from `var(--color-ink-inverse)` to `var(--color-brand-700)` (#1d4ed8, verified in globals.css); grep confirms none remain. tsc clean. |
 
 ### Partially fixed (5) — still needs work
 
@@ -300,14 +301,12 @@ as a new item surfaced by the e2e work.
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
 | F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
 
-### Still open (28)
+### Still open (26)
 
 | # | Sev | Location | What's wrong | Fix |
 |---|---|---|---|---|
 | F3 | blocker | most buttons | No shared keyboard focus recipe (see partial above). | Base rule in `@layer components`. |
 | F4 | blocker | `user/cart/page.tsx:67,80,96,130`, `bet/[id]/BetPageClient.tsx:335-343` | `<div onClick>` / `<li onClick>`: not focusable, no role. | `<button>`/`<a>`, or `role="button" tabIndex={0} onKeyDown`. |
-| F5 | high | `user/cart/page.tsx:153` | `bg-yellow-500 text-white` = 1.92:1 on the only path to checkout. | `bg-warning-500 text-ink-900` (8.31:1) or `bg-brand-600 text-white` (5.17:1). |
-| F7 | high | 8 spinner sites (`admin/bets:509`, `admin/sales:76`, `admin/salesBets:79`, `user/purchases:50`, `SaleCard:128`, `BetSaleCard:143`, `bet/[id]/page:12`, `bet/page:59`) | `color="var(--color-ink-inverse)"` = white spinner on a white card, invisible. | `var(--color-brand-700)`. |
 | F9 | high | `raffle/[id]/RafflePageClient.tsx:156` | Raw `<img>`: it DOES have `object-cover` + fixed `h-64` now (the old `object-fill` distortion is gone), but no aspect ratio and no `next/image`. | Lower severity than written: artwork is no longer distorted. Add `aspect-[4/3]` or leave. |
 | F10 | high | `bet/page.tsx:103,116,127,132` | `bg-gray-800` cards with white text inside the light layout. | Storefront card recipe (`bg-white rounded-card shadow-card border-ink-100`). |
 | F11 | high | `Modal.tsx`, `DeleteRaffleModal.tsx`, `admin/bets` EditBetModal | No `role="dialog"`, no `aria-modal`, no Esc, no focus trap, no scroll lock. | Shared `Dialog` primitive. |
@@ -325,7 +324,6 @@ as a new item surfaced by the e2e work.
 | F22 | medium | `globals.css` + 6 files | Motion with no `prefers-reduced-motion` guard. | Standard reduce block; behaviour change, needs Daniel's ok. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
-| F34 | `quickTicket/play/page.tsx:279` `bg-blue-500` removed (gradient `from-blue-500 to-green-500` kept); the originally cited `bet/[id]:171` no longer contains the pair. |
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the close button's only focus cue. | Remove; add the shared recipe. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |

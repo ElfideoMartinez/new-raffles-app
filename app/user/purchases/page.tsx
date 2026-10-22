@@ -47,7 +47,7 @@ const PurchasesPage = () => {
       <div className="relative mx-auto mt-4 w-full p-4">
         <h1 className="text-center mb-3 text-lg">Compras</h1>
         <div className="flex justify-center">
-          <FadeLoader color="var(--color-ink-inverse)" />
+          <FadeLoader color="var(--color-brand-700)" />
         </div>
       </div>
     );

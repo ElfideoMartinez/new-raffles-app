@@ -506,7 +506,7 @@ export default function BetsPage() {
         </div>
         {isLoading ? (
           <div className='flex justify-center mt-20'>
-            <FadeLoader color="var(--color-ink-inverse)" />
+            <FadeLoader color="var(--color-brand-700)" />
           </div>
         ) : dataBet.length === 0 ? (
           <div className='text-center text-ink-500 mt-20'>
