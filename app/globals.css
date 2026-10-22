@@ -16,28 +16,15 @@
   /* Referenced by OfferStar's default fill. Was missing, so the star rendered
      black (an invalid var() falls back to the initial fill). */
   --color-warning-500: #f59e0b;
-
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* No dark theme is designed yet: every surface is light and the tokens are
-       authoritative. Keep body text dark so it does not flip to white-on-white
-       in cart, purchases, terms and the bet list. */
-    --foreground-rgb: 0, 0, 0;
-  }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: var(--color-ink-900);
   /* Flat page surface. The previous vertical gradient ran to the bottom of the
      document, so on short pages it produced a hard horizontal seam under the
      content that read as a broken palette divider. The header keeps its own
      brand gradient; the page behind it stays uniform. */
-  background-color: rgb(var(--background-end-rgb));
+  background-color: #ffffff;
   min-height: 100vh;
 }
 

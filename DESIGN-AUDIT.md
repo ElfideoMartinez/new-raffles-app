@@ -275,7 +275,7 @@ Every finding below was re-checked by reading the current source, not taken on
 trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
 as a new item surfaced by the e2e work.
 
-### Already fixed (14)
+### Already fixed (17)
 
 | # | Evidence |
 |---|---|
@@ -294,12 +294,12 @@ as a new item surfaced by the e2e work.
 | F35 | `Modal.tsx` close button `focus:outline-none` removed; base focus ring now applies. |
 | F23 | `fetchRaffleData` returns an `error` flag and `RafflePageServer` renders a danger-styled error card instead of a plausible empty page (verified in app/raffle/[id]/page.tsx). |
 | F7 | All 10 loader sites (8 listed + `raffle/[id]/page:110`, `RafflePageClient.tsx:65`) switched from `var(--color-ink-inverse)` to `var(--color-brand-700)` (#1d4ed8, verified in globals.css); grep confirms none remain. tsc clean. |
+| F2 / F39 | `-rgb` scaffold vars (`--foreground-rgb`, `--background-start-rgb`, `--background-end-rgb`) and the `prefers-color-scheme: dark` block deleted from `globals.css`; `body { color: var(--color-ink-900); background-color: #ffffff }` — grep confirms no `-rgb` vars remain. tsc clean, 10/10 e2e pass. |
 
-### Partially fixed (5) — still needs work
+### Partially fixed (4) — still needs work
 
 | # | What remains |
 |---|---|
-| F2 / F39 | The dark block no longer flips text to white (white-on-white is gone), but the `-rgb` scaffold vars (`--foreground-rgb`, `--background-start-rgb`) are still in `globals.css`. Delete them and set `body { color: theme(ink-900) }`. |
 | F3 | FIXED 2026-10-22: base `button/a/[role=button]:focus-visible` recipe added in `@layer components` (globals.css); `.focus-ring` stays for opt-in use. |
 | F18 | `formatDate`/`formatPrice` helpers exist and are used on the storefront, but `admin/bets/page.tsx:300` and `user/purchases/page.tsx:63` still call `toLocaleDateString`/`toLocaleString`, which follow the browser locale. |
 | F27 | `AddToCartButton` is `bg-brand-600` + `disabled:bg-brand-300` + `rounded-pill`, but the stale commented-out class string above it still shows the old `disabled:bg-gray-500` recipe. |
