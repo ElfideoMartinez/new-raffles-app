@@ -286,7 +286,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
         {/* Ticket Selector */}
         <div className='flex items-center gap-2 mt-4 mb-1'>
           <button
-            className={`bg-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-gray-200 ${
+            className={`bg-white rounded-pill w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-gray-200 ${
               teamKey === "A"
                 ? "text-green-700"
                 : teamKey === "B"
@@ -317,7 +317,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     <div className='flex min-h-screen flex-col items-center bg-gray-100 p-4 text-gray-800'>
       {loading ? (
         <div className='flex justify-center items-center h-96'>
-          <div className='animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600'></div>
+          <div className='animate-spin rounded-pill h-16 w-16 border-b-2 border-blue-600'></div>
         </div>
       ) : (
         <>

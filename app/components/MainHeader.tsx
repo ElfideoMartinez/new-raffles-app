@@ -26,7 +26,7 @@ const MainHeader = () => {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4">
           {pathName === '/' ? (
             <button
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-white/15 transition-colors hover:bg-white/25"
               aria-label="Abrir menu"
               onClick={() => setMenuOpen(!menuOpen)}
             >
@@ -34,7 +34,7 @@ const MainHeader = () => {
             </button>
           ) : (
             <button
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
               aria-label="Regresar"
               onClick={() => {
                 router.back();
@@ -46,7 +46,7 @@ const MainHeader = () => {
 
           <Link href="/" className="flex min-w-0 items-center gap-2">
             <Image
-              className="h-10 w-10 rounded-full ring-2 ring-white/40"
+              className="h-10 w-10 rounded-pill ring-2 ring-white/40"
               src="/icon.jpg"
               alt="Rifas Mtz"
               width={40}

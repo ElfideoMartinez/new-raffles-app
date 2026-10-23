@@ -39,7 +39,7 @@ const CartButton = () => {
 
   return (
     <Link href='/user/cart' className='inline-flex items-center gap-1 shrink-0 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70'>
-      <span className='flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold leading-none text-white'>
+      <span className='flex h-5 min-w-5 items-center justify-center rounded-pill bg-red-500 px-1 text-xs font-semibold leading-none text-white'>
         {totalTickets+totalTicketsBets}
       </span>
       <svg
