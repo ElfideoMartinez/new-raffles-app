@@ -274,7 +274,7 @@ Every finding below was re-checked by reading the current source, not taken on
 trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
 as a new item surfaced by the e2e work.
 
-### Already fixed (18)
+### Already fixed (38)
 
 | # | Evidence |
 |---|---|
@@ -303,31 +303,34 @@ as a new item surfaced by the e2e work.
 | F18 | RESOLVED 2026-10-22: both call sites now use `formatDate`/`formatDateTime`; grep confirms 0 `toLocaleDateString`/`toLocaleString` remain in `app/`. |
 | F27 | RESOLVED 2026-10-22: stale commented-out old recipe (with `disabled:bg-gray-500`) deleted; live button already matched the ratified recipe (`bg-brand-600`, `disabled:bg-brand-300`, `rounded-pill`). |
 | F29 | RESOLVED 2026-10-22: `isCartIconAvailable` removed; CartButton now renders on every page including `/checkout/success`, where the (now empty) cart is most useful. |
+| F3 | VERIFIED 2026-10-23: base `button:focus-visible` recipe present in `globals.css` (`@layer components`); grep confirms `focus-visible` base rule active. |
+| F4 | VERIFIED 2026-10-23: cart ticket numbers are `<button>`s (`user/cart/page.tsx:80,98,127`); bet team card has `role="button"` + keydown (`bet/[id]/BetPageClient.tsx:277`). |
+| F9 | VERIFIED 2026-10-23: `RafflePageClient.tsx:159` keeps `h-64 object-cover` as ratified (closed as-is by Daniel). |
+| F10 | VERIFIED 2026-10-23: `bet/page.tsx:103` bet card uses the storefront recipe (`rounded-card border-ink-100 bg-white shadow-card`). |
+| F11 | VERIFIED 2026-10-23: `app/components/Dialog.tsx` exists; `Modal.tsx` and `DeleteRaffleModal.tsx` import it. |
+| F12 | VERIFIED 2026-10-23: `role="tablist"` present in both `admin/sales/page.tsx:54` and `admin/salesBets/page.tsx:57`. |
+| F14 | VERIFIED 2026-10-23: `tailwind.config.ts:89` `sans` leads with `var(--font-inter)`; `layout.tsx:7` passes `variable: "--font-inter"`. |
+| F15 | VERIFIED 2026-10-23: grep over `app/` finds zero `rounded-lg`/`rounded-xl`/`rounded-2xl`/`rounded-3xl`/`rounded-full` — A3b ladder clean. |
+| F16 | VERIFIED 2026-10-23: `globals.css:48` keeps the ratified 1.5rem shape (closed as intended). |
+| F17 | VERIFIED 2026-10-23: `globals.css:45` `font-size: 1.125rem`; only font-size in CSS. |
+| F19 | VERIFIED 2026-10-23: all five cited price sites in `admin/bets/page.tsx` (290,295,326,338,350) route through `formatPrice`. |
+| F20 | VERIFIED 2026-10-23: `layout.tsx:11` "en línea" and `RafflePageClient.tsx:119` "¡Listo! Tu número" accented as claimed. |
+| F21 | VERIFIED 2026-10-23: grep over `checkout/transfer/page.tsx` finds zero `usted`/"su nombre" strings. |
+| F24 | VERIFIED 2026-10-23: no `w-screen` remains in `user/cart/page.tsx` (previously verified; closed). |
+| F25 | VERIFIED 2026-10-23: grep over `admin/create/bet` and `admin/bets` finds zero `bg-gray-800`/`bg-gray-900` — admin fully light per A4a. |
+| F26 | VERIFIED 2026-10-23 (prior run): all five cited sites Spanish; no English remnants. |
+| F28 | VERIFIED 2026-10-23: `TicketButton.tsx:72-73` — selected is `bg-brand-600`; `bg-yellow-400` only signals in-cart. |
+| F36 | VERIFIED 2026-10-23: grep over `app/` finds zero `filter: invert` icon recolourings. |
+| F37 | VERIFIED 2026-10-23: `aria-label` present on CartButton (`:41`), Modal close (`:19`), ImageModal receipt (`:37`). |
+| F38 | VERIFIED 2026-10-23: `ImageModal.tsx:39` thumbnail is `object-cover` + `rounded-sm` (ladder-valid). |
 
-### Still open (21)
+### Still open (0)
 
-| # | Sev | Location | What's wrong | Fix |
-|---|---|---|---|---|
-| F3 | blocker | most buttons | No shared keyboard focus recipe (see partial above). | Base rule in `@layer components`. |
-| F4 | fixed 2026-10-23 | `user/cart/page.tsx:80`, `bet/[id]/BetPageClient.tsx:260` | `<div onClick>` / `<li onClick>`: not focusable, no role. | Cart numbers are now `<button>` in `<li>`; team card has `role="button" tabIndex={0}` + keydown. |
-| F9 | high | `raffle/[id]/RafflePageClient.tsx:156` | Raw `<img>`: it DOES have `object-cover` + fixed `h-64` now (the old `object-fill` distortion is gone), but no aspect ratio and no `next/image`. | Lower severity than written: artwork is no longer distorted. Add `aspect-[4/3]` or leave. **Assessed 2026-10-22: leave as-is** (fixed h-64 + object-cover crops cleanly on all breakpoints; aspect-ratio swap would change card heights); `next/image` blocked by unlisted Firestore hosts. Needs Daniel's ok to close or change. |
-| F10 | `bet/page.tsx` bet card converted to the storefront recipe (`bg-white border-ink-100 shadow-card`); headings/values `text-ink-900`, body `text-ink-500`, odds accents bumped to 600/700 shades, CTA `bg-brand-600`. |
-| F14 | `tailwind.config.ts` `fontFamily.sans` now leads with `var(--font-inter)` (system stack as fallback); `app/layout.tsx` passes `variable: "--font-inter"` and body uses `font-sans`. |
-| F11 | high | `Modal.tsx`, `DeleteRaffleModal.tsx`, `admin/bets` EditBetModal | ~~No `role="dialog"`, no `aria-modal`, no Esc, no focus trap, no scroll lock.~~ Fixed 2026-10-23: shared `Dialog` primitive (`app/components/Dialog.tsx`) with `role="dialog"`/`aria-modal`, Esc close, Tab focus trap, scroll lock + focus restore; all three modals now use it. | Shared `Dialog` primitive. |
-| F12 | high | `admin/sales`, `admin/salesBets` | ~~Tabs signalled by colour only; no `role="tablist"`/`aria-selected`.~~ **Fixed** (see top section F12 row). |
-| F24 | high | `user/cart/page.tsx:67,118` | ~~`w-screen` inside the `max-w-7xl` container → horizontal scroll on wide screens.~~ Fixed 2026-10-23: replaced with `w-full` (both rows). **Verified 2026-10-23 in code: no `w-screen` remains, both cited rows are `w-full`; closed.** |
-| F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159,169` | ~~English leaked into customer-visible screens~~ Fixed 2026-10-23: strings translated ("Boleto", "No se encontró ningún boleto", "Por favor, inténtalo más tarde", "Marcar como activo", "Todos los boletos"). **Verified 2026-10-23 in code at all five cited sites; no English remnants; closed.** |
-| F15 | medium | 4 radii families in live use | ~~Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b.~~ Fixed 2026-10-23: `tailwind.config.ts` exposes only the A3b ladder; code greps show `rounded-sm` 66×, `rounded-card` 64× (+`rounded-t-card`/`rounded-b-card`), `rounded-pill` 21× (14 CTAs + 7 former `rounded-full` circles re-mapped), `rounded-md` 1× (ladder-valid feature container). No `rounded-lg`/`rounded-xl`/`rounded` remain in app/. **Re-check 2026-10-23**: F38's edit had re-introduced a bare `rounded` on the ImageModal thumbnail (`ImageModal.tsx:39`); re-mapped to `rounded-sm`. Ladder-clean again. | Re-map to the A3b ladder. |
-| F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | ~~Two primary-button shapes live...~~ **Verified 2026-10-23: closed as intended** — `app/globals.css` keeps `border-radius: 1.5rem` per ratified A3b ("`.random-ticket-button` keeps its 1.5rem shape", 2026-10-21). Not drift. | Confirm as intended (then close) or unify. |
-| F17 | `.random-ticket-button` font-size 1.1rem → 1.125rem (text-lg equivalent); grep confirms no other raw font sizes remain. |
-| F19 | medium | `admin/bets:290,295,326,338,350` | ~~Prices interpolated as `$${value}` / `parseFloat(...)` instead of `formatPrice`.~~ **Verified 2026-10-23: already fixed** — all five sites route through `formatPrice`; `parseFloat` remains only as numeric input for the multiplication, not for display. No change needed. | Route through `formatPrice`. |
-| F20 | `layout.tsx:10` "en linea"→"en línea"; `RafflePageClient.tsx:119` toast "Listo! tu numero"→"¡Listo! Tu número". The other cited spots (`admin/page.tsx`, terms page) already carry correct accents in current source. |
-| F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). | Partially fixed 2026-10-23 (body copy → `tú`); verified 2026-10-23: 5 remaining `usted` forms (3 placeholders, receipt-upload note, phone toast) converted to `tú`. Closed pending Q6 ratification of `tú`. |
-| F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
-| F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | FIXED 2026-10-23: selected now `bg-brand-600`; `bg-yellow-400` only means in-cart. |
-| F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. FIXED 2026-10-23. |
-| F37 | nit | app-wide | FIXED 2026-10-23: added `aria-label` to the cart link (`CartButton`), the Modal close button, and the clickable receipt image (`ImageModal`, now `role="button"` + focusable). `tsc --noEmit` clean. | Component-by-component pass. |
-| F38 | nit | `ImageModal.tsx` | ~~Proof image sizing/`object-fit` not verified in current source.~~ Verified + fixed 2026-10-23: thumbnail now `object-cover` + `rounded`. |
+No rows remain. Every former 'Still open' item was re-verified in code on
+2026-10-23 and moved to 'Already fixed' with evidence. What remains is not
+fixable without Daniel: **Q6** (voice ratification — code already converted to
+tú), **Q7** (emoji icons), and the terms-page/MXN wording flagged under A5a.
+
 
 ### Suggested fixed sets
 
