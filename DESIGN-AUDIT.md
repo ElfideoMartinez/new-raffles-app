@@ -260,7 +260,7 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the only focus cue on the close button. | Remove it; add the shared focus recipe. | **Mechanical**. |
 | F36 | nit | `DeleteRaffleModal.tsx:16`, cart ×2, header ×2 | PNG icons recoloured with `filter: invert` — breaks if the asset has any colour. | Replace with inline SVG `currentColor` (cart already has the svg commented out). | **Judgement** (asset work). FIXED 2026-10-23: all 5 PNG icons replaced with inline SVG `currentColor` (`text-white`). |
 | F37 | nit | `accessibility` ×3 only (`aria-label`) | Only 3 `aria-label`s in the whole app. | See component patterns. | — |
-| F38 | nit | `ImageModal.tsx:32-37` | Proof image `64×96` with default `object-fit:fill` → stretched receipts. | `object-cover` + `rounded`. | **Mechanical**. |
+| F38 | nit | `ImageModal.tsx` | ~~Proof image `64×96` with default `object-fit:fill` → stretched receipts.~~ **Fixed 2026-10-23**: `object-cover` + `rounded` applied to the thumbnail in `ImageModal.tsx`. | `object-cover` + `rounded`. | **Mechanical**. |
 | F39 | nit | `globals.css:16-18` | Create-next-app scaffold vars (`--foreground-rgb` etc.) still present. | Remove with F2. | **Mechanical**. |
 | F40 | nit | `Cards.tsx:42` vs `<h2>` at 67 | Image alt duplicates the adjacent heading. | `alt=""` (title is already text). | **Judgement** (SEO may prefer alt). |
 
@@ -327,7 +327,7 @@ as a new item surfaced by the e2e work.
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | FIXED 2026-10-23: selected now `bg-brand-600`; `bg-yellow-400` only means in-cart. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. FIXED 2026-10-23. |
 | F37 | nit | app-wide | FIXED 2026-10-23: added `aria-label` to the cart link (`CartButton`), the Modal close button, and the clickable receipt image (`ImageModal`, now `role="button"` + focusable). `tsc --noEmit` clean. | Component-by-component pass. |
-| F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
+| F38 | nit | `ImageModal.tsx` | ~~Proof image sizing/`object-fit` not verified in current source.~~ Verified + fixed 2026-10-23: thumbnail now `object-cover` + `rounded`. |
 
 ### Suggested fixed sets
 
