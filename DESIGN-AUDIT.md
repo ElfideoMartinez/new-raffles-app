@@ -274,7 +274,7 @@ Every finding below was re-checked by reading the current source, not taken on
 trust from the original table. Counts are of the ORIGINAL 40; F23 is added here
 as a new item surfaced by the e2e work.
 
-### Already fixed (17)
+### Already fixed (18)
 
 | # | Evidence |
 |---|---|
@@ -312,9 +312,9 @@ as a new item surfaced by the e2e work.
 | F4 | blocker | `user/cart/page.tsx:67,80,96,130`, `bet/[id]/BetPageClient.tsx:335-343` | `<div onClick>` / `<li onClick>`: not focusable, no role. | `<button>`/`<a>`, or `role="button" tabIndex={0} onKeyDown`. |
 | F9 | high | `raffle/[id]/RafflePageClient.tsx:156` | Raw `<img>`: it DOES have `object-cover` + fixed `h-64` now (the old `object-fill` distortion is gone), but no aspect ratio and no `next/image`. | Lower severity than written: artwork is no longer distorted. Add `aspect-[4/3]` or leave. **Assessed 2026-10-22: leave as-is** (fixed h-64 + object-cover crops cleanly on all breakpoints; aspect-ratio swap would change card heights); `next/image` blocked by unlisted Firestore hosts. Needs Daniel's ok to close or change. |
 | F10 | `bet/page.tsx` bet card converted to the storefront recipe (`bg-white border-ink-100 shadow-card`); headings/values `text-ink-900`, body `text-ink-500`, odds accents bumped to 600/700 shades, CTA `bg-brand-600`. |
+| F14 | `tailwind.config.ts` `fontFamily.sans` now leads with `var(--font-inter)` (system stack as fallback); `app/layout.tsx` passes `variable: "--font-inter"` and body uses `font-sans`. |
 | F11 | high | `Modal.tsx`, `DeleteRaffleModal.tsx`, `admin/bets` EditBetModal | No `role="dialog"`, no `aria-modal`, no Esc, no focus trap, no scroll lock. | Shared `Dialog` primitive. |
 | F12 | high | `admin/sales`, `admin/salesBets` | Tabs signalled by colour only; no `role="tablist"`/`aria-selected`. | ARIA roles + underline indicator. |
-| F14 | high | `tailwind.config.ts:85-93` vs `layout.tsx:6` | `fontFamily.sans` is the system stack while the app loads Inter. `font-sans` would be a lie. | `sans: ['var(--font-inter)', ...system]` and pass `variable: "--font-inter"`. |
 | F24 | high | `user/cart/page.tsx:67,118` | `w-screen` inside the `max-w-7xl` container → horizontal scroll on wide screens. | `w-full`. |
 | F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159` | English leaked into customer-visible screens ("Ticket ID", "No ticket found", "Please try again later", "Set Active"). | Translate the customer-facing strings. |
 | F15 | medium | 4 radii families in live use | Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b. | Re-map to the A3b ladder. |

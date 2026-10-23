@@ -83,7 +83,10 @@ const config: Config = {
         cta: "0 6px 12px rgba(0,0,0,0.15)",
       },
       fontFamily: {
+        // F14: font-sans must match the loaded font. Inter is passed as the
+        // CSS variable in app/layout.tsx; the system stack stays as fallback.
         sans: [
+          "var(--font-inter)",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",

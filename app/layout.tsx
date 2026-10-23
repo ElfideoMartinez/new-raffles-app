@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import MainHeader from "./components/MainHeader";
 
-const inter = Inter({ subsets: ["latin"] });
+// F14: expose Inter as a CSS variable so tailwind's font-sans can use it.
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Rifas Mtz",
@@ -20,7 +21,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/faviconApp.ico" type="image/x-icon" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} font-sans`}>
         <header>
           <MainHeader />
         </header>
