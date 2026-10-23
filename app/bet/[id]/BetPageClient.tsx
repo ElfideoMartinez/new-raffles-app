@@ -266,6 +266,15 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             : ""
         }`}
         onClick={() => updateTickets(teamKey, 1)}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            updateTickets(teamKey, 1);
+          }
+        }}
       >
         {teamKey !== "C" && (
           <p className=''>

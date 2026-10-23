@@ -76,8 +76,10 @@ const UserCartPage = () => {
               <li className='flex w-full justify-between'>
                 <ul className='flex flex-wrap gap-2'>
                   {ticket.ticketNumbers.map((number: number) => (
-                    <li key={number} className='p-2 rounded-card bg-green-500 ml-2 mb-2 flex justify-center hover:cursor-pointer hover:bg-red-500'
-                      onClick={() => {
+                    <li key={number} className='ml-2 mb-2'>
+                      <button type="button"
+                        className='p-2 rounded-card bg-green-500 flex justify-center hover:cursor-pointer hover:bg-red-500'
+                        onClick={() => {
                         useTicketStore.getState().removeTicketFromCart(ticket.raffleId, number);
                         toast.success('Boleto borrado',{
                           duration: 800,
@@ -86,9 +88,10 @@ const UserCartPage = () => {
                           sound: false,
                           position: 'top-right',
                         })
-                      }}
-                    >
-                      {number}
+                        }}
+                      >
+                        {number}
+                      </button>
                     </li>
                   ))}
                 </ul>
