@@ -1868,6 +1868,12 @@ export const updateBet = functions.https.onRequest(async (req, res) => {
 
     await db.collection("bets").doc(data.idBet).set(data.bet, { merge: true });
 
+    // B6: mirror the patch to the RTDB copy — getAllBets/getBetData serve from
+    // RTDB, so an edit that only lands in Firestore is invisible to the
+    // storefront until RTDB fails. `.update` merges, and the admin client
+    // omits server-owned fields (odds/counters), so counters are preserved.
+    await rtdb.ref(`bets/${data.idBet}`).update(data.bet);
+
     res.status(200).json({
       status: 200,
       message: "Bet correctly updated",
@@ -1904,6 +1910,10 @@ export const deleteBet = functions.https.onRequest(async (req, res) => {
     const data = req.body;
 
     await db.collection("bets").doc(data.idBet).delete();
+
+    // B6: keep the RTDB copy in sync so the deleted bet disappears from the
+    // storefront listing immediately, not only on an RTDB outage.
+    await rtdb.ref(`bets/${data.idBet}`).remove();
 
     res.status(200).json({
       status: 200,
