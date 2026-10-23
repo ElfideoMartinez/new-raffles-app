@@ -168,7 +168,7 @@ const CheckoutTransferPage = () => {
           value={name}
           onChange={(e) => handleName(e.target.value)}
           className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
-          placeholder='Ingrese su nombre completo'
+          placeholder='Ingresa tu nombre completo'
         />
       </div>
 
@@ -183,7 +183,7 @@ const CheckoutTransferPage = () => {
           value={phone}
           onChange={(e) => handlePhone(e.target.value)}
           className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
-          placeholder='Ingrese su número de teléfono'
+          placeholder='Ingresa tu número de teléfono'
         />
       </div>
 
@@ -198,7 +198,7 @@ const CheckoutTransferPage = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-          placeholder='Ingrese su correo electrónico (opcional)'
+          placeholder='Ingresa tu correo electrónico (opcional)'
         />
       </div>
 
@@ -209,8 +209,8 @@ const CheckoutTransferPage = () => {
         </label>
         {/* add small description */}
         <p className='text-sm text-gray-500'>
-          Suba una imagen de su comprobante de transferencia. puede ser una foto
-          o captura de pantalla.
+          Sube una imagen de tu comprobante de transferencia. Puede ser una
+          foto o captura de pantalla.
         </p>
         <input
           id='image'
@@ -291,7 +291,7 @@ const CheckoutTransferPage = () => {
               setIsLoading(false);
             }
           } else {
-            toast.warning(`Por favor, ingrese un número de teléfono válido de 10 dígitos`,{
+            toast.warning(`Por favor, ingresa un número de teléfono válido de 10 dígitos`,{
               duration: 2000,
               progress: false,
               position: 'top-right',
