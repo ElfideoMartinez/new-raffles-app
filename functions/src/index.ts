@@ -1665,8 +1665,13 @@ export const getAllBets = functions.https.onRequest(async (req, res) => {
 
   try {
     // Get bets from Realtime Database for real-time data
+    // B5: bound the read — the storefront only needs the newest bets, so the
+    // RTDB read is capped at the 200 most recent instead of the whole node.
     const betsRef = rtdb.ref("bets");
-    const snapshot = await betsRef.once("value");
+    const snapshot = await betsRef
+      .orderByChild("createdAt")
+      .limitToLast(200)
+      .once("value");
     const betsData = snapshot.val();
 
     if (!betsData) {
@@ -1689,7 +1694,11 @@ export const getAllBets = functions.https.onRequest(async (req, res) => {
     // Fallback to Firestore if Realtime Database fails
     try {
       console.log("Falling back to Firestore...");
-      const betsCollection = db.collection("bets");
+      // B5: same cap as the RTDB path — newest 200 only.
+      const betsCollection = db
+        .collection("bets")
+        .orderBy("createdAt", "desc")
+        .limit(200);
       const collectionSnapshot = await betsCollection.get();
 
       const result = collectionSnapshot.docs.map((doc) => ({
@@ -1930,7 +1939,12 @@ export const getSalesBets = functions.https.onRequest(async (req, res) => {
   }
 
   try {
-    const betSalesCollection = db.collection("salesBets");
+    // B5: cap the read — admin sales list loads the newest 500 instead of
+    // growing unbounded with every sale ever made.
+    const betSalesCollection = db
+      .collection("salesBets")
+      .orderBy("createdAt", "desc")
+      .limit(500);
     const betSalesSnapshot = await betSalesCollection.get();
     const betSales = betSalesSnapshot.docs.map((doc) => ({
       id: doc.id,
