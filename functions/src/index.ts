@@ -1690,36 +1690,13 @@ export const getAllBets = functions.https.onRequest(async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching bets from Realtime Database:", err);
-
-    // Fallback to Firestore if Realtime Database fails
-    try {
-      console.log("Falling back to Firestore...");
-      // B5: same cap as the RTDB path — newest 200 only.
-      const betsCollection = db
-        .collection("bets")
-        .orderBy("createdAt", "desc")
-        .limit(200);
-      const collectionSnapshot = await betsCollection.get();
-
-      const result = collectionSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      res.status(200).json({
-        result,
-      });
-    } catch (firestoreErr) {
-      console.error("Error fetching bets from Firestore:", firestoreErr);
-      res.status(500).json({
-        status: 500,
-        message: "Error fetching bets",
-        error:
-          firestoreErr instanceof Error
-            ? firestoreErr.message
-            : String(firestoreErr),
-      });
-    }
+    // B6: RTDB is the single source of truth for bets. The Firestore fallback
+    // was removed on purpose — a second store that not every write path keeps
+    // in sync lets stale data shadow live data. Fail loudly instead.
+    res.status(500).json({
+      status: 500,
+      message: "Error fetching bets",
+    });
   }
 });
 
