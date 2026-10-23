@@ -70,7 +70,7 @@ const TicketButton = ({
       className={`m-1 text-white py-2 px-4 rounded-pill 
         ${isUnavailable ? "cursor-not-allowed opacity-50 bg-brand-500 capitalize" : ""}
         ${inTheCart ? "bg-yellow-400" : ""}
-        ${!inTheCart && !isUnavailable && (isSelected ? "bg-yellow-400" : "bg-green-500")}
+        ${!inTheCart && !isUnavailable && (isSelected ? "bg-brand-600" : "bg-green-500")}
       `}
       disabled={isUnavailable}
     >

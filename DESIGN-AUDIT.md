@@ -251,7 +251,7 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 | F25 | medium | `admin/create/bet` (dark) vs `admin/dashboard`/`sales`/`edit` (light) | The admin area is half dark-mode, half light. | Pick one (see Q4). | **Judgement**. |
 | F26 | medium | `bet/page.tsx`, `quickTicket/play`, `TicketCard`, `quickTickets/active` | English leaked into customer-visible screens ("Ticket ID", "Set Active", "Please try again later", "Created:", "Winner"). | Translate; admin-only screens can stay English if Daniel prefers. | **Judgement** on admin; **mechanical** on quickTicket (customer-facing). |
 | F27 | medium | `AddToCartButton.tsx:45` | `disabled:bg-gray-500` on `bg-blue-500` → a *grey* disabled state that looks like a different component; also `rounded` (0.25rem) the only 0.25rem radius in the app. | `disabled:bg-brand-300 disabled:text-white` + `rounded-card`... or `rounded-pill`. | **Judgement** (radius/shape). |
-| F28 | medium | `TicketButton.tsx:62-66` | Four colour meanings (blue=sold, yellow=in cart, yellow=selected, green=available) with yellow meaning two things. | Sold → `ink-300` + strikethrough; selected → `brand-600`; in-cart → same with a dot. | **Judgement**. |
+| F28 | medium | `TicketButton.tsx:62-66` | Four colour meanings (blue=sold, yellow=in cart, yellow=selected, green=available) with yellow meaning two things. | **Fixed 2026-10-23**: selected now `bg-brand-600`; in-cart keeps `bg-yellow-400`; sold keeps `brand-500` + opacity. |
 | F29 | medium | `MainHeader.tsx:16-17` | `isCartIconAvailable` is true on `/checkout/success` → cart icon hidden exactly when it would be empty; nav elements `invisible` (still focusable/announced). | `hidden` instead of `invisible`, or render conditionally. | **Mechanical** (a11y). |
 | F30 | nit | `bet/[id]:483,497` | `text-md` does not exist → no-op. Bet bar renders at inherited 16px. | `text-base`. | **Mechanical**. |
 | F32 | nit | `edit/raffle:369`, `edit/bet:448` | `cursor-none` (invalid Tailwind class) intending "not-allowed". | `cursor-not-allowed`. | **Mechanical**. |
@@ -324,7 +324,7 @@ as a new item surfaced by the e2e work.
 | F20 | `layout.tsx:10` "en linea"→"en línea"; `RafflePageClient.tsx:119` toast "Listo! tu numero"→"¡Listo! Tu número". The other cited spots (`admin/page.tsx`, terms page) already carry correct accents in current source. |
 | F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). | FIXED 2026-10-23: `checkout/transfer` copy now uses `tú`. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
-| F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
+| F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | FIXED 2026-10-23: selected now `bg-brand-600`; `bg-yellow-400` only means in-cart. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
 | F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
