@@ -36,6 +36,20 @@ service firebase.storage {
         && request.resource.size < 5 * 1024 * 1024;
     }
 
+    // Transfer-checkout receipt uploads (app/checkout/transfer/page.tsx:236).
+    // Written by the customer from the public cart, so write cannot require
+    // auth. Constrained instead: image only, 5 MB ceiling, and the object name
+    // must be the 16-digit pago-concept key the server validates
+    // (functions/src/index.ts:1230-1234). Read stays open because the same
+    // client immediately calls getDownloadURL() on the reference it just
+    // wrote; token-bearing download URLs are not gated by rules anyway.
+    match /salesImages/{conceptKey} {
+      allow read: if true;
+      allow write: if isImage()
+        && request.resource.size < 5 * 1024 * 1024
+        && conceptKey.matches('^\\d{16}$');
+    }
+
     // Everything else: deny.
     match /{allPaths=**} {
       allow read, write: if false;

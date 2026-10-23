@@ -274,9 +274,22 @@ Behaviour details worth knowing before deploying:
 - Admin notification reuses `notificationTokens` and is best effort.
 
 Still required, outside this change: deploy the function and `firestore.rules`
-(§4 steps 3–4), and note that the receipt upload still writes
-`salesImages/<key>` from the browser, which `.storage.rules` denies — see
-"Callers found broken" below.
+(§4 steps 3–4). The receipt-upload gap is now covered by a rule instead: see
+"Remediation log — 2026-10-23 (storage rule for receipt uploads)" below.
+
+## Remediation log — 2026-10-23 (storage rule for receipt uploads)
+
+Closes the receipt-upload gap flagged in this log and in "Callers found
+broken": `app/checkout/transfer/page.tsx:236` uploads the customer's payment
+receipt to `salesImages/<paymentConceptKey>`, which the proposed
+`storage.rules` denied — deploying those rules as written would have broken the
+transfer checkout.
+
+| Change | File |
+|---|---|
+| New `salesImages/{conceptKey}` rule: image-only, 5 MB cap, object name must match the 16-digit pago-concept key the server validates (`functions/src/index.ts:1230-1234`); write does not require auth because the customer path is public by design. | `storage.rules` |
+
+Rules-file edit only — nothing deployed, per run policy.
 
 ## 3. Measured consistency
 
