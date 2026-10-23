@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import { onValue, ref, set, update } from "firebase/database";
 import { realtimeDB } from "@/app/firebaseconfig";
-import { formatDate } from "@/app/utils/format";
+import { formatDate, formatPrice } from "@/app/utils/format";
 
 interface IBetsData {
   id: string;
@@ -286,12 +286,12 @@ function AdminBetCard({
         <div className='space-y-2 mb-4'>
           <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Precio por boleto:</span>
-            <span className='text-ink-900'>${bet.pricePerTicket}</span>
+            <span className='text-ink-900'>{formatPrice(bet.pricePerTicket)}</span>
           </div>
           <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Total de apuestas:</span>
             <span className='text-ink-900'>
-              ${totalBets * parseFloat(bet.pricePerTicket)}
+              {formatPrice(totalBets * parseFloat(bet.pricePerTicket))}
             </span>
           </div>
 
@@ -322,7 +322,7 @@ function AdminBetCard({
             <span className='text-sm font-medium text-success-700'>
               {bet.teams.a}
               <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
-                ${bet.betsTeamA * parseFloat(bet.pricePerTicket)}
+                {formatPrice(bet.betsTeamA * parseFloat(bet.pricePerTicket))}
               </span>
             </span>
             <span className='text-sm text-ink-700'>
@@ -334,7 +334,7 @@ function AdminBetCard({
             <span className='text-sm font-medium text-danger-700'>
               {bet.teams.b}
               <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
-                ${bet.betsTeamB * parseFloat(bet.pricePerTicket)}
+                {formatPrice(bet.betsTeamB * parseFloat(bet.pricePerTicket))}
               </span>
             </span>
             <span className='text-sm text-ink-700'>
@@ -346,7 +346,7 @@ function AdminBetCard({
               <span className='text-sm font-medium text-warning-700'>
                 Empate
                 <span className='ml-2 bg-ink-100 text-ink-700 text-xs px-2 py-1 rounded-pill'>
-                  ${bet.tieBets * parseFloat(bet.pricePerTicket)}
+                  {formatPrice(bet.tieBets * parseFloat(bet.pricePerTicket))}
                 </span>
               </span>
               <span className='text-sm text-ink-700'>
