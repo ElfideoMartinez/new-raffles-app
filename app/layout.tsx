@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Rifas Mtz",
-  description: "Rifas Mtz — compra tus boletos en linea",
+  description: "Rifas Mtz — compra tus boletos en línea",
 }
 
 export default function RootLayout({

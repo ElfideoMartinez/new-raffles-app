@@ -322,7 +322,7 @@ as a new item surfaced by the e2e work.
 | F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | Two primary-button shapes live. A3b ratified keeping 1.5rem, so this is intentional — but it still reads as drift on screen. | Confirm as intended (then close) or unify. |
 | F17 | medium | `globals.css:57` | `font-size: 1.1rem` is the only raw font size outside Tailwind. | `text-lg`. |
 | F19 | medium | `admin/bets:288,293,324,336,348` | Prices interpolated as `$${value}` / `parseFloat(...)` instead of `formatPrice`. | Route through `formatPrice`. |
-| F20 | medium | `layout.tsx:10` (+ others) | Missing accents: metadata description says "linea". | `línea`; finish the accent pass. |
+| F20 | `layout.tsx:10` "en linea"→"en línea"; `RafflePageClient.tsx:119` toast "Listo! tu numero"→"¡Listo! Tu número". The other cited spots (`admin/page.tsx`, terms page) already carry correct accents in current source. |
 | F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | Distinct treatments. |
