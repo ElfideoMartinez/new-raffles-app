@@ -90,6 +90,13 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     return realtimeBetData.pricePerTicket * totalTickets;
   }, [realtimeBetData.pricePerTicket, totalTickets]);
 
+  // B4: a $0 / non-numeric price means the bet is unusable — block the cart
+  // path instead of silently selling at $0.
+  const priceUnusable = useMemo(() => {
+    const p = Number(realtimeBetData.pricePerTicket);
+    return !Number.isFinite(p) || p <= 0;
+  }, [realtimeBetData.pricePerTicket]);
+
   // ---- Pari-mutuel ESTIMATE (DESIGN-AUDIT.md B2, Option A) ----
   // Same formula shape as the server's single source of truth
   // (functions/src/payout.ts): every ticket stakes pricePerTicket into one
@@ -209,7 +216,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   );
 
   const addToCart = useCallback(() => {
-    if (totalTickets === 0) return;
+    if (totalTickets === 0 || priceUnusable) return;
 
     updateBet({
       betId: betId as string,
@@ -231,6 +238,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     totalPrice,
     updateBet,
     userCartBets,
+    priceUnusable,
     router,
   ]);
 
@@ -429,13 +437,18 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               <button
                 className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-base sm:text-lg disabled:opacity-50
                 disabled:hover:bg-yellow-400 disabled:cursor-not-allowed'
-                disabled={totalTickets === 0}
+                disabled={totalTickets === 0 || priceUnusable}
                 onClick={addToCart}
               >
                 Agregar al carrito
               </button>
             </div>
           </div>
+          {priceUnusable && (
+            <p className='fixed bottom-20 sm:bottom-16 w-full text-center text-sm font-semibold text-red-700'>
+              Esta apuesta no está disponible por ahora.
+            </p>
+          )}
           <div className='h-36 sm:h-16'></div>
         </>
       )}

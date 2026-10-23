@@ -1829,6 +1829,34 @@ export const updateBet = functions.https.onRequest(async (req, res) => {
     console.log("Updating bet info...");
     const data = req.body;
 
+    // B4: reject patches that would make a bet unusable (non-positive or
+    // non-numeric price, or empty team names).
+    const bet = data.bet || {};
+    if (bet.pricePerTicket !== undefined) {
+      const price = Number(bet.pricePerTicket);
+      if (!Number.isFinite(price) || price <= 0) {
+        res.status(400).json({
+          status: 400,
+          message: "Invalid bet data: pricePerTicket must be a positive number",
+        });
+        return;
+      }
+    }
+    if (bet.teams !== undefined) {
+      if (
+        typeof bet.teams.a !== "string" ||
+        bet.teams.a.trim() === "" ||
+        typeof bet.teams.b !== "string" ||
+        bet.teams.b.trim() === ""
+      ) {
+        res.status(400).json({
+          status: 400,
+          message: "Invalid bet data: both team names must be non-empty",
+        });
+        return;
+      }
+    }
+
     await db.collection("bets").doc(data.idBet).set(data.bet, { merge: true });
 
     res.status(200).json({
@@ -2352,6 +2380,25 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       return;
     }
 
+    // B4: price must be a positive finite number and team names non-empty,
+    // otherwise a $0 / unusable bet would go live silently.
+    const price = Number(data.pricePerTicket);
+    if (
+      !Number.isFinite(price) ||
+      price <= 0 ||
+      typeof data.teams.a !== "string" ||
+      data.teams.a.trim() === "" ||
+      typeof data.teams.b !== "string" ||
+      data.teams.b.trim() === ""
+    ) {
+      res.status(400).json({
+        status: 400,
+        message:
+          "Invalid bet data: pricePerTicket must be a positive number and both team names must be non-empty",
+      });
+      return;
+    }
+
     // Generate unique bet ID
     const betId = `bet_${Date.now()}_${Math.random()
       .toString(36)
@@ -2363,7 +2410,7 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       description: data.description,
       image: data.image || "",
       date: data.date,
-      pricePerTicket: data.pricePerTicket,
+      pricePerTicket: price,
       teams: data.teams, // { a: string, b: string }
       oddsTeamA: data.oddsTeamA || "1.0",
       oddsTeamB: data.oddsTeamB || "1.0",
