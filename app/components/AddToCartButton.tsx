@@ -19,20 +19,6 @@ const AddToCartButton = ({ raffleId, raffleName ,rafflePrice }: IAddToCartButton
 
   return (
 
-    // <Link href={'/user/cart'}>
-    //   <button
-    //     onClick={() => {
-    //       addTicketsToCart(raffleId, rafflePrice);
-    //     }}
-    //     disabled={selectedTicketCount.length < 1}
-    //     className='disabled:bg-gray-500 flex items-center justify-center w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-pill'
-    //     >
-    //       Agregar al carrito ({selectedTicketCount.length})
-    //   </button>
-    // </Link>
-
-
-
     <button
       onClick={() => {
         addTicketsToCart(raffleId, rafflePrice, raffleName);
