@@ -16,6 +16,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
       >
         <button
           onClick={onClose}
+          aria-label="Cerrar"
           className="absolute top-4 right-4 text-white text-2xl font-bold p-1 m-1 rounded-pill"
           style={{ backgroundColor: "var(--color-brand-700)"}}
         >

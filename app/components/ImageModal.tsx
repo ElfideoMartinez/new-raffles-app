@@ -32,6 +32,9 @@ const ImageWithModal: React.FC<{ sale: Sale }> = ({ sale }) => {
         <img
           src={imageToDisplay}
           alt="Comprobante de pago"
+          role="button"
+          tabIndex={0}
+          aria-label="Ampliar comprobante de pago"
           onClick={() => handleImageClick(sale.paymentImage)}
           className="cursor-pointer w-16 h-24 mb-2 rounded-sm transition-all duration-300 ease-in-out transform hover:scale-105"
         />

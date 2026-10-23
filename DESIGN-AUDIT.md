@@ -326,7 +326,7 @@ as a new item surfaced by the e2e work.
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | FIXED 2026-10-23: selected now `bg-brand-600`; `bg-yellow-400` only means in-cart. |
 | F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. FIXED 2026-10-23. |
-| F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
+| F37 | nit | app-wide | FIXED 2026-10-23: added `aria-label` to the cart link (`CartButton`), the Modal close button, and the clickable receipt image (`ImageModal`, now `role="button"` + focusable). `tsc --noEmit` clean. | Component-by-component pass. |
 | F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
 
 ### Suggested fixed sets
