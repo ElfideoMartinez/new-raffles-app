@@ -115,8 +115,8 @@ const CheckoutTransferPage = () => {
       {/* General Explanation */}
       <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-card border border-blue-300'>       
         <p>
-          Para completar su compra, realice una transferencia bancaria al número
-          de cuenta a continuación. Asegúrese de pegar la clave del concepto de
+          Para completar tu compra, realiza una transferencia bancaria al número
+          de cuenta a continuación. Asegúrate de pegar la clave del concepto de
           pago en el campo del concepto de la transferencia (opcional).
         </p>
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
@@ -137,8 +137,8 @@ const CheckoutTransferPage = () => {
       {ticketCount > 5 && (
         <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-card border border-yellow-400'>
           <p>
-            Nota: Dado que está comprando más de 5 boletos, se necesitará verificar
-            su transferencia antes de que los boletos se confirmen como
+            Nota: Dado que estás comprando más de 5 boletos, se necesitará verificar
+            tu transferencia antes de que los boletos se confirmen como
             "vendidos".
           </p>
         </div>
