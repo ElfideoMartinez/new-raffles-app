@@ -109,7 +109,7 @@ export default function PlayPage() {
       console.error("Error details:", error);
       setError({
         code: "ticket_creation_error",
-        message: "Error creating new ticket. Please try again later.",
+        message: "Error al crear el boleto. Por favor, inténtalo más tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -195,11 +195,11 @@ export default function PlayPage() {
         <p className='text-gray-500'>Cargando tu boleto...</p>
       ) : (
         <p className='text-gray-600 mb-4'>
-          {ticket?.id ? `Ticket ID: ${ticket.id}` : "No ticket found."}
+          {ticket?.id ? `Boleto: ${ticket.id}` : "No se encontró ningún boleto."}
         </p>
       )}
       {!isLoading && !ticket && (
-        <p className='text-red-500'>No ticket found. Please try again.</p>
+        <p className='text-red-500'>No se encontró ningún boleto. Por favor, inténtalo de nuevo.</p>
       )}
       {ticket?.id && ticket?.status === "pending" && (
         <div className='mb-6'>

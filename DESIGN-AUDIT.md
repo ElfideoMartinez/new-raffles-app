@@ -316,7 +316,7 @@ as a new item surfaced by the e2e work.
 | F11 | high | `Modal.tsx`, `DeleteRaffleModal.tsx`, `admin/bets` EditBetModal | No `role="dialog"`, no `aria-modal`, no Esc, no focus trap, no scroll lock. | Shared `Dialog` primitive. |
 | F12 | high | `admin/sales`, `admin/salesBets` | Tabs signalled by colour only; no `role="tablist"`/`aria-selected`. | ARIA roles + underline indicator. |
 | F24 | high | `user/cart/page.tsx:67,118` | ~~`w-screen` inside the `max-w-7xl` container → horizontal scroll on wide screens.~~ Fixed 2026-10-23: replaced with `w-full` (both rows). |
-| F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159` | English leaked into customer-visible screens ("Ticket ID", "No ticket found", "Please try again later", "Set Active"). | Translate the customer-facing strings. |
+| F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159,169` | ~~English leaked into customer-visible screens~~ Fixed 2026-10-23: strings translated ("Boleto", "No se encontró ningún boleto", "Por favor, inténtalo más tarde", "Marcar como activo", "Todos los boletos"). |
 | F15 | medium | 4 radii families in live use | Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b. | Re-map to the A3b ladder. |
 | F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | Two primary-button shapes live. A3b ratified keeping 1.5rem, so this is intentional — but it still reads as drift on screen. | Confirm as intended (then close) or unify. |
 | F17 | `.random-ticket-button` font-size 1.1rem → 1.125rem (text-lg equivalent); grep confirms no other raw font sizes remain. |

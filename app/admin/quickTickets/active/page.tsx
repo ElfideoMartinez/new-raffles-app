@@ -156,7 +156,7 @@ const QuickTicketsActivePage = () => {
                       await update(ticketRef, { status: "active" });
                     }}
                   >
-                    Set Active
+                    Marcar como activo
                   </button>
                 </TicketCard>
               </li>
@@ -166,7 +166,7 @@ const QuickTicketsActivePage = () => {
       )}
       {selectedTab === "all" && (
         <div>
-          <h2>All Tickets</h2>
+          <h2>Todos los boletos</h2>
           <ul>
             {tickets.map((ticket) => (
               <li key={ticket.id}>
