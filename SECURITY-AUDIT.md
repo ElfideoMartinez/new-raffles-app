@@ -144,6 +144,17 @@ and are written from a public function.
   is a high-severity unverified exposure, not a confirmed one.
 - Related: `app/config/api.ts:36-37` points quick-ticket traffic at a **second,
   separately deployed host**, so it is easy to miss in a single-project review.
+- **Status: file fix proposed (2026-10-23), NOT DEPLOYED, NOT EMULATOR-TESTED.**
+  Added `database.rules.json` and wired it into `firebase.json` (`"database"`:
+  `"database.rules.json"`). Rules: clients can read a single `quickTickets/$id`
+  (public player page `app/quickTicket/play/page.tsx:130` listens per ticket) but
+  cannot list the collection (list read requires `auth != null`, covering the
+  admin page `app/admin/quickTickets/active/page.tsx:40`) and cannot write
+  anywhere (writes come from the Functions admin SDK, which bypasses rules).
+  Deploying these rules also protects `bets` writes at the root level; until the
+  rules are deployed the live database is unchanged. Activation codes remain
+  readable per ticket by anyone holding a ticket id — that is the app's current
+  public read contract, not changed by this fix.
 
 ### MEDIUM
 
