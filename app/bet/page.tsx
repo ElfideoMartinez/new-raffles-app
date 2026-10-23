@@ -100,7 +100,7 @@ function BetCard({ bet }: { bet: IBetData }) {
       : "0";
 
   return (
-    <div className='bg-gray-800 rounded-card overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'>
+    <div className='rounded-card overflow-hidden border border-ink-100 bg-white shadow-card transition-shadow duration-300 hover:shadow-lg'>
       {bet.image && (
         <div className='relative h-48 w-full'>
           <Image
@@ -113,23 +113,23 @@ function BetCard({ bet }: { bet: IBetData }) {
       )}
 
       <div className='p-4'>
-        <h3 className='text-xl font-bold text-white mb-2 line-clamp-2'>
+        <h3 className='text-xl font-bold text-ink-900 mb-2 line-clamp-2'>
           {bet.title}
         </h3>
 
-        <p className='text-gray-300 text-sm mb-3 line-clamp-3'>
+        <p className='text-ink-500 text-sm mb-3 line-clamp-3'>
           {bet.description}
         </p>
 
         <div className='space-y-2 mb-4'>
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold '>Precio por boleto:</span>{" "}
-            <span className='text-white'>{formatPrice(bet.pricePerTicket)}</span>
+            <span className='text-ink-900'>{formatPrice(bet.pricePerTicket)}</span>
           </div>
 
-          <div className='text-sm text-gray-400'>
+          <div className='text-sm text-ink-500'>
             <span className='font-semibold'>Cierre:</span>{" "}
-            <span className='text-white'>
+            <span className='text-ink-900'>
               {formatDate(bet.date)}
             </span>
           </div>
@@ -138,12 +138,12 @@ function BetCard({ bet }: { bet: IBetData }) {
         {/* Teams and betting stats */}
         <div className='space-y-2 mb-4'>
           <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-green-400'>
+            <span className='text-sm font-medium text-green-700'>
               {bet.teams.a}
             </span>
             <span
-              className={`text-sm text-gray-300
-              ${bet.oddsTeamA.includes("+") ? "text-green-400" : "text-red-400"}
+              className={`text-sm text-ink-700
+              ${bet.oddsTeamA.includes("+") ? "text-green-700" : "text-red-700"}
               `}
             >
               {bet.oddsTeamA}
@@ -151,12 +151,12 @@ function BetCard({ bet }: { bet: IBetData }) {
           </div>
 
           <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-red-400'>
+            <span className='text-sm font-medium text-red-700'>
               {bet.teams.b}
             </span>
             <span
-              className={`text-sm text-gray-300
-              ${bet.oddsTeamB.includes("+") ? "text-green-400" : "text-red-400"}
+              className={`text-sm text-ink-700
+              ${bet.oddsTeamB.includes("+") ? "text-green-700" : "text-red-700"}
               `}
             >
               {bet.oddsTeamB}
@@ -168,7 +168,7 @@ function BetCard({ bet }: { bet: IBetData }) {
               <span className='text-sm font-medium text-yellow-400'>
                 Empate
               </span>
-              <span className='text-sm text-gray-300'>
+              <span className='text-sm text-ink-700'>
                 {((totalBets / (bet.tieBets || 1)) * 100 - 100).toFixed(0)}
               </span>
             </div>
@@ -180,8 +180,8 @@ function BetCard({ bet }: { bet: IBetData }) {
             href={`/bet/${bet.id}`}
             className={`w-full text-center py-2 px-4 rounded-card font-semibold transition-colors duration-300 ${
               bet.isFinished
-                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                ? "bg-ink-100 text-ink-500 cursor-not-allowed"
+                : "bg-brand-600 hover:bg-brand-700 text-white"
             }`}
           >
             {bet.isFinished ? "Apuesta Finalizada" : "Participar"}
