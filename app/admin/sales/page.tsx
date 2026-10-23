@@ -51,20 +51,26 @@ const SalesPage = () => {
   return (
     <div className='flex flex-col w-full items-center'>
       <h1 className="my-1">Ventas</h1>
-      <div className='flex space-x-4 mb-4'>
+      <div className='flex space-x-4 mb-4' role="tablist">
         <button
-          className={`p-2 ${
-            activeTab === "verified" ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-600"
+          role="tab"
+          aria-selected={activeTab === "verified"}
+          className={`p-2 border-b-2 ${
+            activeTab === "verified"
+              ? "bg-blue-500 text-white border-blue-700"
+              : "bg-gray-300 text-gray-600 border-transparent"
           }`}
           onClick={() => setActiveTab("verified")}
         >
           Ventas verificadas
         </button>
         <button
-          className={`p-2 ${
+          role="tab"
+          aria-selected={activeTab === "non-verified"}
+          className={`p-2 border-b-2 ${
             activeTab === "non-verified"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-300 text-gray-600"
+              ? "bg-blue-500 text-white border-blue-700"
+              : "bg-gray-300 text-gray-600 border-transparent"
           }`}
           onClick={() => setActiveTab("non-verified")}
         >
