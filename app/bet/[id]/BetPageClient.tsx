@@ -90,128 +90,58 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     return realtimeBetData.pricePerTicket * totalTickets;
   }, [realtimeBetData.pricePerTicket, totalTickets]);
 
-  // Optimized gain calculation
-  const calculateGain = useCallback(
-    (numberOfTickets: number, team: "A" | "B" | "C") => {
-      if (numberOfTickets === 0) return 0;
+  // ---- Pari-mutuel ESTIMATE (DESIGN-AUDIT.md B2, Option A) ----
+  // Same formula shape as the server's single source of truth
+  // (functions/src/payout.ts): every ticket stakes pricePerTicket into one
+  // pool; pool × (1 − take) is split equally among the winning outcome's
+  // tickets. These numbers are ESTIMATES only — settlement is server-side
+  // and authoritative. Never display fixed-odds / American odds here.
+  const TAKE_RATE = 0.1; // keep in sync with Remote Config `betsTakeRate`
 
-      const { betsTeamA, betsTeamB, tieBets } = realtimeBetData;
-      const totalBets = betsTeamA + betsTeamB + tieBets;
-      let winPerTicket = 0;
-
-      switch (team) {
-        case "A":
-          winPerTicket = betsTeamA === 0 ? totalBets : totalBets / betsTeamA;
-          break;
-        case "B":
-          winPerTicket =
-            betsTeamB === 0 ? totalBets : totalBets / betsTeamB + betsTeamB;
-          break;
-        case "C":
-          winPerTicket =
-            tieBets === 0 ? totalBets : totalBets / tieBets + tieBets;
-          break;
+  const estimatedMultiplier = useCallback(
+    (team: "A" | "B" | "C") => {
+      const { betsTeamA, betsTeamB, tieBets, pricePerTicket } = realtimeBetData;
+      const outcomeTickets =
+        team === "A" ? betsTeamA : team === "B" ? betsTeamB : tieBets;
+      const totalSold = betsTeamA + betsTeamB + tieBets;
+      const pool = totalSold * pricePerTicket;
+      const distributable = pool * (1 - TAKE_RATE);
+      if (outcomeTickets > 0) {
+        return distributable / (outcomeTickets * pricePerTicket);
       }
-
-      return winPerTicket * numberOfTickets;
+      // No tickets on this outcome yet: one ticket would take the whole
+      // distributable pool. Zero pool means nothing to win yet.
+      return pool > 0 ? distributable / pricePerTicket : 0;
     },
     [realtimeBetData]
+  );
+
+  const estimateWinnings = useCallback(
+    (team: "A" | "B" | "C", tickets: number) => {
+      if (tickets === 0) return 0;
+      return estimatedMultiplier(team) * tickets * realtimeBetData.pricePerTicket;
+    },
+    [estimatedMultiplier, realtimeBetData.pricePerTicket]
   );
 
   const potentialWinnings = useMemo(() => {
-    if (ticketsTeamA > 0) return calculateGain(ticketsTeamA, "A");
-    if (ticketsTeamB > 0) return calculateGain(ticketsTeamB, "B");
-    if (tieTickets > 0) return calculateGain(tieTickets, "C");
+    if (ticketsTeamA > 0) return estimateWinnings("A", ticketsTeamA);
+    if (ticketsTeamB > 0) return estimateWinnings("B", ticketsTeamB);
+    if (tieTickets > 0) return estimateWinnings("C", tieTickets);
     return 0;
-  }, [ticketsTeamA, ticketsTeamB, tieTickets, calculateGain]);
+  }, [ticketsTeamA, ticketsTeamB, tieTickets, estimateWinnings]);
 
-  // Calculate odds with the specified formula
-  const calculateOdds = useCallback(
+  // Stake-share percentage shown on each team card (no American odds).
+  const stakeSharePercent = useCallback(
     (team: "A" | "B" | "C") => {
-      console.log("Calculating odds...", realtimeBetData);
       const { betsTeamA, betsTeamB, tieBets } = realtimeBetData;
-      const totalBets = betsTeamA + betsTeamB + tieBets;
-      console.log("Calculating odds for team:", team);
-      console.log("Bets Team A:", betsTeamA);
-      console.log("Bets Team B:", betsTeamB);
-      console.log("Tie Bets:", tieBets);
-      console.log("Total Bets:", totalBets);
-
-      if (totalBets === 0) return "+100"; // neutral
-
-      let teamBets = 0;
-      switch (team) {
-        case "A":
-          teamBets = Number(betsTeamA);
-          break;
-        case "B":
-          teamBets = Number(betsTeamB);
-          break;
-        case "C":
-          teamBets = Number(tieBets);
-          break;
-      }
-      if (teamBets === 0) return "+100"; // high odds for no bets
-
-      // Probabilidad "real"
-      const probability = teamBets / totalBets;
-      console.log("Raw Probability:", probability);
-
-      // -------- Aplicar margen (vig) --------
-      // Aquí asumimos overround = 110% (10% margen)
-      const overround = 1.1;
-      const adjustedProb = probability * overround;
-      console.log("Adjusted Probability:", adjustedProb);
-      // Cuota decimal
-      const decimalOdds = 1 / adjustedProb;
-      console.log("Decimal Odds:", decimalOdds);
-      // Convertir a American Odds
-      let americanOdds = 0;
-      if (decimalOdds >= 2) {
-        americanOdds = (decimalOdds - 1) * 100;
-        console.log("American Odds (Positive):", americanOdds);
-        return `+${americanOdds.toFixed(0)}`;
-      } else {
-        console.log("Decimal Odds less than 2:", decimalOdds);
-        americanOdds = -100 / (decimalOdds - 1);
-        console.log("American Odds (Negative):", americanOdds);
-        return `${americanOdds.toFixed(0)}`;
-      }
+      const totalSold = betsTeamA + betsTeamB + tieBets;
+      if (totalSold === 0) return 0;
+      const outcomeTickets =
+        team === "A" ? betsTeamA : team === "B" ? betsTeamB : tieBets;
+      return Math.round((outcomeTickets / totalSold) * 100);
     },
     [realtimeBetData]
-  );
-
-  // Calculate winnings based on American odds
-  const calculateAmericanOddsWinnings = useCallback(
-    (team: "A" | "B" | "C", betAmount: number) => {
-      if (betAmount === 0) return 0;
-
-      const odds = calculateOdds(team);
-      const numericOdds = parseInt(odds.replace(/[+\-]/g, ""));
-
-      console.log(
-        "Calculating winnings for positive odds...",
-        numericOdds,
-        betAmount
-      );
-      let winnings = 0;
-      if (odds.startsWith("-")) {
-        // Negative odds: bet amount needed to win $100
-        winnings = (100 / numericOdds) * betAmount;
-      } else {
-        // Positive odds: amount won for every $100 bet
-        winnings = (numericOdds / 100) * betAmount;
-      }
-      console.log(
-        "Total winnings calculated:",
-        winnings,
-        Number(betAmount),
-        "sumando betAmount:",
-        winnings + Number(betAmount)
-      );
-      return winnings + Number(betAmount); // Return total payout (winnings + original bet)
-    },
-    [calculateOdds]
   );
 
   // Real-time database listener
@@ -288,7 +218,6 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       letterTeam: selectedLetterTeam,
       ticketNumbers: totalTickets,
       totalPrice: totalPrice,
-      clientReturns: potentialWinnings,
     });
 
     console.log("Cart updated:", userCartBets());
@@ -312,7 +241,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     color,
     emoji,
     tickets,
-    betsCount,
+    stakeShare,
     disabled,
   }: {
     teamKey: "A" | "B" | "C";
@@ -320,13 +249,10 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     color: string;
     emoji: string;
     tickets: number;
-    betsCount: string;
+    stakeShare: number;
     disabled: boolean;
   }) => {
-    const winPerTicket = calculateAmericanOddsWinnings(
-      teamKey,
-      realtimeBetData.pricePerTicket
-    );
+    const estimatedPayout = estimateWinnings(teamKey, tickets);
     if (teamKey === "C" && realtimeBetData.oddsTie) {
       return null;
     }
@@ -344,14 +270,14 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
         {teamKey !== "C" && (
           <p className=''>
             {favorite === "Equals"
-              ? `Empate: ${betsCount}`
+              ? `Empate: ${stakeShare}%`
               : `${
                   teamName === favorite ? "Favorito: " : "Menos favorito: "
-                } ${betsCount}`}
+                } ${stakeShare}%`}
           </p>
         )}
 
-        {teamKey === "C" && <p className=''>Empate: {betsCount}</p>}
+        {teamKey === "C" && <p className=''>Empate: {stakeShare}%</p>}
 
         <button className='w-full py-4 text-xl font-bold cursor-pointer'>
           {emoji} {teamName}
@@ -379,8 +305,9 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
         </div>
 
         <div className='mt-2 bg-yellow-300 text-green-900 rounded-sm px-3 py-1 text-sm font-semibold text-center'>
-          Gana:
-          <span className='cursor-pointer'>{winPerTicket.toFixed(2)}</span>
+          Pagas ${realtimeBetData.pricePerTicket} — si gana {teamName} te
+          llevas ~${estimatedPayout.toFixed(2)}
+          <span className='block text-xs font-normal'>(estimado)</span>
         </div>
       </div>
     );
@@ -437,7 +364,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               color='bg-green-600 hover:bg-green-700'
               emoji='⚪'
               tickets={ticketsTeamA}
-              betsCount={calculateOdds("A")}
+              stakeShare={stakeSharePercent("A")}
               disabled={ticketsTeamB > 0 || tieTickets > 0}
             />
 
@@ -448,7 +375,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               color='bg-gray-600 hover:bg-gray-700'
               emoji=''
               tickets={tieTickets}
-              betsCount={calculateOdds("C")}
+              stakeShare={stakeSharePercent("C")}
               disabled={ticketsTeamA > 0 || ticketsTeamB > 0}
             />
 
@@ -459,7 +386,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               color='bg-red-600 hover:bg-red-700'
               emoji='🔴'
               tickets={ticketsTeamB}
-              betsCount={calculateOdds("B")}
+              stakeShare={stakeSharePercent("B")}
               disabled={ticketsTeamA > 0 || tieTickets > 0}
             />
           </div>
@@ -481,13 +408,10 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               </span>
               <div>
                 <span className='text-white font-semibold text-base text-start'>
-                  🏆 Gana hasta:{" "}
+                  🏆 Gana hasta (estimado):{" "}
                   <span id='cartWinnings' className='ml-8 sm:ml-0'>
-                    $
-                    {calculateAmericanOddsWinnings(
-                      selectedLetterTeam as "A" | "B" | "C",
-                      totalPrice
-                    ).toFixed(2)}
+                    ~$
+                    {potentialWinnings.toFixed(2)}
                   </span>
                 </span>
               </div>

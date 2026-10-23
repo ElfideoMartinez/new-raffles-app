@@ -5,6 +5,14 @@ import * as admin from "firebase-admin";
 import { getDatabase } from "firebase-admin/database";
 import { getRemoteConfig } from "firebase-admin/remote-config";
 import type express from "express";
+import {
+  DEFAULT_TAKE_RATE,
+  distributableCents,
+  payoutPerTicketCents,
+  poolCents,
+  sanitizeTakeRate,
+  toCents,
+} from "./payout";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -1938,12 +1946,10 @@ export const confirmRejectBetSale = functions.https.onRequest(
       const data = req.body;
       console.log("data", data);
 
-      const { id, action, betSummary } = data;
+      const { id, action } = data;
 
-      if (!id || !action || !betSummary) {
-        res
-          .status(400)
-          .json({ status: 400, message: "Missing id, action, or betSummary" });
+      if (!id || !action) {
+        res.status(400).json({ status: 400, message: "Missing id or action" });
         return;
       }
 
@@ -1955,71 +1961,107 @@ export const confirmRejectBetSale = functions.https.onRequest(
         return;
       }
 
-      if (!Array.isArray(betSummary)) {
-        res.status(400).json({
-          status: 400,
-          message: "Invalid betSummary; must be an array",
+      // Counters are recomputed from the PERSISTED sale document, never from
+      // the client-sent `betSummary` (which is treated as a hint only). See
+      // DESIGN-AUDIT.md B1 and BETS-MATH-AUDIT.md M7-M10.
+      const saleRef = db.collection("salesBets").doc(String(id));
+      const saleSnap = await saleRef.get();
+      if (!saleSnap.exists) {
+        res.status(404).json({ status: 404, message: "Sale not found" });
+        return;
+      }
+      const sale = saleSnap.data() as Record<string, unknown>;
+      const currentlyVerified = sale.verified === true;
+
+      // Idempotency guard (M7/M8): a sale is applied exactly once per state
+      // transition. Re-confirming a confirmed sale or re-rejecting a rejected
+      // sale is a no-op, so double-clicks and replays cannot drift counters.
+      if (action === "confirm" && currentlyVerified) {
+        res.status(200).json({
+          status: 200,
+          message: "Bet sale already confirmed; no changes applied",
         });
         return;
       }
-      for (const bet of betSummary) {
-        const realTimeDbRef = rtdb.ref(`bets/${bet.betId}`);
-        const betSnapshot = await realTimeDbRef.once("value");
-        const betData = betSnapshot.val();
-        console.log("Bet data from Realtime DB:", betData);
-
-        if (!betData) {
-          console.warn(`Bet with ID ${bet.betId} not found in Realtime DB`);
-          continue;
-        }
-        const updates: any = {};
-        console.log("Processing bet:", bet, "with action:", action);
-        if (action === "confirm") {
-          // Update salesBets document to mark it as verified
-          const saleRef = db.collection("salesBets").doc(id);
-          await saleRef.update({
-            verified: true,
-            clientReturns: betData.clientReturns || 0,
-          });
-          // Update bet statistics in Realtime Database.
-          // These are stake counts (= tickets bought), never odds; odds are the
-          // strings oddsTeamA/oddsTeamB and must not be added here.
-          if (bet.team === "A") {
-            updates.betsTeamA =
-              Number(betData.betsTeamA || 0) + bet.ticketNumbers;
-          } else if (bet.team === "B") {
-            updates.betsTeamB =
-              Number(betData.betsTeamB || 0) + bet.ticketNumbers;
-          } else if (bet.team === "C") {
-            updates.tieBets = Number(betData.tieBets || 0) + bet.ticketNumbers;
-          }
-          updates.totalBets = (betData.totalBets || 0) + bet.ticketNumbers;
-          await realTimeDbRef.update(updates);
-        } else if (action === "reject") {
-          const saleRef = db.collection("salesBets").doc(id);
-          await saleRef.update({
-            verified: false,
-            clientReturns: betData.clientReturns || 0,
-          });
-          if (bet.team === "A") {
-            updates.betsTeamA = Number(
-              (betData.betsTeamA || 0) - bet.ticketNumbers
-            );
-          } else if (bet.team === "B") {
-            updates.betsTeamB = Number(
-              (betData.betsTeamB || 0) - bet.ticketNumbers
-            );
-          } else if (bet.team === "C") {
-            updates.tieBets = Number(
-              (betData.tieBets || 0) - bet.ticketNumbers
-            );
-          }
-          updates.totalBets = Number(
-            (betData.totalBets || 0) - bet.ticketNumbers
-          );
-          await realTimeDbRef.update(updates);
-        }
+      if (action === "reject" && !currentlyVerified) {
+        res.status(200).json({
+          status: 200,
+          message: "Bet sale already rejected; no changes applied",
+        });
+        return;
       }
+
+      // Extract validated deltas from the persisted document only.
+      const rawLines = Array.isArray(sale.bets) ? sale.bets : [];
+      const deltas = new Map<
+        string,
+        { team: "A" | "B" | "C"; tickets: number }
+      >();
+      for (const line of rawLines) {
+        const entry = (line ?? {}) as Record<string, unknown>;
+        const betId = typeof entry.betId === "string" ? entry.betId : "";
+        if (!betId) continue;
+        const letter =
+          typeof entry.letterTeam === "string"
+            ? entry.letterTeam.trim().toUpperCase()
+            : "";
+        const team: "A" | "B" | "C" | null =
+          letter === "A" || letter === "B" || letter === "C"
+            ? letter
+            : null;
+        if (!team) continue; // legacy lines without a valid outcome never move counters (M9)
+        const tickets = Number(entry.ticketNumbers);
+        if (!Number.isFinite(tickets) || tickets <= 0) continue; // no string concatenation (M10)
+        const existing = deltas.get(betId);
+        deltas.set(betId, {
+          tickets: (existing?.tickets ?? 0) + tickets,
+          team: existing && existing.team !== team ? existing.team : team,
+        });
+      }
+      if (deltas.size === 0) {
+        res.status(400).json({
+          status: 400,
+          message: "Sale has no valid bet lines to process",
+        });
+        return;
+      }
+
+      // Firestore transaction guards the sale-doc state flip so two concurrent
+      // admin clicks cannot both apply (B1). Counter updates use RTDB
+      // transactions so concurrent sales on the same bet never lose an
+      // increment.
+      await db.runTransaction(async (transaction) => {
+        const fresh = await transaction.get(saleRef);
+        if (!fresh.exists) {
+          throw new Error("Sale disappeared during transaction");
+        }
+        const freshVerified = (fresh.data() as Record<string, unknown>).verified === true;
+        if (action === "confirm" && freshVerified) return; // lost race: already confirmed
+        if (action === "reject" && !freshVerified) return; // lost race: already rejected
+        transaction.update(saleRef, {
+          verified: action === "confirm",
+        });
+      });
+
+      const sign = action === "confirm" ? 1 : -1;
+      for (const [betId, delta] of deltas) {
+        const realTimeDbRef = rtdb.ref(`bets/${betId}`);
+        await realTimeDbRef.transaction((betData: Record<string, unknown> | null) => {
+          if (!betData) return betData; // bet not found; nothing to update
+          const updated = { ...betData };
+          const move = (field: string, amount: number) => {
+            const current = Number(updated[field]) || 0;
+            // Clamp at zero so a reject can never produce negative counters (M8).
+            updated[field] = Math.max(0, current + sign * amount);
+          };
+          if (delta.team === "A") move("betsTeamA", delta.tickets);
+          else if (delta.team === "B") move("betsTeamB", delta.tickets);
+          else move("tieBets", delta.tickets);
+          move("totalBets", delta.tickets);
+          return updated;
+        });
+      }
+
       res.status(200).json({
         status: 200,
         message: "Bet sale processed successfully",
@@ -2034,6 +2076,242 @@ export const confirmRejectBetSale = functions.https.onRequest(
     }
   }
 );
+
+// ---------------------------------------------------------------------------
+// Bet settlement (pari-mutuel pool) — DESIGN-AUDIT.md B2, Option A.
+//
+// ADMIN ONLY. Triggered by an admin once the match has an official result:
+//   POST { betId, result: "A" | "B" | "C" | "VOID" }
+// "VOID" (match cancelled/abandoned with no official result) and a winning
+// outcome with zero tickets both refund every ticket's full stake (see
+// BETS-MODEL-RESEARCH.md section 3). Payout per winning ticket is
+//   floor_to_centavo( poolCents × (1 − takeRate) / winningTickets )
+// and settlement is idempotent: a bet can only be settled once.
+// ---------------------------------------------------------------------------
+async function readTakeRate(): Promise<number> {
+  // Remote Config parameter `betsTakeRate` (e.g. "0.10"); falls back to the
+  // documented default. Remote Config holds no secrets.
+  try {
+    const template = await remoteConfig.getTemplate();
+    const param = template.parameters["betsTakeRate"];
+    const raw =
+      param?.defaultValue && "value" in param.defaultValue
+        ? param.defaultValue.value
+        : undefined;
+    const sanitized = sanitizeTakeRate(raw);
+    if (sanitized !== null) return sanitized;
+  } catch (err) {
+    console.warn("Could not read betsTakeRate from Remote Config:", err);
+  }
+  return DEFAULT_TAKE_RATE;
+}
+
+/** Outcome letter for a persisted salesBets bet line, or null if invalid. */
+function lineOutcome(line: unknown): "A" | "B" | "C" | null {
+  const entry = (line ?? {}) as Record<string, unknown>;
+  const letter =
+    typeof entry.letterTeam === "string"
+      ? entry.letterTeam.trim().toUpperCase()
+      : "";
+  if (letter === "A" || letter === "B" || letter === "C") return letter;
+  // Legacy docs may only carry the team NAME; match it against the bet teams.
+  return null;
+}
+
+interface BetSaleLine {
+  saleRef: admin.firestore.DocumentReference;
+  ticketsByOutcome: { A: number; B: number; C: number };
+}
+
+export const settleBet = functions.https.onRequest(async (req, res) => {
+  if (await rejectUnlessAdmin(req, res)) return;
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+  if (req.method !== "POST") {
+    res.status(405).json({ status: 405, message: "Only POST requests" });
+    return;
+  }
+
+  try {
+    const { betId, result } = req.body as {
+      betId?: unknown;
+      result?: unknown;
+    };
+    if (typeof betId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(betId)) {
+      res.status(400).json({ status: 400, message: "Invalid betId" });
+      return;
+    }
+    const outcome =
+      typeof result === "string" ? result.trim().toUpperCase() : "";
+    if (outcome !== "A" && outcome !== "B" && outcome !== "C" && outcome !== "VOID") {
+      res.status(400).json({
+        status: 400,
+        message: 'Invalid result; must be "A", "B", "C", or "VOID"',
+      });
+      return;
+    }
+
+    const takeRate = await readTakeRate();
+
+    // Load the bet (RTDB is the live source for admin-created bets; Firestore
+    // mirrors it). Settlement state lives on both.
+    const rtdbRef = rtdb.ref(`bets/${betId}`);
+    const betSnapshot = await rtdbRef.once("value");
+    const rtdbBet = betSnapshot.val() as Record<string, unknown> | null;
+    const firestoreId = rtdbBet ? String(rtdbBet.firestoreId ?? "") : "";
+    const firestoreBetRef = firestoreId
+      ? db.collection("bets").doc(firestoreId)
+      : null;
+    const firestoreBetSnap = firestoreBetRef ? await firestoreBetRef.get() : null;
+    const firestoreBet = firestoreBetSnap?.data() as Record<string, unknown> | undefined;
+
+    if (!rtdbBet && !firestoreBet) {
+      res.status(404).json({ status: 404, message: "Bet not found" });
+      return;
+    }
+
+    const sourceBet = rtdbBet ?? firestoreBet!;
+    // Idempotency: never settle twice.
+    if (sourceBet.settled === true) {
+      res.status(200).json({
+        status: 200,
+        message: "Bet already settled; no changes applied",
+        alreadySettled: true,
+      });
+      return;
+    }
+
+    const pricePerTicket = Number(sourceBet.pricePerTicket);
+    if (!Number.isFinite(pricePerTicket) || pricePerTicket <= 0) {
+      res
+        .status(400)
+        .json({ status: 400, message: "Bet has an invalid pricePerTicket" });
+      return;
+    }
+
+    // Recompute counters from the PERSISTED salesBets docs (M4/B1: never from
+    // the live RTDB counters, which may have drifted).
+    const salesSnapshot = await db.collection("salesBets").get();
+    const salesByOutcome: BetSaleLine[] = [];
+    const ticketsByOutcome = { A: 0, B: 0, C: 0 };
+    salesSnapshot.forEach((doc) => {
+      if (doc.get("verified") !== true) return;
+      const rawLines = doc.get("bets");
+      if (!Array.isArray(rawLines)) return;
+      const saleLine: BetSaleLine = {
+        saleRef: doc.ref,
+        ticketsByOutcome: { A: 0, B: 0, C: 0 },
+      };
+      for (const line of rawLines) {
+        const entry = (line ?? {}) as Record<string, unknown>;
+        if (entry.betId !== betId) continue;
+        const team = lineOutcome(line);
+        if (!team) continue;
+        const tickets = Number(entry.ticketNumbers);
+        if (!Number.isFinite(tickets) || tickets <= 0) continue;
+        saleLine.ticketsByOutcome[team] += tickets;
+        ticketsByOutcome[team] += tickets;
+      }
+      if (
+        saleLine.ticketsByOutcome.A +
+          saleLine.ticketsByOutcome.B +
+          saleLine.ticketsByOutcome.C >
+        0
+      ) {
+        salesByOutcome.push(saleLine);
+      }
+    });
+
+    const totalTickets = ticketsByOutcome.A + ticketsByOutcome.B + ticketsByOutcome.C;
+    const pool = poolCents(totalTickets, pricePerTicket);
+    const distributable = distributableCents(pool, takeRate);
+
+    const isVoid = outcome === "VOID";
+    const winningTickets = isVoid ? 0 : ticketsByOutcome[outcome as "A" | "B" | "C"];
+    const refundAll = isVoid || winningTickets === 0;
+
+    // Refund-all (void or zero winning tickets): every ticket gets its full
+    // stake back and the organizer keeps nothing.
+    const perTicketCents = refundAll
+      ? toCents(pricePerTicket)
+      : payoutPerTicketCents(distributable, winningTickets);
+
+    // Write per-sale payout fields.
+    const batch = db.batch();
+    for (const sale of salesByOutcome) {
+      const winningForSale = isVoid
+        ? 0
+        : sale.ticketsByOutcome[outcome as "A" | "B" | "C"];
+      const payoutForSaleCents = refundAll
+        ? toCents(
+            pricePerTicket *
+              (sale.ticketsByOutcome.A +
+                sale.ticketsByOutcome.B +
+                sale.ticketsByOutcome.C)
+          )
+        : perTicketCents * winningForSale;
+      const lineStatus = refundAll
+        ? "refund"
+        : winningForSale > 0
+        ? "paid"
+        : "lost";
+      batch.update(sale.saleRef, {
+        payout: payoutForSaleCents / 100,
+        payoutStatus: lineStatus,
+        [`settlements.${betId}`]: {
+          result: outcome,
+          payoutPerTicket: perTicketCents / 100,
+          status: lineStatus,
+          tickets: sale.ticketsByOutcome,
+          takeRate,
+          settledAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+      });
+    }
+    await batch.commit();
+
+    // Mark the bet settled with the outcome and per-ticket payout.
+    const settledFields = {
+      settled: true,
+      result: outcome,
+      payoutPerTicket: perTicketCents / 100,
+      totalTickets,
+      pool: pool / 100,
+      takeRate,
+      settledAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    if (firestoreBetRef && firestoreBetSnap?.exists) {
+      await firestoreBetRef.update(settledFields);
+    }
+    await rtdbRef.update({ ...settledFields, settledAt: Date.now() });
+
+    res.status(200).json({
+      status: 200,
+      message: "Bet settled successfully",
+      betId,
+      result: outcome,
+      refundAll,
+      totalTickets,
+      pool: pool / 100,
+      takeRate,
+      payoutPerTicket: perTicketCents / 100,
+      salesUpdated: salesByOutcome.length,
+    });
+  } catch (err) {
+    console.error("Error settling bet:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Error settling bet",
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+});
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createBet = functions.https.onRequest(async (req, res) => {
