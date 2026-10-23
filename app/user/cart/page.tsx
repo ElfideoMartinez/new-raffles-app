@@ -64,7 +64,7 @@ const UserCartPage = () => {
       <header className="flex justify-center mt-2">
         <h1>Carrito</h1>
       </header>
-      <ul className='flex w-screen overflow-hidden flex-col'>
+      <ul className='flex w-full overflow-hidden flex-col'>
         {tickets.map((ticket: any) => (
           <li key={ticket.raffleId}>
             <div className="ml-2">
@@ -115,7 +115,7 @@ const UserCartPage = () => {
           </li>
         ))}
       </ul>
-      <ul className="flex w-screen overflow-hidden flex-col px-2 py-2">
+      <ul className="flex w-full overflow-hidden flex-col px-2 py-2">
         {userCartBets.map((bet) => (
           <div key={bet.betId} className="flex justify-between">
             <div>
