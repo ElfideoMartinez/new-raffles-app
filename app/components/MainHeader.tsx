@@ -14,7 +14,6 @@ const MainHeader = () => {
   const router = useRouter();
   const pathName = usePathname();
   const isMain = pathName === '/' || pathName === '/admin/dashboard' || pathName === '/checkout/success';
-  const isCartIconAvailable = pathName === '/checkout/success';
   //console.log(pathName);
 
   useEffect(() => {
@@ -58,7 +57,7 @@ const MainHeader = () => {
             </span>
           </Link>
 
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center ${isCartIconAvailable ? 'hidden' : ''}`}>
+          <div className='flex h-10 w-10 shrink-0 items-center justify-center'>
             <CartButton />
           </div>
         </div>

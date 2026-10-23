@@ -303,7 +303,7 @@ as a new item surfaced by the e2e work.
 | F3 | FIXED 2026-10-22: base `button/a/[role=button]:focus-visible` recipe added in `@layer components` (globals.css); `.focus-ring` stays for opt-in use. |
 | F18 | RESOLVED 2026-10-22: both call sites now use `formatDate`/`formatDateTime`; grep confirms 0 `toLocaleDateString`/`toLocaleString` remain in `app/`. |
 | F27 | RESOLVED 2026-10-22: stale commented-out old recipe (with `disabled:bg-gray-500`) deleted; live button already matched the ratified recipe (`bg-brand-600`, `disabled:bg-brand-300`, `rounded-pill`). |
-| F29 | Cart now hides via `hidden` (not `invisible`), so it is no longer focusable — but `isCartIconAvailable` still returns true on `/checkout/success`, which is exactly when the empty cart would be useful. |
+| F29 | RESOLVED 2026-10-22: `isCartIconAvailable` removed; CartButton now renders on every page including `/checkout/success`, where the (now empty) cart is most useful. |
 
 ### Still open (21)
 
