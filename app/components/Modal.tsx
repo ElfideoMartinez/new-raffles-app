@@ -1,5 +1,6 @@
 
 import React from "react";
+import Dialog from "./Dialog";
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,16 +9,10 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
-      onClick={onClose}
-    >
+    <Dialog open={isOpen} onClose={onClose}>
       <div
         className="relative max-w-full max-h-full p-4 overflow-hidden"
-        onClick={(e) => e.stopPropagation()} 
       >
         <button
           onClick={onClose}
@@ -34,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, imageUrl }) => {
           className="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain rounded-card shadow-lg"
         />
       </div>
-    </div>
+    </Dialog>
   );
 };
 

@@ -7,6 +7,7 @@ import { FadeLoader } from "react-spinners";
 import { onValue, ref, set, update } from "firebase/database";
 import { realtimeDB } from "@/app/firebaseconfig";
 import { formatDate, formatPrice } from "@/app/utils/format";
+import Dialog from "@/app/components/Dialog";
 
 interface IBetsData {
   id: string;
@@ -83,10 +84,10 @@ function EditBetModal({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+    <Dialog open={isOpen} onClose={onClose} labelledBy="edit-bet-title">
       <div className='bg-white rounded-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
         <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-xl font-bold text-ink-900'>Editar Apuesta</h2>
+          <h2 id='edit-bet-title' className='text-xl font-bold text-ink-900'>Editar Apuesta</h2>
           <button
             onClick={onClose}
             className='text-ink-500 hover:text-ink-900 text-2xl'
@@ -228,7 +229,7 @@ function EditBetModal({
           </div>
         </form>
       </div>
-    </div>
+    </Dialog>
   );
 }
 
