@@ -41,7 +41,8 @@ body {
        1.86:1 at the accent-400 end; ink-900 is 9.59:1. Do not revert. */
     color: var(--color-ink-900);
     font-weight: bold;
-    font-size: 1.1rem;
+    /* F17: aligned with Tailwind text-lg (1.125rem); was a 1.1rem oddity. */
+    font-size: 1.125rem;
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 1.5rem;

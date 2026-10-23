@@ -320,7 +320,7 @@ as a new item surfaced by the e2e work.
 | F26 | high | `quickTicket/play/page.tsx:112,198,202`, `admin/quickTickets/active:159` | English leaked into customer-visible screens ("Ticket ID", "No ticket found", "Please try again later", "Set Active"). | Translate the customer-facing strings. |
 | F15 | medium | 4 radii families in live use | Cards 1rem, bet 0.75rem, admin 0.5rem, chips 0.375rem — contradicts ratified A3b. | Re-map to the A3b ladder. |
 | F16 | medium | `.random-ticket-button` (1.5rem) vs `rounded-pill` CTA | Two primary-button shapes live. A3b ratified keeping 1.5rem, so this is intentional — but it still reads as drift on screen. | Confirm as intended (then close) or unify. |
-| F17 | medium | `globals.css:57` | `font-size: 1.1rem` is the only raw font size outside Tailwind. | `text-lg`. |
+| F17 | `.random-ticket-button` font-size 1.1rem → 1.125rem (text-lg equivalent); grep confirms no other raw font sizes remain. |
 | F19 | medium | `admin/bets:288,293,324,336,348` | Prices interpolated as `$${value}` / `parseFloat(...)` instead of `formatPrice`. | Route through `formatPrice`. |
 | F20 | `layout.tsx:10` "en linea"→"en línea"; `RafflePageClient.tsx:119` toast "Listo! tu numero"→"¡Listo! Tu número". The other cited spots (`admin/page.tsx`, terms page) already carry correct accents in current source. |
 | F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). |
