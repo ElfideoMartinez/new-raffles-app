@@ -258,7 +258,7 @@ Severity: **blocker** = breaks use or WCAG A/AA on a primary flow · **high** = 
 | F33 | nit | `bet/[id]:498` | `disabled:opacity-55` — not in Tailwind's scale (55 ≠ 50/60) → silently dropped. | `disabled:opacity-50`. | **Mechanical**. |
 | F34 | nit | `quickTicket/play:279` (audit originally cited `bet/[id]:171`, which is now clean) | `bg-gradient-to-r` + `bg-blue-500` both set → flat bg is dead code. | Remove `bg-blue-500`. | **Mechanical**. |
 | F35 | nit | `Modal.tsx:24` | `focus:outline-none` removes the only focus cue on the close button. | Remove it; add the shared focus recipe. | **Mechanical**. |
-| F36 | nit | `DeleteRaffleModal.tsx:16`, cart ×2, header ×2 | PNG icons recoloured with `filter: invert` — breaks if the asset has any colour. | Replace with inline SVG `currentColor` (cart already has the svg commented out). | **Judgement** (asset work). |
+| F36 | nit | `DeleteRaffleModal.tsx:16`, cart ×2, header ×2 | PNG icons recoloured with `filter: invert` — breaks if the asset has any colour. | Replace with inline SVG `currentColor` (cart already has the svg commented out). | **Judgement** (asset work). FIXED 2026-10-23: all 5 PNG icons replaced with inline SVG `currentColor` (`text-white`). |
 | F37 | nit | `accessibility` ×3 only (`aria-label`) | Only 3 `aria-label`s in the whole app. | See component patterns. | — |
 | F38 | nit | `ImageModal.tsx:32-37` | Proof image `64×96` with default `object-fit:fill` → stretched receipts. | `object-cover` + `rounded`. | **Mechanical**. |
 | F39 | nit | `globals.css:16-18` | Create-next-app scaffold vars (`--foreground-rgb` etc.) still present. | Remove with F2. | **Mechanical**. |
@@ -325,7 +325,7 @@ as a new item surfaced by the e2e work.
 | F21 | medium | `checkout/transfer` vs storefront | *usted* on checkout, *tú* on the shop. | Pick one (Q6, still open). | FIXED 2026-10-23: `checkout/transfer` copy now uses `tú`. |
 | F25 | medium | admin area | Half dark, half light historically; A4a ratified light everywhere, but check each admin route actually got converted. | Verify `admin/create/bet` and `admin/bets` render light. |
 | F28 | medium | `TicketButton.tsx:72-73` | `bg-yellow-400` means both "in cart" and "selected". | FIXED 2026-10-23: selected now `bg-brand-600`; `bg-yellow-400` only means in-cart. |
-| F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. |
+| F36 | nit | cart ×2, `DeleteRaffleModal:17`, `MainHeader:34` | PNG icons recoloured with `filter: invert`. | Inline SVG with `currentColor`. FIXED 2026-10-23. |
 | F37 | nit | app-wide | 8 `aria-label`s total. | Component-by-component pass. |
 | F38 | nit | `ImageModal.tsx` | Proof image sizing/`object-fit` not verified in current source. | Re-check before fixing. |
 
