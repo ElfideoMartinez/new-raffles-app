@@ -222,6 +222,14 @@ iOS/PWA delivery specifics (no manifest.json yet — see notifications research
 §3); foreground vs background handler. Reproduce with a registered token,
 check the `sendEachForMulticast` response (success vs unregistered), and fix.
 
+### 21. Merge "Editar Apuesta" into "Administrar apuesta" (Daniel, 12:11)
+Keep one admin bets tab ("Administrar apuesta") that carries both functions —
+editing the bet (dates, teams, status) and the settle control. Remove the
+separate "Editar Apuesta" dashboard entry and fold /admin/edit/bet in
+(redirect or absorb it); the `/admin/bets` page already contains an
+"Editar Apuesta" section — build the unified tab on that. Update the
+dashboard group and admin nav accordingly.
+
 ---
 
 ### 13. Winner retrieval without AI
