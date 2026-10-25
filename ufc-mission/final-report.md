@@ -2,7 +2,18 @@
 **Run:** 2026-10-24 17:15 CST | **Agent:** Chief of Staff
 
 ## Status
-`AWAITING_COMPLETION_VERIFICATION` -> `VERIFIED_COMPLETE` (operationally: event done, core money path proven; settlement verification remains open as a hard blocker recorded in state notes).
+`AWAITING_COMPLETION_VERIFICATION` -> `VERIFIED_COMPLETE` (event done, core money path proven, test-bet settlement verified — see `settlement-verification-2026-10-25.md`).
+
+> **Update 2026-10-25 ~08:30 CST:** Settlement is no longer HELD. With Daniel's
+> explicit go, both test bets were settled and verified end-to-end
+> (`settlement-verification-2026-10-25.md`): Pico $45.00/boleto (pool $300),
+> Volkanovski $83.33/boleto (pool $2,500); `settleBet` idempotency re-check
+> returned `alreadySettled` with no duplicates; winner banner live on `/bet/[id]`.
+> Backlog 13 decision RATIFIED: **ASSISTED settlement** (admin confirms winner;
+> system does payouts + notifications; auto-settlement from sports APIs
+> rejected/deferred). Winner notifications implemented in `settleBet`
+> (per-sale FCM push + in-app `notifications/{betId}__{saleId}` records,
+> idempotent) and deployed. Known finding: `/bet` LIST cards show no winner badge.
 
 ## 1. Event complete + final results (event-card.md updated)
 Event over; all 14 bouts concluded. Main card (final, per Daniel's 15:26 CST summary — provenance warning retained, not independently verified):
@@ -12,8 +23,11 @@ Event over; all 14 bouts concluded. Main card (final, per Daniel's 15:26 CST sum
 - Volkov def. Kuniev — Decision R3
 - Pico def. Keita — KO/TKO R1 1:14
 
-## 2. Test bet settlement — HELD, not settled
-Not executed. Reasons: no admin settle control exists (backlog 13b, P0); scripted ID-token minting is blocked (service account lacks `iam.serviceAccounts.signBlob`); Daniel explicitly chose HOLD at the end of the prior session, and this unattended run will not override a human decision or mutate sale records. Therefore **winner banner UI and `settleBet` payout maths remain UNVERIFIED**. Recommend next step: build the settle control, then settle Pico then Volkanovski on test data with Daniel's go-ahead.
+## 2. Test bet settlement — DONE 2026-10-25 (was HELD)
+Settled and verified with Daniel's explicit go; full evidence in
+`settlement-verification-2026-10-25.md` (payout maths, idempotency re-check,
+banner screenshots `evidence-banner-pico-45.jpg` / `evidence-banner-volkanovski-83.jpg`).
+Winner notifications shipped in `settleBet` (backlog 13, assisted settlement).
 
 ## 3. Test admin account — REMINDER (action required by Daniel)
 `ufc-test-1792801216865@example.com` (uid `XjFG5wIoBTYBxHUXysxTOYVuNOu1`) still has `admin: true`. Delete or de-privilege it via Firebase console before any real launch.
@@ -22,9 +36,9 @@ Not executed. Reasons: no admin settle control exists (backlog 13b, P0); scripte
 **Verified (evidence in close-out.md):** transfer sale -> admin confirm -> counters (live RTDB check); admin auth claims; CORS on 16 admin functions; public API 200s; clean builds; fixes 1-4 (CORS ordering, white-screen error states, totalBets derivation, /admin/edit/bet loader crash).
 
 **Unverified — do NOT claim working:**
-- Winner banner (never rendered a settled bet)
-- `settleBet` (deployed, never executed)
-- Batch winner messaging (does not exist)
+- Winner banner (live on `/bet/[id]` for both settled test bets; `/bet` list cards still lack the badge)
+- `settleBet` (executed, idempotency verified)
+- Batch winner messaging (built + deployed 2026-10-25; verified idempotent on already-settled bets — no duplicate sends)
 - Instagram content (never posted; account does not exist)
 - Bet cutoff (not implemented — T15)
 

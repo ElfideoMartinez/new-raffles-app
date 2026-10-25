@@ -2144,6 +2144,126 @@ interface BetSaleLine {
   ticketsByOutcome: { A: number; B: number; C: number };
 }
 
+interface BetSaleNotification {
+  saleId: string;
+  name: string;
+  phone: string;
+  email: string;
+  userId: string | null;
+  status: "paid" | "lost" | "refund";
+  tickets: number;
+  payoutCents: number;
+}
+
+function outcomeName(
+  outcome: "A" | "B" | "C" | "VOID",
+  teams: { a?: unknown; b?: unknown }
+): string {
+  if (outcome === "VOID") return "VOID (evento anulado)";
+  if (outcome === "C") return "Empate";
+  const name = outcome === "A" ? teams.a : teams.b;
+  return typeof name === "string" && name.trim() !== ""
+    ? name.trim()
+    : `Equipo ${outcome}`;
+}
+
+/**
+ * Batch winner/settlement notifications for a just-settled bet (backlog 13).
+ *
+ * Best effort: a notification failure never fails or rolls back settlement.
+ * Channels, mirroring the app's existing infrastructure:
+ *  - FCM push to every registered token in `notificationTokens` (same
+ *    broadcast channel as `sendPurchaseNotifications`; tokens are device-level
+ *    in this app, not per-buyer).
+ *  - One in-app record per sale in the Firestore `notifications` collection,
+ *    which is also the idempotency ledger: doc id `${betId}__${saleId}`.
+ *    Re-settlement cannot duplicate sends because settleBet returns early on
+ *    `settled === true`, and a record that already exists is skipped.
+ */
+async function notifyBetSettlement(
+  betId: string,
+  sourceBet: Record<string, unknown>,
+  outcome: "A" | "B" | "C" | "VOID",
+  perTicketCents: number,
+  refundAll: boolean,
+  sales: BetSaleNotification[]
+): Promise<void> {
+  try {
+    if (sales.length === 0) return;
+    const teams = (sourceBet.teams ?? {}) as { a?: unknown; b?: unknown };
+    const title =
+      typeof sourceBet.title === "string" && sourceBet.title.trim() !== ""
+        ? sourceBet.title.trim()
+        : betId;
+    const winnerName = outcomeName(outcome, teams);
+    const perTicket = (perTicketCents / 100).toFixed(2);
+    const matchup = `${teams.a ?? "A"} vs ${teams.b ?? "B"}`;
+
+    const tokensSnapshot = await db.collection("notificationTokens").get();
+    const tokens: string[] = [];
+    tokensSnapshot.forEach((doc) => {
+      const token = doc.get("token");
+      if (typeof token === "string" && token) tokens.push(token);
+    });
+
+    for (const sale of sales) {
+      const notifRef = db.doc(`notifications/${betId}__${sale.saleId}`);
+      if ((await notifRef.get()).exists) continue; // idempotent re-send guard
+
+      let notifType: string;
+      let pushTitle: string;
+      let body: string;
+      if (refundAll) {
+        notifType = "refund";
+        pushTitle = "Apuesta reembolsada";
+        body = `Tu apuesta en "${title}" (${matchup}) fue reembolsada: ${sale.tickets} boleto(s), $${perTicket} por boleto = $${(
+          sale.payoutCents / 100
+        ).toFixed(2)}. Bet: ${betId}.`;
+      } else if (sale.status === "paid") {
+        notifType = "won";
+        pushTitle = "🏆 ¡Ganaste!";
+        body = `Ganaste $${(sale.payoutCents / 100).toFixed(2)} en "${title}" (${matchup}): ganó ${winnerName}. ${sale.tickets} boleto(s) × $${perTicket}/boleto. Bet: ${betId}.`;
+      } else {
+        notifType = "lost";
+        pushTitle = "Apuesta liquidada";
+        body = `La apuesta "${title}" (${matchup}) fue liquidada: ganó ${winnerName}. Tus ${sale.tickets} boleto(s) no resultaron ganadores. Bet: ${betId}.`;
+      }
+
+      await notifRef.set({
+        betId,
+        saleId: sale.saleId,
+        userId: sale.userId,
+        name: sale.name,
+        phone: sale.phone,
+        email: sale.email,
+        type: notifType,
+        title: pushTitle,
+        body,
+        betTitle: title,
+        matchup,
+        winnerName,
+        result: outcome,
+        perTicketPayout: perTicketCents / 100,
+        payout: sale.payoutCents / 100,
+        tickets: sale.tickets,
+        read: false,
+        channel: "fcm+inapp",
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      if (tokens.length > 0) {
+        await admin.messaging().sendEachForMulticast({
+          tokens,
+          notification: { title: pushTitle, body },
+          data: { betId, saleId: sale.saleId, type: notifType },
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Winner/settlement notifications failed (best effort):", err);
+  }
+}
+
 export const settleBet = functions.https.onRequest(async (req, res) => {
   if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
@@ -2261,6 +2381,7 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
 
     // Write per-sale payout fields.
     const batch = db.batch();
+    const saleNotifications: BetSaleNotification[] = [];
     for (const sale of salesByOutcome) {
       const winningForSale = isVoid
         ? 0
@@ -2278,6 +2399,20 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
         : winningForSale > 0
         ? "paid"
         : "lost";
+      const saleDoc = await sale.saleRef.get();
+      saleNotifications.push({
+        saleId: sale.saleRef.id,
+        name: String(saleDoc.get("name") ?? ""),
+        phone: String(saleDoc.get("phone") ?? ""),
+        email: String(saleDoc.get("email") ?? ""),
+        userId: saleDoc.get("userId") ?? null,
+        status: lineStatus as BetSaleNotification["status"],
+        tickets:
+          sale.ticketsByOutcome.A +
+          sale.ticketsByOutcome.B +
+          sale.ticketsByOutcome.C,
+        payoutCents: payoutForSaleCents,
+      });
       batch.update(sale.saleRef, {
         payout: payoutForSaleCents / 100,
         payoutStatus: lineStatus,
@@ -2308,6 +2443,17 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
     }
     await rtdbRef.update({ ...settledFields, settledAt: Date.now() });
 
+    // Backlog 13: batch winner/settlement notifications (assisted-settlement
+    // flow ratified 2026-10-25). Best effort; never blocks the response.
+    await notifyBetSettlement(
+      betId,
+      sourceBet,
+      outcome as "A" | "B" | "C" | "VOID",
+      perTicketCents,
+      refundAll,
+      saleNotifications
+    );
+
     res.status(200).json({
       status: 200,
       message: "Bet settled successfully",
@@ -2319,6 +2465,7 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
       takeRate,
       payoutPerTicket: perTicketCents / 100,
       salesUpdated: salesByOutcome.length,
+      notificationsQueued: saleNotifications.length,
     });
   } catch (err) {
     console.error("Error settling bet:", err);

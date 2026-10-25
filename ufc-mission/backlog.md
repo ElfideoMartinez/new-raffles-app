@@ -10,6 +10,13 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (finding, /bet list winner badge)**: the `/bet` list page shows
+  NO winner badge on settled bet cards (Volkanovski/Pico cards show only "REPARTO
+  ACTUAL"); the RESULTADO OFICIAL banner appears only on `/bet/[id]` detail.
+  Evidence: `ufc-mission/settlement-verification-2026-10-25.md` and screenshots
+  `evidence-banner-pico-45.jpg` / `evidence-banner-volkanovski-83.jpg`. Also noted:
+  Kavanagh card shows "Apuesta Finalizada" (`isFinished`) without ever being settled
+  — follow-up.
 - **Done 2026-10-25 (backlog 13b, admin settle control)**: `/admin/bets` now has a
   per-bet "Liquidar" button (hidden behind a "✓ Liquidada" badge once `settled === true`)
   opening a settlement modal: A/B/Empate/VOID choice, per-ticket payout preview with an
@@ -99,6 +106,21 @@ Determine the official winner programmatically instead of an admin typing it int
 scraped data) vs. assisted settlement (scrape pre-fills `result`, admin confirms).
 Recommend **assisted** — same time saved, human stays on the money. Scraping an
 undocumented endpoint to decide payouts is a real risk of paying the wrong people.
+
+**DECISION RATIFIED 2026-10-25 (Daniel, explicit go): ASSISTED settlement.** An
+admin confirms the winner (sports data may pre-fill `result`); the system does
+payouts and notifications. **Auto-settlement from sports APIs is REJECTED/deferred.**
+Winner-notification batch messaging built 2026-10-25: `settleBet` now sends, after
+a successful settle, one notification per buyer sale — winners get "🏆 ¡Ganaste!
+$X" and losers a "bet settled" notice (refund for VOID/zero-winning-ticket),
+including bet id, matchup/title, winner name, per-ticket payout and per-sale
+ticket totals. Channels: FCM push to registered `notificationTokens` (same
+channel as `sendPurchaseNotifications`) + in-app record per sale in the
+`notifications` Firestore collection (doc id `${betId}__${saleId}`), which also
+serves as the idempotency ledger — re-settlement returns early on `settled:true`
+and existing records are never re-sent. Evidence: `functions/src/index.ts`
+(`notifyBetSettlement`), tsc clean, deployed and verified 2026-10-25 on the
+already-settled test bets (see `ufc-mission/settlement-verification-2026-10-25.md`).
 
 ### 13b. No settle control in the admin UI  [P0 — blocks settlement]
 **Done 2026-10-25** — see the Done entry at the top of this file (settle modal on
