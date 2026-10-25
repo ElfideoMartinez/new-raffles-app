@@ -55,3 +55,6 @@ firebase-debug.*.log
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# generated UI screenshots (local artifacts)
+/screenshots/

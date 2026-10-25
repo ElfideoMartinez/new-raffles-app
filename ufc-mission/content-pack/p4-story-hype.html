@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1080px; height: 1920px; overflow: hidden; }
+  .stage {
+    position: relative; width: 1080px; height: 1920px;
+    background: url('file:///Users/danielmartinez/.openclaw/media/tool-image-generation/p4-story-bg---cb5c9a15-a9fe-4228-bdef-f66d465b4c7b.jpg') center/cover no-repeat;
+    font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    color: #fff;
+  }
+  .scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 38%, rgba(0,0,0,.72) 62%, rgba(0,0,0,.88) 100%);
+  }
+  .live {
+    position: absolute; top: 120px; left: 60px;
+    background: #e63946; color: #fff; font-size: 34px; font-weight: 900;
+    padding: 14px 34px; border-radius: 12px; letter-spacing: 6px;
+  }
+  .title {
+    position: absolute; top: 210px; left: 0; right: 0; text-align: center;
+    font-size: 92px; font-weight: 900; letter-spacing: 4px; line-height: 1.15;
+    text-shadow: 0 4px 28px rgba(0,0,0,.95);
+  }
+  .sub {
+    position: absolute; top: 470px; left: 0; right: 0; text-align: center;
+    font-size: 40px; font-weight: 900; color: #f5c542; letter-spacing: 8px;
+    text-shadow: 0 3px 18px rgba(0,0,0,.95);
+  }
+  .pollzone {
+    position: absolute; top: 900px; left: 0; right: 0; text-align: center;
+  }
+  .pollhint {
+    display: inline-block; font-size: 34px; color: #ffd766; font-weight: 900;
+    background: rgba(0,0,0,.55); padding: 12px 30px; border-radius: 30px;
+    border: 2px dashed #f5c542; letter-spacing: 1px;
+  }
+  .winner {
+    position: absolute; bottom: 260px; left: 0; right: 0; text-align: center;
+    font-size: 40px; font-weight: 900; color: #f5c542; letter-spacing: 2px;
+    text-shadow: 0 3px 18px rgba(0,0,0,.95);
+  }
+  .cta {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 150px;
+    background: linear-gradient(90deg, #e63946, #8b0000);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px;
+  }
+  .cta .big { font-size: 44px; font-weight: 900; letter-spacing: 2px; color: #fff; }
+  .cta .small { font-size: 30px; font-weight: 900; color: #ffd766; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="scrim"></div>
+    <div class="live">🔴 EN VIVO</div>
+    <div class="title">ESTELAR<br>EN CAMINO</div>
+    <div class="sub">VOLKANOVSKI VS EVLOEV</div>
+    <div class="pollzone">
+      <span class="pollhint">📍 zona reservada para la encuesta</span>
+    </div>
+    <div class="winner">🏆 GANADOR DE LA RIFA SE ANUNCIA HOY EN LA TARDE</div>
+    <div class="cta">
+      <div class="big">TUS BOLETOS AQUÍ</div>
+      <div class="small">LINK AQUÍ ⬆ · LINK EN BIO</div>
+    </div>
+  </div>
+</body>
+</html>

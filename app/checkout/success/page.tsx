@@ -2,6 +2,8 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
+import { useCheckoutSuccessConfig } from "@/app/config/checkoutSuccessConfig";
+import { useStorefrontConfig } from "@/app/config/storefrontConfig";
 
 interface IRaffle {
   raffleId: string;
@@ -25,6 +27,12 @@ const SuccessPage = () => {
   const cleanCart = useTicketStore((state) => state.cleanCart);
   const cleanBets = useTicketStore((state) => state.clearCartBets);
   const cleanSelected = useTicketStore((state) => state.clearSelectedTickets);
+  // Copy is runtime-editable from /admin/config; falls back to the original
+  // hardcoded strings if the Firestore doc is absent.
+  const copy = useCheckoutSuccessConfig();
+  // Contact lines come from the shared storefront config so /contact,
+  // /checkout/success and the transfer page can never disagree.
+  const contact = useStorefrontConfig();
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [ticketCount, setTicketCount] = useState(0);
@@ -75,30 +83,27 @@ const SuccessPage = () => {
   return (
     <div className='flex flex-col w-full items-center mt-7 px-7 text-center gap-3'>
       <p>
-    🎉 <strong>¡Gracias por tu compra!</strong> 🎉<br/><br/>
-        Para conocer al ganador, ingresa a la página de la rifa el día que finalice.
+        <strong>{copy.thanksTitle}</strong>
+        <br/><br/>
+        {copy.winnerWhere}
       </p>
-      <p> 
-        Ahí mismo donde escogiste tus boletos se publicará el número ganador.<br/>
-        ¡Guarda ese enlace y mucha suerte! 🍀
+      <p>
+        {copy.winnerHow}
       </p>
-      {ticketCount > 5 ? 
-        <div>
-          <p>Ojo 👀 <br></br>Como tu compra fue de mas de 5 boletos, tus boletos comprados seguiran apareciendo como disponibles,<br></br> 
-          una vez verificada tu transferencia te lo haremos saber por medio de whatsapp y tus boletos apareceran como vendidos.</p>
-        </div> 
-      : 
-        <div>
-          <p>✅ Hemos registrado tu compra por transferencia. <br></br>
-            Una vez que verifiquemos el pago, te avisaremos por WhatsApp.</p>
-        </div>
-      }
-      <p>Si tienes cualquier duda o necesitas más información, no dudes en ponerte en contacto con nosotros</p>
-      <p>📧 Correo: ealejandramtzq04@gmail.com<br/>
-         📞 Teléfono: 6391316226
+      <div>
+        <p className='whitespace-pre-line'>
+          {ticketCount > 5 ? copy.manyTicketsNote : copy.fewTicketsNote}
+        </p>
+      </div>
+      <p>{contact.contactIntro}</p>
+      <p>
+        {contact.contactEmail ? <>📧 Correo: {contact.contactEmail}<br/></> : null}
+        {contact.contactPhones.map((phone) => (
+          <span key={phone}>📞 Teléfono: {phone}<br/></span>
+        ))}
       </p>
       <Link href='../' className='p-2 mt-4 rounded-card' style={{ backgroundColor: "var(--color-brand-700)" }}>
-        Ir a inicio
+        {copy.homeButtonLabel}
       </Link>
     </div>
   );

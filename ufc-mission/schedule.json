@@ -1,0 +1,10 @@
+{
+  "timezone": "America/Chihuahua (CST, UTC-6)",
+  "jobs": [
+    {"id": "e92a98ea-16da-4845-9c77-e5a01bbc6a1d", "name": "ufc-mission-pre-event", "atUTC": "2026-10-24T13:30:00Z", "local": "2026-10-24 07:30 CST", "condition": "pre-event readiness + final card check + odds + mock tests P0/P1", "status": "scheduled", "delivery": "telegram:5262019985"},
+    {"id": "f927d087-45ff-479d-b686-d0a176405fb2", "name": "ufc-mission-monitoring", "atUTC": "2026-10-24T18:30:00Z", "local": "2026-10-24 12:30 CST", "condition": "mid-event monitoring, fight cutoffs, card-change check", "status": "scheduled", "delivery": "telegram:5262019985"},
+    {"id": "032005ec-6a21-489a-b095-ac421b9f9a45", "name": "ufc-mission-completion", "atUTC": "2026-10-24T23:30:00Z", "local": "2026-10-24 17:30 CST", "condition": "verify event complete (retry hourly if not); then schedule ufc-mission-final-report at completion+2h", "status": "scheduled", "delivery": "telegram:5262019985"},
+    {"id": "TBD", "name": "ufc-mission-final-report", "atUTC": "created by completion job", "local": "verified event completion + 2h", "condition": "write final-report.md, reconcile numbers, set VERIFIED_COMPLETE", "status": "pending-creation"}
+  ],
+  "survivesRestart": "gateway automations store (sqlite)"
+}

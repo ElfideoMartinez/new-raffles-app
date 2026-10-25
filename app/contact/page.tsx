@@ -1,11 +1,19 @@
+"use client";
+import { useStorefrontConfig } from "@/app/config/storefrontConfig";
 
 const ContactPage = () => {
+  const contact = useStorefrontConfig();
   return (
     <div className="text-lg w-11/12 relative flex flex-col justify-center text-center p-6 mt-4 mx-auto">
       <h1 className="mb-5 text-lg">Contáctanos</h1>
-      <p>Si tienes cualquier duda o necesitas más información, no dudes en ponerte en contacto con nosotros</p><br/>
-      <p>📞 Teléfono: 6391316226<br/>
-        📧 Correo: ealejandramtzq04@gmail.com 
+      <p>{contact.contactIntro}</p><br/>
+      <p>
+        {contact.contactPhones.map((phone) => (
+          <span key={phone}>
+            📞 Teléfono: {phone}<br/>
+          </span>
+        ))}
+        {contact.contactEmail ? <>📧 Correo: {contact.contactEmail}</> : null}
       </p>
     </div>
   )

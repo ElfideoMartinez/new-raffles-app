@@ -121,12 +121,20 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
             <p>Boletos vendidos: {bet.ticketNumbers}</p>
             <p className='mt-1'>
               Equipo:{" "}
+              {/* Empate (letter C) needs its own colour: the old ternary
+                  painted it the same red as team B, so an admin reading a
+                  batch of sales could not tell a draw pick from the away
+                  fighter at a glance. */}
               <span
                 className={`px-3 py-1 rounded-card ${
-                  bet.letterTeam == "A" ? "bg-green-600" : "bg-red-600"
+                  bet.letterTeam === "A"
+                    ? "bg-green-600 text-white"
+                    : bet.letterTeam === "C"
+                    ? "bg-yellow-500 text-gray-900"
+                    : "bg-red-600 text-white"
                 }`}
               >
-                {bet.team}
+                {bet.letterTeam === "C" ? "Empate" : bet.team}
               </span>
             </p>
           </div>

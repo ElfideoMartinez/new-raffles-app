@@ -100,6 +100,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ---------- appConfig ----------
+    // Runtime storefront copy edited from /admin/config (checkout thank-you
+    // text, contact email/phone). Admins read and write; nobody else can see
+    // it. Written by the client SDK, so this IS the security boundary.
+    match /appConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
     // ---------- admins ----------
     // Admin roster. Readable by admins only; never client-writable.
     match /admins/{uid} {

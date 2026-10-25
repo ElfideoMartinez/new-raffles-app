@@ -27,6 +27,72 @@ interface BetRealtimeData {
   };
   tieBets: number;
   title: string;
+  // Written by settleBet() when an admin settles the match.
+  settled?: boolean;
+  result?: "A" | "B" | "C" | "VOID" | string;
+  payoutPerTicket?: number;
+  totalTickets?: number;
+  pool?: number;
+}
+
+/**
+ * Settled-match banner.
+ *
+ * settleBet() writes { settled, result, payoutPerTicket, pool } to the bet.
+ * Before this, a finished bet only greyed out the selection cards, so a visitor
+ * could not tell who won or what a winning ticket paid. `result` is the outcome
+ * letter: A/B are the two fighters, C is the draw, VOID means refunded.
+ */
+function WinnerBanner({
+  result,
+  teams,
+  payoutPerTicket,
+  settled,
+}: {
+  result?: string;
+  teams: { a: string; b: string };
+  payoutPerTicket?: number;
+  settled?: boolean;
+}) {
+  if (!settled && !result) return null;
+
+  const label =
+    result === "A"
+      ? teams.a
+      : result === "B"
+      ? teams.b
+      : result === "C"
+      ? "Empate"
+      : null;
+
+  const isVoid = result === "VOID";
+
+  return (
+    <div
+      role='status'
+      className={`mb-4 w-full max-w-2xl rounded-card border p-4 text-center ${
+        isVoid
+          ? "border-gray-300 bg-gray-100 text-gray-800"
+          : "border-yellow-400 bg-yellow-50 text-yellow-900"
+      }`}
+    >
+      {isVoid ? (
+        <p className='font-bold'>Apuesta anulada: se reembolsa el importe completo.</p>
+      ) : label ? (
+        <>
+          <p className='text-sm uppercase tracking-wide'>Resultado oficial</p>
+          <p className='text-xl font-bold'>🏆 Ganador: {label}</p>
+        </>
+      ) : (
+        <p className='font-bold'>Apuesta finalizada.</p>
+      )}
+      {typeof payoutPerTicket === "number" && payoutPerTicket > 0 && !isVoid ? (
+        <p className='mt-1 text-sm'>
+          Pago por boleto ganador: ${payoutPerTicket.toFixed(2)}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 const BetPageClient = ({ betId }: { betId: string | null }) => {
@@ -343,6 +409,14 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             className='mb-6 h-[33vh] w-full rounded-card bg-cover bg-center shadow-lg'
             src={realtimeBetData.image}
             alt={realtimeBetData.title}
+          />
+
+          {/* Settled result: winner + payout, or refund notice. */}
+          <WinnerBanner
+            result={realtimeBetData.result}
+            teams={realtimeBetData.teams}
+            payoutPerTicket={realtimeBetData.payoutPerTicket}
+            settled={realtimeBetData.settled}
           />
 
           {/* Title and Description */}

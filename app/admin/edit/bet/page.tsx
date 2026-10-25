@@ -19,9 +19,39 @@ interface IBetData {
   title: string;
 }
 
+/** Normalise whatever the API returned into a strict [a, b] string tuple.
+ *
+ * The API returns teams as {a,b}; very old records may hold an array. The form
+ * indexes teams[0]/teams[1] and calls .trim() on them during render, so ANY
+ * non-string element (null, number, undefined) used to throw inside the render
+ * and white-screen /admin/edit/bet. Coerce here, once, so the render can never
+ * see a non-string.
+ */
+function toTeamTuple(teams: unknown): [string, string] {
+  if (Array.isArray(teams)) {
+    return [
+      typeof teams[0] === "string" ? teams[0] : "",
+      typeof teams[1] === "string" ? teams[1] : "",
+    ];
+  }
+  if (teams && typeof teams === "object") {
+    const t = teams as { a?: unknown; b?: unknown };
+    return [typeof t.a === "string" ? t.a : "", typeof t.b === "string" ? t.b : ""];
+  }
+  return ["", ""];
+}
+
+/** Safe string read for inputs that must never receive null/undefined. */
+function asString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return "";
+}
+
 const EditBetPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingBet, setIsLoadingBet] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isFinishedBet, setIsFinishedBet] = useState(false);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [idBet, setIdBet] = useState("");
@@ -34,7 +64,7 @@ const EditBetPage = () => {
     date: "",
     pricePerTicket: "",
     initialPool: "",
-    teams: ["", ""],
+    teams: ["", ""] as [string, string],
     betsTeamA: 0,
     betsTeamB: 0,
     isFinished: false,
@@ -80,13 +110,14 @@ const EditBetPage = () => {
   };
 
   const handleTeamChange = (index: number, value: string) => {
-    const newTeams = [...bet.teams];
-    newTeams[index] = value;
-    setBet({
-      ...bet,
-      teams: newTeams,
+    setBet((prev) => {
+      const next: [string, string] = [
+        asString(prev.teams[0]),
+        asString(prev.teams[1]),
+      ];
+      next[index] = value;
+      return { ...prev, teams: next };
     });
-    console.log(bet);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -176,10 +207,12 @@ const EditBetPage = () => {
   const handleChangeRaffle = async (id: string) => {
     if (id == "default") {
       setIdBet(id);
+      setLoadError(null);
       cleanBet();
       return;
     }
     setIsLoadingBet(true);
+    setLoadError(null);
     setIdBet(id);
     try {
       const responseData = await fetch(
@@ -201,27 +234,32 @@ const EditBetPage = () => {
       const result = await responseData.json();
       console.log(result);
 
+      const d = result?.betData ?? {};
       setBet((prevBet) => ({
         ...prevBet,
-        title: result.betData.title || "",
-        description: result.betData.description || "",
-        image: result.betData.image || "",
-        date: result.betData.date || "",
-        pricePerTicket: result.betData.pricePerTicket || "",
-        initialPool: result.betData.initialPool || "",
-        // Canonical docs store teams as {a,b}; older ones as an array. The form
-        // edits a tuple, so normalise on load instead of letting a shape change
-        // reach the UI (bet.teams[0] was undefined for object-shaped docs).
-        teams: Array.isArray(result.betData.teams)
-          ? result.betData.teams
-          : [result.betData.teams?.a || "", result.betData.teams?.b || ""],
-        betsTeamA: result.betData.betsTeamA || 0,
-        betsTeamB: result.betData.betsTeamB || 0,
-        isFinished: result.betData.isFinished || false,
+        title: asString(d.title),
+        description: asString(d.description),
+        image: asString(d.image),
+        date: asString(d.date),
+        pricePerTicket: asString(d.pricePerTicket),
+        initialPool: asString(d.initialPool),
+        // Always a [string, string]; the UI indexes and .trim()s it.
+        teams: toTeamTuple(d.teams),
+        betsTeamA: Number(d.betsTeamA) || 0,
+        betsTeamB: Number(d.betsTeamB) || 0,
+        isFinished: d.isFinished === true,
       }));
-      setIsLoadingBet(false);
     } catch (e) {
-      console.log(e);
+      console.error("Could not load bet for editing:", e);
+      // Without this the form silently keeps the previous bet's values while
+      // the select shows the new one — worse than an error.
+      setLoadError(
+        "No se pudo cargar la apuesta seleccionada. Inténtalo de nuevo."
+      );
+    } finally {
+      // Always clear the spinner. It used to be set true and never reset,
+      // which is why choosing a bet left the page stuck on the loader.
+      setIsLoadingBet(false);
     }
   };
 
@@ -285,7 +323,7 @@ const EditBetPage = () => {
       date: "",
       pricePerTicket: "",
       initialPool: "",
-      teams: ["", ""],
+      teams: ["", ""] as [string, string],
       betsTeamA: 0,
       betsTeamB: 0,
       isFinished: false,
@@ -302,8 +340,8 @@ const EditBetPage = () => {
 
     const areTeamsValid =
       bet.teams.length === 2 &&
-      bet.teams[0].trim() !== "" &&
-      bet.teams[1].trim() !== "";
+      asString(bet.teams[0]).trim() !== "" &&
+      asString(bet.teams[1]).trim() !== "";
 
     return areStringsValid && areTeamsValid;
   }, [bet]);
@@ -338,6 +376,12 @@ const EditBetPage = () => {
             ))}
           </select>
         </div>
+        {loadError && (
+          <p className='text-sm text-red-700 bg-red-50 border border-red-300 rounded-card p-3'>
+            {loadError}
+          </p>
+        )}
+
         {isLoadingBet ? (
           <div className='flex justify-center pt-2'>
             <FadeLoader color="var(--color-ink-900)" />
@@ -423,7 +467,7 @@ const EditBetPage = () => {
               <input
                 type='text'
                 name='teamA'
-                value={bet.teams[0]}
+                value={asString(bet.teams[0])}
                 onChange={(e) => handleTeamChange(0, e.target.value)}
                 required
                 className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
@@ -437,7 +481,7 @@ const EditBetPage = () => {
               <input
                 type='text'
                 name='teamB'
-                value={bet.teams[1]}
+                value={asString(bet.teams[1])}
                 onChange={(e) => handleTeamChange(1, e.target.value)}
                 required
                 className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'

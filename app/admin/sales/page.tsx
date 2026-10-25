@@ -1,5 +1,6 @@
 "use client";
-import { apiUrl, authedApiFetch } from "@/app/config/api";
+import { authedApiFetch } from "@/app/config/api";
+import ApiErrorState, { safeMessage, type ErrorKind } from "@/app/components/ApiErrorState";
 import SaleCard from "@/app/components/SaleCard";
 import withAuth from "@/app/components/WithAuth";
 import Link from "next/link";
@@ -26,21 +27,32 @@ const SalesPage = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [activeTab, setActiveTab] = useState("verified"); // State to track active tab
   const [loading, setLoading] = useState(true);
+  // Same failure mode as /admin/salesBets: treat a non-2xx as an error state
+  // instead of letting setSales(undefined) crash the render.
+  const [error, setError] = useState<{ kind: ErrorKind; message: string } | null>(null);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const res = await authedApiFetch("getSales", { method: "GET" });
+      if (!res.ok) {
+        setSales([]);
+        setError({ kind: res.status === 401 ? "session" : res.status === 403 ? "forbidden" : "server", message: await safeMessage(res) });
+        return;
+      }
       const data = await res.json();
-      console.log(data);
-      setSales(data.sales);
-      setLoading(false);
+      setSales(Array.isArray(data?.sales) ? data.sales : []);
     } catch (error) {
       console.error("Error fetching sales data:", error);
       setSales([]);
+      setError({ kind: "network", message: "No se pudo conectar con el servidor." });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,6 +93,13 @@ const SalesPage = () => {
         <div className="flex justify-center items-center w-full h-64">
           <FadeLoader color="var(--color-brand-700)"/>
         </div>
+      ): error ? (
+        <ApiErrorState
+          kind={error.kind}
+          message={error.message}
+          onRetry={fetchData}
+          entityLabel="ventas"
+        />
       ):(
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
           {activeTab === "verified"

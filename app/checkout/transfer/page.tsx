@@ -1,5 +1,6 @@
 "use client";
 import { apiUrl } from "@/app/config/api";
+import { useStorefrontConfig } from "@/app/config/storefrontConfig";
 import useTicketStore from "@/app/store";
 import { auth, storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
@@ -9,6 +10,8 @@ import { toast } from "nextjs-toast-notify";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
+  // Bank account + notes are runtime-editable from /admin/config.
+  const storefront = useStorefrontConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentConceptKey, setPaymenthConcept] = useState("");
   const raffles = useTicketStore((state) => state.getItemsFromCart());
@@ -121,13 +124,24 @@ const CheckoutTransferPage = () => {
         </p>
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
-            onClick={() => copyToClipboard("4152314135006792")}
+            onClick={() => copyToClipboard(storefront.bankAccount)}
             className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-sm border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
           >
-            4152314135006792
+            {storefront.bankAccount}
           </button>
           <span className='text-sm text-gray-500'>(Toca para copiar)</span>
         </div>
+        {(storefront.bankName || storefront.bankHolder) && (
+          <p className='mt-2 text-sm text-gray-700 text-center'>
+            {storefront.bankName ? <>Banco: {storefront.bankName}<br/></> : null}
+            {storefront.bankHolder ? <>Titular: {storefront.bankHolder}</> : null}
+          </p>
+        )}
+        {storefront.bankNote ? (
+          <p className='mt-2 text-sm text-gray-700 text-center whitespace-pre-line'>
+            {storefront.bankNote}
+          </p>
+        ) : null}
         <h1 className='text-black text-xl font-bold text-center mt-2'>
           Monto total ${total}
         </h1>

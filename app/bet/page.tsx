@@ -16,11 +16,18 @@ interface IBetData {
   initialPool: number;
   betsTeamA: number;
   betsTeamB: number;
-  oddsTeamA: string;
-  oddsTeamB: string;
+  // Legacy placeholder values ("1.0") from a fixed-odds model this app no
+  // longer uses. Not displayed: this is a pari-mutuel pool, so no true odds
+  // exist before settlement. The card shows live ticket share instead.
+  oddsTeamA?: string;
+  oddsTeamB?: string;
   tieBets?: number;
   teams: { a: string; b: string };
   isFinished: boolean;
+  // Written by settleBet() when an admin settles the match.
+  settled?: boolean;
+  result?: "A" | "B" | "C" | "VOID" | string;
+  payoutPerTicket?: number;
 }
 export default async function BetsPage() {
   try {
@@ -135,43 +142,41 @@ function BetCard({ bet }: { bet: IBetData }) {
           </div>
         </div>
 
-        {/* Teams and betting stats */}
+        {/* Live ticket distribution.
+            This is a pari-mutuel pool: payout is pool x (1 - takeRate) /
+            winningTickets, computed at settlement. So there is no pre-match
+            "odds" to show. The old oddsTeamA/B fields held a hardcoded "1.0"
+            placeholder and the tie row printed totalBets/tieBets*100-100
+            (nonsense, e.g. -100 or 150). Both are gone; the share of the pool
+            is the honest number and it already comes from the counters. */}
         <div className='space-y-2 mb-4'>
-          <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-green-700'>
-              {bet.teams.a}
-            </span>
-            <span
-              className={`text-sm text-ink-700
-              ${bet.oddsTeamA.includes("+") ? "text-green-700" : "text-red-700"}
-              `}
-            >
-              {bet.oddsTeamA}
-            </span>
+          <div className='text-xs uppercase tracking-wide text-ink-500'>
+            Reparto actual {totalBets > 0 ? `(${totalBets} boletos)` : ""}
           </div>
 
-          <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium text-red-700'>
-              {bet.teams.b}
-            </span>
-            <span
-              className={`text-sm text-ink-700
-              ${bet.oddsTeamB.includes("+") ? "text-green-700" : "text-red-700"}
-              `}
-            >
-              {bet.oddsTeamB}
-            </span>
-          </div>
-
-          {bet.tieBets !== undefined && (
-            <div className='flex items-center justify-between'>
-              <span className='text-sm font-medium text-yellow-400'>
-                Empate
-              </span>
-              <span className='text-sm text-ink-700'>
-                {((totalBets / (bet.tieBets || 1)) * 100 - 100).toFixed(0)}
-              </span>
-            </div>
+          {totalBets === 0 ? (
+            <p className='text-sm text-ink-500'>Aún no hay boletos vendidos.</p>
+          ) : (
+            <>
+              <ShareRow
+                label={bet.teams.a}
+                percent={teamAPercentage}
+                barClass='bg-green-600'
+              />
+              <ShareRow
+                label={bet.teams.b}
+                percent={teamBPercentage}
+                barClass='bg-red-600'
+              />
+              {Number(bet.tieBets) > 0 && (
+                <ShareRow
+                  label='Empate'
+                  percent={tiePercentage}
+                  barClass='bg-yellow-500'
+                  labelClass='text-yellow-700'
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -189,10 +194,68 @@ function BetCard({ bet }: { bet: IBetData }) {
 
           {bet.isFinished && (
             <span className='text-center text-xs text-gray-500'>
-              Esta apuesta ha terminado
+              {winnerLabel(bet)
+                ? winnerLabel(bet)
+                : "Esta apuesta ha terminado"}
             </span>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Result line for a settled bet card.
+ *
+ * settleBet() stores `result` as an outcome letter (A/B/C/VOID). Without this,
+ * a finished card only said "terminó", which tells a customer nothing about
+ * who won. Returns null when the bet has no result yet, so the caller can fall
+ * back to the neutral finished message.
+ */
+function winnerLabel(bet: IBetData): string | null {
+  if (!bet.result) return null;
+  if (bet.result === "VOID") return "Apuesta anulada: se reembolsó a los participantes";
+  const winner =
+    bet.result === "A"
+      ? bet.teams?.a
+      : bet.result === "B"
+      ? bet.teams?.b
+      : bet.result === "C"
+      ? "Empate"
+      : null;
+  if (!winner) return null;
+  const payout =
+    typeof bet.payoutPerTicket === "number" && bet.payoutPerTicket > 0
+      ? ` · pago por boleto: $${bet.payoutPerTicket.toFixed(2)}`
+      : "";
+  return `Ganador: ${winner}${payout}`;
+}
+
+/**
+ * One outcome's share of the pool: label, percentage and a proportional bar.
+ * Percentages are computed by the caller from the ticket counters.
+ */
+function ShareRow({
+  label,
+  percent,
+  barClass,
+  labelClass = "text-ink-900",
+}: {
+  label: string;
+  percent: string;
+  barClass: string;
+  labelClass?: string;
+}) {
+  const width = Math.max(0, Math.min(100, Number(percent) || 0));
+  return (
+    <div>
+      <div className='flex items-center justify-between'>
+        <span className={`text-sm font-medium ${labelClass}`}>{label}</span>
+        <span className='text-sm text-ink-700'>{percent}%</span>
+      </div>
+      <div className='mt-1 h-1.5 w-full rounded-full bg-ink-100'>
+        <div className={`h-1.5 rounded-full ${barClass}`} style={{ width: `${width}%` }} />
       </div>
     </div>
   );

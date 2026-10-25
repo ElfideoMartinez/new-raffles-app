@@ -1,0 +1,25 @@
+{
+  "state": "VERIFIED_COMPLETE",
+  "updated": "2026-10-24T17:15:00-06:00",
+  "mission": "End-to-end UFC event test of the raffles/betting app",
+  "timezone": "America/Chihuahua",
+  "event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "venue": "Etihad Arena, Abu Dhabi",
+    "localTimes": {
+      "earlyPrelimsCST": "08:00",
+      "prelimsCST": "10:00",
+      "mainCardCST": "12:00"
+    }
+  },
+  "lastCompletedTask": "17:15 CST completion verification run. Event confirmed complete (all 14 bouts); final results recorded in event-card.md (provenance warning retained). Settlement of test bets HELD per Daniel instruction (no settle control, ID-token blocker, explicit HOLD); settleBet + winner banner remain unverified. Final report: final-report.md. Test admin account deletion reminder recorded.",
+  "nextAction": "Daniel: (1) delete/de-privilege test admin ufc-test-1792801216865@example.com (uid XjFG5wIoBTYBxHUXysxTOYVuNOu1, admin:true); (2) build settle control (backlog 13b) then settle test bets with approval to verify winner UI; (3) gate sendPurchaseNotifications before launch; (4) commit only on explicit go.",
+  "dependencies": [
+    "frontend redeploy for /bet (optional, needs Daniel approval)",
+    "Instagram account must be created manually by Daniel before any posting"
+  ],
+  "retries": 0,
+  "errors": [],
+  "notes": "Real-money tests R01/R02 never authorized; no real money moved. Event results recorded in event-card.md WITH provenance warning (pasted summary, self-declared unverified). Winner banner + settleBet still UNVERIFIED - nothing settled. Bet cutoff not implemented (T15). sendPurchaseNotifications still public/unauthenticated. Test admin account still privileged. Nothing committed to git. | 17:15 verification run: event complete, results in event-card.md; settlement held per Daniel; report at final-report.md; state VERIFIED_COMPLETE; test admin account still privileged; nothing committed."
+}

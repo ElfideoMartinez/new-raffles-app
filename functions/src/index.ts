@@ -86,13 +86,54 @@ async function logAdminAction(
 }
 
 /**
+ * Set the CORS headers every HTTP function needs, and answer preflights.
+ *
+ * MUST run before any auth check. Auth rejections are 401/403 responses; if
+ * the CORS headers are not already on the response the browser hides the real
+ * status behind an opaque "CORS error" (that is exactly what made the admin
+ * sales page look like an empty list instead of "session expired").
+ *
+ * Returns true when the request was a preflight and the caller must return.
+ *
+ * `Authorization` is allowed explicitly: admin endpoints read the Firebase ID
+ * token from that header, and a preflight that does not allow it fails even
+ * for a fully signed-in admin.
+ */
+function applyCors(
+  req: functionsV1.https.Request,
+  res: express.Response,
+  methods: string
+): boolean {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", methods);
+  res.set(
+    "Access-Control-Allow-Headers",
+    "Authorization, Content-Type, Accept"
+  );
+  res.set("Access-Control-Max-Age", "3600");
+  if (req.headers.origin) {
+    res.set("Vary", "Origin");
+  }
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return true;
+  }
+  return false;
+}
+
+/**
  * Run the admin check for an HTTP request. Returns true when the request was
  * rejected and the caller must return immediately.
+ *
+ * CORS is applied first so the browser can read the 401/403 and show the admin
+ * a real message instead of an opaque network error.
  */
 async function rejectUnlessAdmin(
   req: functionsV1.https.Request,
-  res: express.Response
+  res: express.Response,
+  methods = "GET, POST, OPTIONS"
 ): Promise<boolean> {
+  if (applyCors(req, res, methods)) return true;
   try {
     await assertAdmin(req.headers.authorization);
     return false;
@@ -465,10 +506,7 @@ export const getRaffleData = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const markTicketsAsSold = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  if (await rejectUnlessAdmin(req, res, "GET, OPTIONS")) return;
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -531,10 +569,7 @@ const setTicketsAsSold = async (raffleId: string, ticketNumbers: number[]) => {
 };
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createSale = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  if (await rejectUnlessAdmin(req, res, "GET, OPTIONS")) return;
   if (req.method !== "POST") {
     res.status(405).json({
       status: 405,
@@ -568,20 +603,8 @@ export const createSale = functions.https.onRequest(async (req, res) => {
 });
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const success = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  // Handle preflight OPTIONS request for CORS
-  if (req.method === "OPTIONS") {
-    res.set("Access-Control-Allow-Origin", "*");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type");
-    res.status(204).send(""); // Respond with no content
-    return;
-  }
-
-  // Set CORS headers
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
+  // CORS headers and the preflight are already handled by rejectUnlessAdmin.
 
   // Validate method
   if (req.method !== "POST") {
@@ -701,11 +724,7 @@ export const getAllRaffles = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const getSales = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     // Handle preflight requests
     res.status(204).send("");
@@ -740,11 +759,7 @@ export const getSales = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const rejectSale = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
@@ -803,11 +818,7 @@ export const rejectSale = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const confirmSale = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
@@ -863,11 +874,7 @@ export const confirmSale = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createRaffle = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send(""); // Respuesta sin contenido para OPTIONS
@@ -926,11 +933,7 @@ export const createRaffle = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const checkTransfer = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send({
@@ -1544,11 +1547,7 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const updateRaffle = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "PATCH, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send("");
@@ -1588,11 +1587,7 @@ export const updateRaffle = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const deleteRaffle = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "DELETE, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send("");
@@ -1795,11 +1790,7 @@ export const getBetData = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const updateBet = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "PATCH, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "PATCH, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send("");
@@ -1866,11 +1857,7 @@ export const updateBet = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const deleteBet = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "DELETE, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "DELETE, OPTIONS")) return;
   // Manejar solicitud preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     res.status(204).send("");
@@ -1907,11 +1894,7 @@ export const deleteBet = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const getSalesBets = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "GET, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
@@ -1953,11 +1936,7 @@ export const getSalesBets = functions.https.onRequest(async (req, res) => {
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const confirmRejectBetSale = functions.https.onRequest(
   async (req, res) => {
-    if (await rejectUnlessAdmin(req, res)) return;
-    res.set("Access-Control-Allow-Origin", "*");
-    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type");
-
+    if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
     if (req.method === "OPTIONS") {
       res.status(204).send("");
       return;
@@ -2086,7 +2065,14 @@ export const confirmRejectBetSale = functions.https.onRequest(
           if (delta.team === "A") move("betsTeamA", delta.tickets);
           else if (delta.team === "B") move("betsTeamB", delta.tickets);
           else move("tieBets", delta.tickets);
-          move("totalBets", delta.tickets);
+          // totalBets is DERIVED, never incremented on its own. The three
+          // outcome counters are the source of truth; keeping a separate
+          // running total is how it drifts out of sync (and how it used to end
+          // up absent, since createBet never wrote the key at all).
+          updated.totalBets =
+            (Number(updated.betsTeamA) || 0) +
+            (Number(updated.betsTeamB) || 0) +
+            (Number(updated.tieBets) || 0);
           return updated;
         });
       }
@@ -2153,11 +2139,7 @@ interface BetSaleLine {
 }
 
 export const settleBet = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
@@ -2344,11 +2326,7 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
 
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const createBet = functions.https.onRequest(async (req, res) => {
-  if (await rejectUnlessAdmin(req, res)) return;
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
-
+  if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
     res.status(204).send("");
     return;
@@ -2419,6 +2397,10 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       betsTeamA: 0,
       betsTeamB: 0,
       tieBets: 0,
+      // Derived from the three counters above (see confirmRejectBetSale). Kept
+      // in the record so clients never read `undefined`, but never incremented
+      // independently.
+      totalBets: 0,
       initialPool: 0,
       isFinished: false,
       createdAt: Date.now(),
