@@ -12,11 +12,8 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ## P0 — correctness / money
 
 ### 1. `oddsTie` is written as `undefined`
-`functions/src/index.ts` → `createBet`: `oddsTie: data.oddsTie || undefined`.
-Firestore rejects `undefined` field values in several write paths. All five live
-bets happen to have `oddsTie` absent, so this has not failed yet, but creating a
-bet **with** tie odds may throw at write time. Omit the key entirely when empty
-instead of assigning `undefined`.
+**Fixed 2026-10-24** — see Done. Omitted the key entirely when empty in
+`createBet`; no longer assigns `undefined`.
 
 ### 2. Pari-mutuel odds are a placeholder, not a price
 `createBet` defaults `oddsTeamA`/`oddsTeamB` to `"1.0"`. The app is a pari-mutuel
@@ -173,6 +170,9 @@ Recorded so they are not re-reported:
   `result` / `payoutPerTicket` from `settleBet`). **Not yet observed against a
   settled bet** — needs one real settlement to verify.
 - Custom 404 page (`app/not-found.tsx`).
+- **Item 1 (2026-10-24)**: `createBet` no longer writes `oddsTie: undefined`;
+the key is omitted entirely when empty (`functions/src/index.ts`). Verified
+with `cd functions && npx tsc --noEmit` (clean).
 - `/user/purchases`: per-purchase "Ver detalles" toggle + "Reportar problema"
   link to a new informational `/soporte` page (no support backend exists yet).
 - `/admin/edit/bet`: fixed render crash from non-tuple `teams`, and a missing

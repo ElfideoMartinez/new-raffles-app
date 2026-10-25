@@ -2393,7 +2393,7 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       teams: data.teams, // { a: string, b: string }
       oddsTeamA: data.oddsTeamA || "1.0",
       oddsTeamB: data.oddsTeamB || "1.0",
-      oddsTie: data.oddsTie || undefined,
+      ...(data.oddsTie ? { oddsTie: data.oddsTie } : {}),
       betsTeamA: 0,
       betsTeamB: 0,
       tieBets: 0,
