@@ -1,6 +1,18 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+
+// Route the buyer came from before checkout (set by the cart page).
+// Falls back to the list view.
+const HOME_FALLBACK = "/";
+const readCheckoutOrigin = () => {
+  try {
+    const origin = sessionStorage.getItem("checkoutOrigin");
+    return origin && origin.startsWith("/") ? origin : HOME_FALLBACK;
+  } catch {
+    return HOME_FALLBACK;
+  }
+};
 import useTicketStore from "@/app/store";
 import { useCheckoutSuccessConfig } from "@/app/config/checkoutSuccessConfig";
 import { useStorefrontConfig } from "@/app/config/storefrontConfig";
@@ -36,6 +48,7 @@ const SuccessPage = () => {
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [ticketCount, setTicketCount] = useState(0);
+  const [returnRoute, setReturnRoute] = useState(HOME_FALLBACK);
 
   console.log("Tickets", ticketCount);
   useEffect(() => {
@@ -49,6 +62,8 @@ const SuccessPage = () => {
     cleanBets();
     cleanSelected();
     setIsHydrated(true);
+    setReturnRoute(readCheckoutOrigin());
+    try { sessionStorage.removeItem("checkoutOrigin"); } catch { /* private mode */ }
   }, []);
 
   const saveSaleLocalStorage = () => {
@@ -102,7 +117,7 @@ const SuccessPage = () => {
           <span key={phone}>📞 Teléfono: {phone}<br/></span>
         ))}
       </p>
-      <Link href='../' className='p-2 mt-4 rounded-card' style={{ backgroundColor: "var(--color-brand-700)" }}>
+      <Link href={returnRoute} className='p-2 mt-4 rounded-card' style={{ backgroundColor: "var(--color-brand-700)" }}>
         {copy.homeButtonLabel}
       </Link>
     </div>

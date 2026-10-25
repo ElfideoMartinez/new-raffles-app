@@ -70,12 +70,6 @@ A failed confirm looks identical to a never-attempted one a minute later.
 `isLoading` disables the button and swaps in a `FadeLoader`, but there is no
 label change or in-place progress. Folds into the pattern work in item 12.5.
 
-### 9. Post-payment navigation
-`app/checkout/success/page.tsx` links back with a hardcoded `<Link href='../'>`,
-so it always goes up one level regardless of origin. Capture the origin route
-before checkout and return there, falling back to the list view. **This is a code
-issue, not a Firebase console setting.**
-
 ---
 
 ## P2 — feature work
@@ -145,6 +139,13 @@ a result. Resolve provider credits before building a pipeline on it.
 ---
 
 ## Done during the 2026-10-24 UFC test
+
+- **Fixed 2026-10-24 (backlog 9)**: post-payment navigation returns the buyer
+  to their origin route. Cart page saves its pathname in sessionStorage before
+  linking to checkout; `/checkout/success` reads it, sanitizes it, clears it,
+  and falls back to `/` if absent.
+  Evidence: `app/user/cart/page.tsx`, `app/checkout/success/page.tsx`,
+  `npx tsc --noEmit` clean.
 
 Recorded so they are not re-reported:
 - **Fixed 2026-10-24 (backlog 5)**: `createTransferSale` now enforces the bet

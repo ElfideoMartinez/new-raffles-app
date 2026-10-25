@@ -2,10 +2,14 @@
 import React, { useEffect, useState } from "react";
 import useTicketStore from "@/app/store";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { formatPrice } from "@/app/utils/format";
 import { toast } from "nextjs-toast-notify";
 
 const UserCartPage = () => {
+  // Remember where the buyer came from so /checkout/success can send them back
+  // here instead of hardcoding a parent route (backlog item 9).
+  const pathname = usePathname();
   const tickets = useTicketStore((state) => state.getItemsFromCart());
   const userCartBets = useTicketStore((state) => state.getBetsFromCart());
   const removeBet = useTicketStore((state) => state.removeBetById);
@@ -144,6 +148,9 @@ const UserCartPage = () => {
           <p className='self-center text-center mb-2'>Monto total: {formatPrice(totalRafflePrice + totalBetsPrice)}</p>
           <Link
             href='/checkout/transfer'
+            onClick={() => {
+              try { sessionStorage.setItem("checkoutOrigin", pathname); } catch { /* private mode */ }
+            }}
             className='bg-brand-600 text-white p-2 rounded-card w-full flex justify-center'
           >
             Pago por transferencia
