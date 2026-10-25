@@ -10,6 +10,14 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (backlog 13b, admin settle control)**: `/admin/bets` now has a
+  per-bet "Liquidar" button (hidden behind a "✓ Liquidada" badge once `settled === true`)
+  opening a settlement modal: A/B/Empate/VOID choice, per-ticket payout preview with an
+  explicit estimate disclaimer (10% take, live RTDB counters; official maths stays in
+  `settleBet`), checkbox confirm, "Procesando…" submit, persistent error banner, and
+  clear "already settled" idempotency message. Calls `settleBet` via `authedApiFetch`
+  (Firebase ID token with admin claim). No settlement was executed. Evidence:
+  `app/admin/bets/page.tsx`, `npx tsc --noEmit` clean at repo root.
 - **Done 2026-10-25 (backlog 12.2, persistent admin navigation)**: new
   `app/admin/layout.tsx` renders a shared nav bar (Inicio, Ventas/Rifas,
   Ventas/Apuestas, Apuestas, Configuración) above every page in the `/admin`
@@ -93,6 +101,8 @@ Recommend **assisted** — same time saved, human stays on the money. Scraping a
 undocumented endpoint to decide payouts is a real risk of paying the wrong people.
 
 ### 13b. No settle control in the admin UI  [P0 — blocks settlement]
+**Done 2026-10-25** — see the Done entry at the top of this file (settle modal on
+`/admin/bets`; verification against production data is waiting on Daniel's go).
 `settleBet` is deployed and does the pari-mutuel payout maths, but **nothing in
 `/admin` calls it**. There is no button, no form, no link. Settlement is therefore
 impossible without hand-crafting an authenticated request.
