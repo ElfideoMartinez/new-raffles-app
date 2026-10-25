@@ -366,6 +366,8 @@ const EditBetPage = () => {
           </label>
           <select
             className='w-full py-2 px-3 text-gray-950 bg-white border rounded-sm focus:border-blue-500'
+            value={idBet || "default"}
+            disabled={isLoadingBet}
             onChange={(e) => handleChangeRaffle(e.target.value)}
           >
             <option value={"default"}>Selecciona una apuesta</option>

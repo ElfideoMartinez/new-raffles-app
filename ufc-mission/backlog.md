@@ -68,6 +68,10 @@ Focus ordered by impact:
    `app/admin/dashboard/page.tsx`.
 4. `/admin/edit/bet` and `/admin/edit/raffle` both stall-then-jump: a single
    select acts as both picker and loader with no persistent selection.
+   **Done 2026-10-25 (backlog 12.4)** — picker selects are now controlled
+   (`value` bound to the loaded id, disabled while loading) in both edit
+   pages, so the selection persists through the load instead of jumping
+   back to the placeholder. Evidence: `npx tsc --noEmit` clean at repo root.
 5. Buttons need loading + failure states as a consistent pattern (items 6, 7).
 
 ---
