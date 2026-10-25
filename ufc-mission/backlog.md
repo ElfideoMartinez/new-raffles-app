@@ -40,10 +40,8 @@ deployed twice because of it. **Consolidating these is the highest-value admin
 change and should be the first task of the admin UX audit (item 12).**
 
 ### 5. No bet cutoff behaviour
-Verified live (T15): a bet stays open for purchases after the fight has started.
-`isFinished` only greys out the UI; the server accepts `createTransferSale` for a
-started bout. Needs a server-side close time enforced in the create path, not just
-a UI state.
+**Fixed 2026-10-24** — see Done. `createTransferSale` rejects bet lines whose
+event `date` has passed (409 "Esta apuesta ya cerró").
 
 ---
 
@@ -149,6 +147,11 @@ a result. Resolve provider credits before building a pipeline on it.
 ## Done during the 2026-10-24 UFC test
 
 Recorded so they are not re-reported:
+- **Fixed 2026-10-24 (backlog 5)**: `createTransferSale` now enforces the bet
+  cutoff server-side: if the bet's event `date` has passed, the line is rejected
+  with 409 "Esta apuesta ya cerró" instead of trusting UI `isFinished`.
+  Evidence: `functions/src/index.ts` (bet loop, ~:1328), `cd functions &&
+  npx tsc --noEmit` clean.
 - **Fixed 2026-10-24 (backlog 3)**: `sendPurchaseNotifications` now requires admin auth via `rejectUnlessAdmin` (401/403, CORS preflight handled) and appends an `adminWriteLog` entry. Evidence: `functions/src/index.ts` (~:160), `cd functions && npx tsc --noEmit` clean.
 
 - CORS headers now applied before the admin auth check on all 16 admin functions;

@@ -1345,6 +1345,15 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
         throw transferBadRequest("Una de las apuestas ya no está disponible.");
       }
 
+      // Server-side bet cutoff (backlog item 5): once the event date has
+      // passed, no new transfer sales may include this bet. UI greys the bet
+      // via `isFinished`, but the server must enforce the close time itself.
+      const eventDate =
+        typeof betData.date === "string" ? Date.parse(betData.date) : NaN;
+      if (Number.isFinite(eventDate) && eventDate <= Date.now()) {
+        throw transferConflict("Esta apuesta ya cerró.");
+      }
+
       const pricePerTicket = transferPrice(betData.pricePerTicket);
       if (pricePerTicket === null) {
         throw transferConflict("No pudimos validar el precio de la apuesta.");
