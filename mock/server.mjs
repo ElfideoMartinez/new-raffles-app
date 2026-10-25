@@ -119,6 +119,32 @@ const salesBets = [
       },
     ],
   },
+  // Settlement review fixtures (numeric ticketNumbers, as settleBet reads them).
+  {
+    id: "mock-sale-2",
+    name: "Ana Prueba",
+    email: "ana@example.com",
+    phone: "+526141111111",
+    verified: true,
+    bets: [
+      { betId: "mock-bet-1", ticketNumbers: 4, letterTeam: "A" },
+      { betId: "mock-bet-2", ticketNumbers: 2, letterTeam: "B" },
+    ],
+  },
+  {
+    id: "mock-sale-3",
+    name: "Beto Demo",
+    email: "beto@example.com",
+    verified: true,
+    bets: [{ betId: "mock-bet-1", ticketNumbers: 6, letterTeam: "B" }],
+  },
+  {
+    id: "mock-sale-4",
+    name: "Carla Fix",
+    email: "carla@example.com",
+    verified: true,
+    bets: [{ betId: "mock-bet-1", ticketNumbers: 1, letterTeam: "C" }],
+  },
 ];
 
 /**
@@ -161,6 +187,26 @@ const routes = {
     return { __raw: { betData: bet, data: mockTickets(bet) } };
   },
   getSalesBets: () => ({ betSales: salesBets }),
+  // Mirror of the real settleBet response shape (functions/src/index.ts). The
+  // admin settlement page only shows this after the explicit confirm button.
+  settleBet: (body) => {
+    const outcome = String(body?.result || "").toUpperCase();
+    return {
+      __raw: {
+        status: 200,
+        message: "Bet settled successfully",
+        betId: String(body?.betId || ""),
+        result: outcome,
+        refundAll: false,
+        totalTickets: 11,
+        pool: 550,
+        takeRate: 0.1,
+        payoutPerTicket: 45,
+        salesUpdated: 3,
+        notificationsQueued: 3,
+      },
+    };
+  },
   confirmRejectBetSale: (body) => ({ ok: true, id: body?.id ?? null, action: body?.action ?? null }),
   checkTransfer: (body) => ({ ok: true, id: body?.id ?? null, status: "pending" }),
   createCheckoutSession: () => ({

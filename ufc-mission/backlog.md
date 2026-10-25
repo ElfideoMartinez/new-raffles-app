@@ -10,6 +10,25 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (admin settlement review + confirm screen)**: new admin page
+  `/admin/settlement` (WithAuth-guarded, linked from the shared admin nav as
+  "Liquidación"). Bet selector lists all bets (open/finished, unsettled first);
+  the review view computes payouts CLIENT-SIDE from verified `salesBets` docs
+  mirroring settleBet's maths (pool = tickets × price; take 10% default;
+  per-ticket = floor(distributable / winners); refund-all on VOID/zero winners),
+  shows per-sale buyer name/email, tickets, pick, projected payout or $0, pool
+  total, take, and per-ticket rate. Winner-pick control (A / B / Empate / VOID)
+  matches settleBet's `result` param. The ONLY path to settleBet is one explicit
+  "Liquidar" button with the projected winner total on it, gated by a confirm
+  checkbox; nothing settles on navigation/auto/timers. After settle, the full
+  settleBet response (incl. `notificationsQueued`) is shown. Finding:
+  settleBet does NOT support skipping notifications — no "liquidar sin
+  notificaciones" checkbox was added (would require a param change in
+  functions/src/index.ts); recorded as backlog follow-up (see 13b note).
+  Evidence: `npx tsc --noEmit` clean; `npm run build` clean with the new route
+  (7.08 kB); screenshots rendered against the local mock
+  (`screenshots/admin-settlement-review-fixture.png`,
+  `screenshots/admin-settlement-confirm-gate-fixture.png`).
 - **Done 2026-10-25 (finding, /bet list winner badge)**: the `/bet` list page shows
   NO winner badge on settled bet cards (Volkanovski/Pico cards show only "REPARTO
   ACTUAL"); the RESULTADO OFICIAL banner appears only on `/bet/[id]` detail.

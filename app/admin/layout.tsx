@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/admin/sales", label: "Ventas/Rifas" },
   { href: "/admin/salesBets", label: "Ventas/Apuestas" },
   { href: "/admin/bets", label: "Apuestas" },
+  { href: "/admin/settlement", label: "Liquidación" },
   { href: "/admin/config", label: "Configuración" },
 ];
 
