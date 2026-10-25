@@ -7,6 +7,10 @@
 > 2. Legacy device association is client-side only (localStorage
 >    "purchases" groups). Server-side association for pre-login sales
 >    (userId:null docs) needs a data model decision (e.g. backfill by phone/email).
+>    **DONE 2026-10-25**: backfill run with approval — 2 salesBets matched by
+>    email (0 unmatched), evidence recorded on each doc
+>    (`backfill: {by:'email', matchedTo, at}`); anonymous purchase path verified
+>    unchanged. See `ufc-mission/backfill-2026-10-25.md`.
 > 3. In-app notifications feed (`notifications/*` docs written by settleBet)
 >    has no client reader yet; Notificaciones page currently covers push settings only.
 > 4. `NEXT_PUBLIC_ENABLE_MOCK_AUTH=1` exists for local screenshots only
@@ -281,9 +285,14 @@ device-roster work deliberately deferred.
 ### 17. Content generator + asset formatter for Instagram
 Post-test follow-up. Generate post assets from templates and format them to
 1080×1350 (feed) / 1080×1920 (story).
-**Blocker note:** the creative-director subagent failed on 2026-10-24 with an
-OpenRouter billing 403 (credits exhausted); the content pack was built by hand as
-a result. Resolve provider credits before building a pipeline on it.
+**Update 2026-10-25 (Daniel approved):** the Instagram account EXISTS since
+2026-10-24: handle **@bet.mx.ufc**, and one successful post was made during the
+UFC mission. Posting tooling can assume the account is real. Remaining work is
+the content generator/formatter only.
+**Blocker note (still open):** the creative-director subagent failed on
+2026-10-24 with an OpenRouter billing 403 (credits exhausted); the content pack
+was built by hand as a result. Resolve provider credits before building a
+pipeline on it.
 
 ---
 
