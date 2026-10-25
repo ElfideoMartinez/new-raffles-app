@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+  Story template — HYPE / HISTORY — 1080x1920 (9:16).
+  Timeline of fighter history / narrative hype. No poll band.
+-->
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f5f0e8;
+    background:
+      radial-gradient(1200px 1000px at 80% -10%, rgba(216,64,64,.6), transparent 62%),
+      radial-gradient(900px 700px at -10% 106%, rgba(255,122,24,.35), transparent 55%),
+      linear-gradient(170deg, #12100e 0%, #1c1512 50%, #0a0908 100%);
+    display: flex; flex-direction: column;
+    padding: 170px 100px 140px;
+  }
+  .kicker { font-size: 34px; letter-spacing: .3em; color: #ffb347; font-weight: 700; }
+  .headline {
+    font-size: 170px; font-weight: 900; line-height: .9; letter-spacing: -0.02em;
+    text-transform: uppercase; margin-top: 18px; color: #fff;
+    text-shadow: 0 8px 40px rgba(216,64,64,.55);
+  }
+  .sub { font-size: 46px; font-weight: 700; color: #ff4d3d; margin-top: 26px; line-height: 1.2; text-transform: uppercase; letter-spacing: .04em; }
+  .timeline { margin-top: 90px; display: flex; flex-direction: column; gap: 44px; }
+  .item { display: flex; gap: 26px; align-items: flex-start; }
+  .badge {
+    flex: 0 0 auto; background: #ff4d3d; color: #12100e;
+    font-size: 34px; font-weight: 900; padding: 14px 22px; border-radius: 10px;
+    letter-spacing: .04em;
+  }
+  .text { font-size: 44px; font-weight: 700; line-height: 1.25; color: rgba(245,240,232,.92); }
+  .spacer { flex: 1; }
+  .cta {
+    align-self: flex-start; background: #f5f0e8; color: #12100e;
+    font-size: 42px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .06em; padding: 26px 54px; border-radius: 999px;
+  }
+  .brand { margin-top: 34px; font-size: 32px; color: rgba(245,240,232,.65); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="kicker">{{event.kicker}}</div>
+  <div class="headline">{{story.headline}}</div>
+  <div class="sub">{{story.sub}}</div>
+  <div class="timeline">
+    {{#each story.lines}}<div class="item">
+      <div class="badge">{{label}}</div>
+      <div class="text">{{value}}</div>
+    </div>{{/each}}
+  </div>
+  <div class="spacer"></div>
+  <div class="cta">{{cta}} 🎲🥊🔥</div>
+  <div class="brand">{{brand.name}} · {{brand.handle}}</div>
+</body>
+</html>

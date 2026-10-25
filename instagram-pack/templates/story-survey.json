@@ -1,0 +1,18 @@
+{
+  "slug": "story-survey-demo",
+  "locale": "es-MX",
+  "templates": { "story": "scripts/instagram/templates/story-survey.html" },
+  "brand": { "name": "Rifas Mtz", "handle": "@bet.mx.ufc", "url": "https://raffleapp-dbc1b.web.app", "tagline": "Rifas de comunidad" },
+  "event": { "kicker": "UFC 333 · NOCHE DE PELEAS", "title": "UFC 333", "subtitle": "Volkanovski vs. Evloev" },
+  "caption": { "text": "Encuesta: ¿quién gana la estelar?", "hashtags": "#UFC333 #RifasMtz" },
+  "story": {
+    "headline": "¿Quién gana la estelar?",
+    "sub": "Volkanovski (C) vs. Evloev — título pluma",
+    "lines": [
+      { "label": "A", "value": "Volkanovski" },
+      { "label": "B", "value": "Evloev" },
+      { "label": "C", "value": "Decisión dividida" }
+    ],
+    "sticker_note": "Encuesta interactiva: usar el sticker de poll de IG sobre la banda inferior"
+  }
+}

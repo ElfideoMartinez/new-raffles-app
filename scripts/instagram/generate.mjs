@@ -37,6 +37,10 @@ const input = JSON.parse(readFileSync(inputPath, "utf8"));
 const required = ["slug", "brand", "event", "caption"];
 for (const k of required) if (!(k in input)) throw new Error(`Input missing required key: ${k}`);
 
+// Default CTA (Daniel, 2026-10-25): bet-themed emoji, max 3.
+const DEFAULT_CTA = "Atrévete a jugar 🎲🥊🔥";
+if (!input.cta) input.cta = DEFAULT_CTA;
+
 const outDir = join(ROOT, "instagram-pack", "out", input.slug);
 mkdirSync(outDir, { recursive: true });
 
@@ -48,20 +52,51 @@ function fill(html, data) {
     return list.map((item) => body.replace(/\{\{([\w.]+)\}\}/g, (__, key) =>
       key === "this" ? item : get(item, key, "") ?? "")).join("");
   });
+  // raw (unescaped-content) tokens: {{triple.brace}} or {{{path}}} — used for data URIs
+  html = html.replace(/\{\{\{\s*([\w.]+)\s*\}\}\}/g, (_, path) => get(data, path, "") ?? "");
+  html = html.replace(/\{\{\s*triple\.([\w.]+)\s*\}\}/g, (_, path) => get(data, path, "") ?? "");
+  // {{#if path}}…{{/if}} and {{#unless path}}…{{/unless}}
+  html = html.replace(/\{\{#if ([\w.]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (_, path, body) =>
+    truthy(get(data, path)) ? body : ""
+  );
+  html = html.replace(/\{\{#unless ([\w.]+)\}\}([\s\S]*?)\{\{\/unless\}\}/g, (_, path, body) =>
+    truthy(get(data, path)) ? "" : body
+  );
   // plain tokens
   return html.replace(/\{\{([\w.]+)\}\}/g, (_, path) => get(data, path, "") ?? "");
+}
+function truthy(v) {
+  if (Array.isArray(v)) return v.length > 0;
+  return v !== undefined && v !== null && v !== "" && v !== false;
 }
 function get(obj, path, dflt) {
   return path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), obj) ?? dflt;
 }
 function readTemplate(kind) {
-  const p = input[`${kind}Template`] || join(HERE, "templates", `${kind}-event.html`);
+  // input.feedTemplate/storyTemplate wins; else input.templates.{feed,story}; else the event default
+  const p = input[`${kind}Template`]
+    || input.templates?.[kind]
+    || join(HERE, "templates", `${kind}-event.html`);
   return fill(readFileSync(p, "utf8"), input);
+}
+
+// ---- 1b. Optional fighter photo -> data URI (local file only) -------------
+if (input.fighter && input.fighter.image && !input.fighter.photoDataUri) {
+  const img = resolve(ROOT, input.fighter.image);
+  if (existsSync(img)) {
+    const ext = img.toLowerCase().endsWith(".png") ? "png" : "jpeg";
+    input.fighter.photoDataUri = `data:image/${ext};base64,${readFileSync(img).toString("base64")}`;
+    console.log(`  photo embedded: ${input.fighter.image}`);
+  } else {
+    console.warn(`  photo not found (initials fallback): ${input.fighter.image}`);
+  }
 }
 
 // ---- 2. Render with headless Chrome ---------------------------------------
 const CHROME_ARGS = ["--hide-scrollbars", "--disable-remote-fonts", "--disable-dev-shm-usage"];
 const sizes = { feed: [1080, 1350], story: [1080, 1920] };
+// input.only = "feed" | "story" -> render just that kind
+const kinds = input.only ? [input.only] : ["feed", "story"];
 
 const browser = await puppeteer.launch({
   executablePath: CHROME, headless: "new",
@@ -69,7 +104,7 @@ const browser = await puppeteer.launch({
 });
 const results = [];
 try {
-  for (const kind of ["feed", "story"]) {
+  for (const kind of kinds) {
     const [w, h] = sizes[kind];
     const html = readTemplate(kind);
     const page = await browser.newPage();

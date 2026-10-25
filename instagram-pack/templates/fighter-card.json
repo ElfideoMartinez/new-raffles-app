@@ -1,0 +1,25 @@
+{
+  "slug": "fighter-demo",
+  "locale": "es-MX",
+  "templates": { "feed": "scripts/instagram/templates/feed-hype.html" },
+  "brand": { "name": "Rifas Mtz", "handle": "@bet.mx.ufc" },
+  "event": { "kicker": "UFC 333 · PERFIL", "title": "UFC 333", "subtitle": "Volkanovski vs. Evloev" },
+  "cta": "Ficha del peleador",
+  "caption": { "text": "Perfil del peleador", "hashtags": "#RifasMtz" },
+  "fighter": {
+    "name": "Alexander Volkanovski",
+    "nickname": "The Great",
+    "initials": "AV",
+    "stats": [
+      { "label": "Récord", "value": "26-4" },
+      { "label": "KOs", "value": "13" },
+      { "label": "UFC", "value": "2019" }
+    ],
+    "facts": [
+      "Excampeón pluma, 5 defensas titulares",
+      "Peleó en 3 divisiones: pluma, ligero y pluma",
+      "Nacido en Wollongong, Australia",
+      "Fue rugby league antes de MMA"
+    ]
+  }
+}

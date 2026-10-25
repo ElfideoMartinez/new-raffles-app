@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+  Story template — SURVEY / POLL — 1080x1920 (9:16). Rendered by scripts/instagram/generate.mjs.
+  Self-contained: no external fonts, images or network assets.
+  Designed for a poll sticker dropped in the middle band.
+-->
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f5f0e8;
+    background:
+      radial-gradient(1100px 900px at 50% -10%, rgba(216,64,64,.55), transparent 62%),
+      radial-gradient(900px 700px at -5% 108%, rgba(255,122,24,.32), transparent 55%),
+      linear-gradient(165deg, #12100e 0%, #1c1512 55%, #0d0b0a 100%);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 170px 110px 150px;
+  }
+  .kicker {
+    font-size: 34px; letter-spacing: .3em; text-transform: uppercase;
+    color: #ffb347; font-weight: 700;
+  }
+  .question {
+    font-size: 96px; font-weight: 900; line-height: 1.02;
+    text-transform: uppercase; margin-top: 40px; letter-spacing: -.01em;
+  }
+  .sub { font-size: 52px; font-weight: 700; color: rgba(245,240,232,.8); margin-top: 30px; line-height: 1.25; }
+  .opts { margin-top: 90px; display: flex; flex-direction: column; gap: 30px; width: 100%; }
+  .opt {
+    background: rgba(255,255,255,.07); border: 2px solid rgba(255,179,71,.55);
+    border-radius: 28px; padding: 34px 44px;
+    font-size: 54px; font-weight: 900; letter-spacing: .02em;
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+  }
+  .opt .badge {
+    width: 74px; height: 74px; border-radius: 999px; background: #ff4d3d; color: #12100e;
+    font-size: 42px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+    flex: 0 0 auto;
+  }
+  .hint {
+    margin-top: 70px; font-size: 36px; font-weight: 700; color: #ffb347;
+    letter-spacing: .16em; text-transform: uppercase;
+  }
+  .spacer { flex: 1; }
+  .brand { font-size: 32px; color: rgba(245,240,232,.7); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="kicker">{{event.kicker}}</div>
+  <div class="question">{{story.headline}}</div>
+  <div class="sub">{{story.sub}}</div>
+  <div class="opts">
+    {{#each story.lines}}<div class="opt"><span class="badge">{{label}}</span>{{value}}</div>{{/each}}
+  </div>
+  <div class="hint">{{cta}}</div>
+  <div class="spacer"></div>
+  <div class="brand">{{brand.name}} · {{brand.handle}}</div>
+</body>
+</html>

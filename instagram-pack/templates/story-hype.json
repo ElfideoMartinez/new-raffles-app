@@ -1,0 +1,22 @@
+{
+  "slug": "story-hype-demo",
+  "locale": "es-MX",
+  "templates": { "story": "scripts/instagram/templates/story-hype.html" },
+  "brand": { "name": "Rifas Mtz", "handle": "@bet.mx.ufc", "url": "https://raffleapp-dbc1b.web.app", "tagline": "Rifas de comunidad" },
+  "event": { "kicker": "UFC 333 · HOY 12:00", "title": "UFC 333", "subtitle": "Volkanovski vs. Evloev" },
+  "caption": {
+    "text": "🥊 HOY: UFC 333 — el regreso de Volkanovski al título y la defensa de Evloev.\n\nLa última vez que se vieron, Volkanovski cerró con un TKO en el segundo asalto. Evloev lleva 8 victorias al hilo, cuatro por sumisión.\n\n¿Se repite la historia o se rompe la racha? Esta noche lo sabremos.\n\nEn Rifas Mtz celebramos con una rifa especial. Participa: https://raffleapp-dbc1b.web.app 🧡",
+    "hashtags": "#UFC333 #Volkanovski #Evloev #RifasMtz #MMAEspañol #FightNight",
+    "first_comment": "📋 Rifas de comunidad para probar la app — sin dinero en juego. Horas de Chihuahua (CST)."
+  },
+  "story": {
+    "headline": "HISTORIA",
+    "sub": "Volkanovski vs. Evloev · camino al título",
+    "lines": [
+      { "label": "2019", "value": "Volkanovski gana el título pluma" },
+      { "label": "2023", "value": "Evloev sigue invicto en UFC" },
+      { "label": "HOY", "value": "Se cruzan otra vez — 12:00 CST" }
+    ],
+    "sticker_note": "Story de hype/historia: fondo full-bleed, sin poll. Usar el sticker de cuenta @bet.mx.ufc"
+  }
+}

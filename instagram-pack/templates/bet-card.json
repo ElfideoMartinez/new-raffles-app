@@ -1,0 +1,55 @@
+{
+  "slug": "bet-card-demo",
+  "locale": "es-MX",
+  "templates": {
+    "feed": "scripts/instagram/templates/feed-vs.html"
+  },
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc"
+  },
+  "event": {
+    "kicker": "UFC 333 · APUESTA",
+    "title": "UFC 333",
+    "subtitle": "Volkanovski vs. Evloev"
+  },
+  "cta": "Elige tu campeón 🎲🥊🔥",
+  "caption": {
+    "text": "¿Quién gana? Elige tu lado en la app.",
+    "hashtags": "#UFC333 #RifasMtz"
+  },
+  "matchup": {
+    "label": "ESTELAR · TÍTULO PLUMA",
+    "left": {
+      "name": "Alexander Volkanovski",
+      "nickname": "The Great",
+      "initials": "AV",
+      "stats": [
+        {
+          "label": "Récord",
+          "value": "26-4"
+        },
+        {
+          "label": "KOs",
+          "value": "13"
+        }
+      ]
+    },
+    "right": {
+      "name": "Movsar Evloev",
+      "nickname": "The Silent Assassin",
+      "initials": "ME",
+      "stats": [
+        {
+          "label": "Récord",
+          "value": "19-0"
+        },
+        {
+          "label": "Finishes",
+          "value": "7"
+        }
+      ]
+    },
+    "center": "VS"
+  }
+}
