@@ -198,7 +198,31 @@ Focus ordered by impact:
 
 ---
 
-## P2 — feature work
+## P2 — client UX (reported by Daniel, 2026-10-25 11:58 — PARKED)
+
+### 18. Client side menu: placement + missing sections
+The hamburger/side menu looks wrong — it should overlay at the very top of
+everything (full-height drawer above all content), and it is missing whole
+sections: bets, quick bets (boletos rápidos), and raffles should be reachable
+from the menu alongside Mis compras / Notificaciones.
+
+### 19. Notificaciones page: simplify copy + two stop options
+The client-facing notification copy is too long — simplify it. Provide two
+distinct options to stop notifications: (a) pause/disable pushes on this
+device (token stays, prefs off), and (b) stop completely / delete the device
+token. Both must work signed-in and state clearly what each does.
+
+### 20. sendTestPush not arriving on phone
+After granting notification permission on his phone, Daniel's "Enviar prueba"
+did not deliver any notification. Suspects (verify in order): token was never
+registered to the roster (the old localStorage short-circuit was fixed in code
+— confirm the fix is in the deployed build and a doc landed in
+`notificationTokens` with `tokenId == uid`); FCM credential/VAPID config;
+iOS/PWA delivery specifics (no manifest.json yet — see notifications research
+§3); foreground vs background handler. Reproduce with a registered token,
+check the `sendEachForMulticast` response (success vs unregistered), and fix.
+
+---
 
 ### 13. Winner retrieval without AI
 Determine the official winner programmatically instead of an admin typing it into
