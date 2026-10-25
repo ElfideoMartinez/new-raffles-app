@@ -10,6 +10,42 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (admin settlement + nav UI/UX alignment, per-buyer grouping)**:
+  Wrote down the app's actual UI standard first (`ufc-mission/ui-standard-2026-10-25.md`:
+  tokens from `tailwind.config.ts`, radius ladder, card/button/badge patterns,
+  loading/empty/error states, Spanish copy tone), then aligned `/admin/settlement`:
+  no new one-off styles; replaced off-token classes in SettlementReview
+  (`bg-gray-*` → ink ramp, `border-ink-200` → `border-ink-300`, `bg-danger-100` →
+  `bg-danger-50`, back button to the standard secondary `rounded-sm bg-ink-100`).
+  Payout list is now GROUPED per buyer: same buyer holding several sale documents
+  (grouped by email → phone → name) renders as one buyer group with a header
+  carrying contact, sale count, total tickets, pick summary and the per-buyer
+  projected payout (winner/refund), with each sale listed beneath it (sale id,
+  tickets, picks, payout). Admin nav (`app/admin/layout.tsx`) reorganised into
+  labelled Spanish sections — Inicio / Ventas/Compras / Apuestas y rifas /
+  Liquidación / Ajustes — mapping every admin route (incl. quickTickets and the
+  create/edit pages, previously absent from the nav). Token fixes riding along:
+  added `danger-800` to the tailwind ramp so the existing `hover:bg-danger-800`
+  on both Liquidar buttons actually does something (it was a silent no-op), and
+  fixed the same broken-token classes in `admin/bets`' SettleBetModal and the
+  shared `ApiErrorState` (default `red-*`/`gray-*` → danger/ink tokens).
+  Dev-only test seam: SettlementReview accepts an optional `sales` prop so the
+  local screenshot harness can render it without Firebase auth (production
+  callers unchanged). NOTE for the backlog: sales vs salesBets near-duplicate
+  pages were NOT merged (kept separate routes as instructed) — candidate for a
+  future consolidation; also `/admin/config` and the `admin/edit|create/*` forms
+  still use stock `gray-*`/`blue-*`/`yellow-*` classes instead of tokens
+  (untouched here, follow-up).
+  Evidence: `npx tsc --noEmit` clean; `npm run build` clean (settlement 7.41 kB);
+  headless-Chrome renders against the local mock (with a second same-buyer sale
+  added to `mock/server.mjs` fixtures) with zero overflow at 1440px and 390px:
+  `ufc-mission/before-settlement-review-flat-1440.png` (before: flat table, Ana
+  Prueba split into two rows) / `...-flat-390.png`,
+  `ufc-mission/after-settlement-review-grouped-1440.png` (after: 3 compradores ·
+  4 ventas, Ana grouped 6 boletos) / `...-grouped-390.png`,
+  `ufc-mission/after-settlement-review-outcome-selected.png` (Gana A: buyer
+  totals $585 = $98 × 6, per-sale $390 + $195); the sectioned admin nav is
+  visible at the top of the before/after pairs.
 - **Done 2026-10-25 (admin settlement review + confirm screen)**: new admin page
   `/admin/settlement` (WithAuth-guarded, linked from the shared admin nav as
   "Liquidación"). Bet selector lists all bets (open/finished, unsettled first);

@@ -64,19 +64,48 @@ interface SaleRow {
   byOutcome: { A: number; B: number; C: number };
 }
 
+interface BuyerGroup {
+  key: string;
+  name: string;
+  email: string;
+  phone: string;
+  sales: SaleRow[];
+  tickets: number;
+  byOutcome: { A: number; B: number; C: number };
+}
+
 function asString(v: unknown): string {
   return typeof v === "string" ? v : "";
+}
+
+function picksSummary(by: { A: number; B: number; C: number }): string {
+  return (
+    [
+      by.A > 0 ? `A ×${by.A}` : null,
+      by.B > 0 ? `B ×${by.B}` : null,
+      by.C > 0 ? `Empate ×${by.C}` : null,
+    ]
+      .filter(Boolean)
+      .join(", ") || "—"
+  );
 }
 
 export function SettlementReview({
   bet,
   onBack,
+  sales: salesProp,
 }: {
   bet: IBetsData & { id: string };
   onBack: () => void;
+  /** Dev-only seam: inject fixture sales instead of the authed fetch, so the
+   * component can be rendered by the local screenshot harness without Firebase
+   * auth. Production callers omit it and get the normal authedApiFetch path. */
+  sales?: ISaleData[];
 }) {
   const pricePerTicket = parseFloat(bet.pricePerTicket);
-  const [sales, setSales] = useState<ISaleData[] | null>(null);
+  const [sales, setSales] = useState<ISaleData[] | null>(
+    salesProp !== undefined ? salesProp : null
+  );
   const [error, setError] = useState<{ kind: ErrorKind; message: string } | null>(
     null
   );
@@ -109,6 +138,7 @@ export function SettlementReview({
   };
 
   useEffect(() => {
+    if (salesProp !== undefined) return; // fixture seam: data already injected
     loadSales();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bet.id]);
@@ -144,6 +174,41 @@ export function SettlementReview({
     }
     return out;
   }, [sales, bet.id]);
+
+  // Same buyer can hold several sale documents (e.g. one per transfer). Group
+  // them under one buyer identity — email first, then phone, then name — so
+  // the payout list shows ONE group per buyer with a per-buyer total, instead
+  // of one anonymous row per sale.
+  const groups: BuyerGroup[] = useMemo(() => {
+    const map = new Map<string, BuyerGroup>();
+    for (const r of rows) {
+      const key = r.email || r.phone || r.name || r.saleId;
+      let g = map.get(key);
+      if (!g) {
+        g = {
+          key,
+          name: r.name,
+          email: r.email,
+          phone: r.phone,
+          sales: [],
+          tickets: 0,
+          byOutcome: { A: 0, B: 0, C: 0 },
+        };
+        map.set(key, g);
+      }
+      if (!g.name && r.name) g.name = r.name;
+      if (!g.email && r.email) g.email = r.email;
+      if (!g.phone && r.phone) g.phone = r.phone;
+      g.sales.push(r);
+      g.tickets += r.tickets;
+      g.byOutcome.A += r.byOutcome.A;
+      g.byOutcome.B += r.byOutcome.B;
+      g.byOutcome.C += r.byOutcome.C;
+    }
+    return [...map.values()].sort(
+      (a, b) => b.tickets - a.tickets || a.name.localeCompare(b.name)
+    );
+  }, [rows]);
 
   const totals = useMemo(() => {
     const ticketsByOutcome = rows.reduce(
@@ -221,7 +286,7 @@ export function SettlementReview({
     <div className="w-full max-w-5xl">
       <button
         onClick={onBack}
-        className="mb-4 px-3 py-1.5 text-sm rounded-card bg-gray-200 text-gray-800 hover:bg-gray-300"
+        className="mb-4 px-3 py-1.5 text-sm rounded-sm bg-ink-100 text-ink-900 hover:bg-ink-300 transition-colors"
       >
         ← Otra apuesta
       </button>
@@ -290,66 +355,127 @@ export function SettlementReview({
             </p>
           </div>
 
-          {/* Payout list */}
-          <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4 overflow-x-auto">
-            <p className="font-semibold text-ink-900 mb-2 text-sm">
-              Lista de pagos ({rows.length} ventas)
+          {/* Payout list — ONE group per buyer even when the buyer holds
+              several sale documents; per-buyer totals in the group header. */}
+          <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4">
+            <p className="font-semibold text-ink-900 mb-3 text-sm">
+              Lista de pagos ({groups.length}{" "}
+              {groups.length === 1 ? "comprador" : "compradores"} · {rows.length}{" "}
+              {rows.length === 1 ? "venta" : "ventas"})
             </p>
-            {rows.length === 0 ? (
+            {groups.length === 0 ? (
               <p className="text-sm text-ink-500">
                 No hay ventas verificadas con boletos para esta apuesta.
               </p>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-ink-500 border-b border-ink-200">
-                    <th className="py-2 pr-4">Comprador</th>
-                    <th className="py-2 pr-4">Boletos</th>
-                    <th className="py-2 pr-4">Jugada</th>
-                    <th className="py-2 pr-4">Ganador: pago</th>
-                    <th className="py-2 pr-4">Perdedor: pago</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => {
-                    const picks = [
-                      r.byOutcome.A > 0 ? `A ×${r.byOutcome.A}` : null,
-                      r.byOutcome.B > 0 ? `B ×${r.byOutcome.B}` : null,
-                      r.byOutcome.C > 0 ? `Empate ×${r.byOutcome.C}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(", ");
-                    const winnerPayout =
-                      preview && !preview.refundAll && outcome
-                        ? preview.perTicketCents * r.byOutcome[outcome as "A" | "B" | "C"]
-                        : preview && preview.refundAll
-                        ? Math.round(pricePerTicket * r.tickets * 100)
-                        : null;
-                    return (
-                      <tr key={r.saleId} className="border-b border-ink-100">
-                        <td className="py-2 pr-4">
-                          <span className="font-medium text-ink-900">
-                            {r.name || "(sin nombre)"}
+              <div className="space-y-3">
+                {groups.map((g) => {
+                  const payoutCents = !preview
+                    ? null
+                    : preview.refundAll
+                    ? Math.round(pricePerTicket * g.tickets * 100)
+                    : outcome
+                    ? preview.perTicketCents *
+                      g.byOutcome[outcome as "A" | "B" | "C"]
+                    : null;
+                  return (
+                    <div
+                      key={g.key}
+                      className="rounded-card border border-ink-100 overflow-hidden"
+                    >
+                      {/* Buyer header: identity + per-buyer totals */}
+                      <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 items-center bg-ink-100 px-3 py-2">
+                        <div>
+                          <p className="text-sm font-semibold text-ink-900">
+                            {g.name || "(sin nombre)"}
+                          </p>
+                          <p className="text-xs text-ink-500">
+                            {[g.email, g.phone].filter(Boolean).join(" · ") ||
+                              "Sin contacto"}
+                            {" — "}
+                            {g.sales.length} {" "}
+                            {g.sales.length === 1 ? "venta" : "ventas"}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                          <span className="px-2 py-0.5 rounded-pill bg-white border border-ink-300 font-semibold text-ink-900">
+                            {g.tickets} boletos
                           </span>
-                          {r.email && (
-                            <span className="block text-xs text-ink-500">
-                              {r.email}
+                          <span className="text-ink-700">
+                            {picksSummary(g.byOutcome)}
+                          </span>
+                          {payoutCents == null ? (
+                            <span className="text-ink-500">Pago: —</span>
+                          ) : preview && preview.refundAll ? (
+                            <span className="text-ink-700">
+                              Reembolso:{" "}
+                              <span className="font-semibold text-ink-900">
+                                {formatPrice((payoutCents / 100).toFixed(2))}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="text-ink-700">
+                              Ganador:{" "}
+                              <span className="font-semibold text-success-700">
+                                {formatPrice((payoutCents / 100).toFixed(2))}
+                              </span>{" "}
+                              · Perdedor: $0.00
                             </span>
                           )}
-                        </td>
-                        <td className="py-2 pr-4">{r.tickets}</td>
-                        <td className="py-2 pr-4">{picks}</td>
-                        <td className="py-2 pr-4 text-success-700 font-semibold">
-                          {winnerPayout != null
-                            ? formatPrice((winnerPayout / 100).toFixed(2))
-                            : "—"}
-                        </td>
-                        <td className="py-2 pr-4 text-ink-500">$0.00</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                      </div>
+                      {/* The buyer's individual sales (one line per sale doc) */}
+                      <ul className="px-3 py-1">
+                        {g.sales.map((s) => {
+                          const salePayoutCents = !preview
+                            ? null
+                            : preview.refundAll
+                            ? Math.round(pricePerTicket * s.tickets * 100)
+                            : outcome
+                            ? preview.perTicketCents *
+                              s.byOutcome[outcome as "A" | "B" | "C"]
+                            : null;
+                          return (
+                            <li
+                              key={s.saleId}
+                              className="flex flex-wrap justify-between gap-x-3 gap-y-0.5 py-1.5 border-b border-ink-100 last:border-b-0 text-sm"
+                            >
+                              <span className="text-xs text-ink-500 font-mono break-all">
+                                {s.saleId}
+                              </span>
+                              <span className="flex flex-wrap items-center gap-x-3">
+                                <span className="text-ink-700">
+                                  {s.tickets} boletos
+                                </span>
+                                <span className="text-ink-700">
+                                  {picksSummary(s.byOutcome)}
+                                </span>
+                                {salePayoutCents == null ? (
+                                  <span className="text-ink-500">—</span>
+                                ) : salePayoutCents === 0 ? (
+                                  <span className="text-ink-500">$0.00</span>
+                                ) : (
+                                  <span
+                                    className={`font-semibold ${
+                                      preview && preview.refundAll
+                                        ? "text-ink-900"
+                                        : "text-success-700"
+                                    }`}
+                                  >
+                                    {formatPrice(
+                                      (salePayoutCents / 100).toFixed(2)
+                                    )}
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
 
@@ -380,7 +506,7 @@ export function SettlementReview({
             </div>
 
             {preview && (
-              <div className="rounded-sm border border-ink-200 bg-ink-100 p-3 text-sm mb-4">
+              <div className="rounded-sm border border-ink-300 bg-ink-100 p-3 text-sm mb-4">
                 {preview.refundAll ? (
                   <p className="text-ink-700">
                     Reembolso total: cada boleto recupera su apuesta completa (
@@ -439,7 +565,7 @@ export function SettlementReview({
             {submitError && (
               <div
                 role="alert"
-                className="mt-3 px-3 py-2 rounded-sm bg-danger-100 border border-danger-500 text-danger-700 text-sm"
+                className="mt-3 px-3 py-2 rounded-sm bg-danger-50 border border-danger-500 text-danger-700 text-sm"
               >
                 {submitError}
               </div>

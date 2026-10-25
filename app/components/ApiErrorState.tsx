@@ -64,15 +64,15 @@ export default function ApiErrorState({
   return (
     <div
       role="alert"
-      className="w-full max-w-xl mx-auto my-6 p-5 rounded-card border border-red-300 bg-red-50 text-center"
+      className="w-full max-w-xl mx-auto my-6 p-5 rounded-card border border-danger-500 bg-danger-50 text-center"
     >
-      <p className="text-lg font-bold text-red-800">{TITLES[kind]}</p>
-      <p className="mt-1 text-sm text-red-700">
+      <p className="text-lg font-bold text-danger-700">{TITLES[kind]}</p>
+      <p className="mt-1 text-sm text-danger-700">
         No se pudieron cargar las {entityLabel}.
       </p>
-      <p className="mt-2 text-sm text-gray-700">{HINTS[kind]}</p>
+      <p className="mt-2 text-sm text-ink-700">{HINTS[kind]}</p>
       {message && (
-        <p className="mt-2 text-xs text-gray-500 break-words">
+        <p className="mt-2 text-xs text-ink-500 break-words">
           Detalle del servidor: {message}
         </p>
       )}
@@ -90,7 +90,7 @@ export default function ApiErrorState({
           <button
             type="button"
             onClick={onRetry}
-            className="p-2 rounded-card bg-gray-200 text-gray-800"
+            className="p-2 rounded-card bg-ink-100 text-ink-900 hover:bg-ink-300 transition-colors"
           >
             Reintentar
           </button>

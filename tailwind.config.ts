@@ -41,9 +41,18 @@ const config: Config = {
           100: "#f1f5f9",
         },
         // Semantic states used by the sale/ticket flows.
+        // danger-800 added 2026-10-25: the destructive Liquidar button hover
+        // (`hover:bg-danger-800`) already referenced it in admin/bets and the
+        // settlement review, but the ramp stopped at 700, so the hover was a
+        // silent no-op. One step darker than danger-700 (#b91c1c).
         success: { 50: "#ecfdf5", 500: "#10b981", 700: "#047857" },
         warning: { 50: "#fffbeb", 500: "#f59e0b", 700: "#b45309" },
-        danger: { 50: "#fef2f2", 500: "#ef4444", 700: "#b91c1c" },
+        danger: {
+          50: "#fef2f2",
+          500: "#ef4444",
+          700: "#b91c1c",
+          800: "#991b1b",
+        },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

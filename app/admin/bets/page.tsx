@@ -332,7 +332,7 @@ function SettleBetModal({
 
         <div
           role='alert'
-          className='mb-4 px-3 py-2 rounded-sm border border-warning-500 text-warning-700 text-sm bg-warning-100'
+          className='mb-4 px-3 py-2 rounded-sm border border-warning-500 text-warning-700 text-sm bg-warning-50'
         >
           La liquidación es <strong>permanente e idempotente</strong>: una
           apuesta solo puede liquidarse una vez. Revisa el resultado antes de
@@ -369,7 +369,7 @@ function SettleBetModal({
           </div>
 
           {preview && (
-            <div className='rounded-sm border border-ink-200 bg-ink-100 p-3 text-sm'>
+            <div className='rounded-sm border border-ink-300 bg-ink-100 p-3 text-sm'>
               <p className='font-semibold text-ink-900 mb-1'>
                 Pago estimado por boleto ganador
               </p>
@@ -405,7 +405,7 @@ function SettleBetModal({
           {error && (
             <div
               role='alert'
-              className='px-3 py-2 rounded-sm bg-danger-100 border border-danger-500 text-danger-700 text-sm'
+              className='px-3 py-2 rounded-sm bg-danger-50 border border-danger-500 text-danger-700 text-sm'
             >
               {error}
             </div>

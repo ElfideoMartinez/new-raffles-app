@@ -145,6 +145,16 @@ const salesBets = [
     verified: true,
     bets: [{ betId: "mock-bet-1", ticketNumbers: 1, letterTeam: "C" }],
   },
+  // Same buyer as mock-sale-2 with a SECOND sale, so the settlement review can
+  // show its per-buyer grouping (one buyer, two sale documents).
+  {
+    id: "mock-sale-5",
+    name: "Ana Prueba",
+    email: "ana@example.com",
+    phone: "+526141111111",
+    verified: true,
+    bets: [{ betId: "mock-bet-1", ticketNumbers: 2, letterTeam: "A" }],
+  },
 ];
 
 /**
