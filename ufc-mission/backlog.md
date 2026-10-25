@@ -10,6 +10,12 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (backlog 12.2, persistent admin navigation)**: new
+  `app/admin/layout.tsx` renders a shared nav bar (Inicio, Ventas/Rifas,
+  Ventas/Apuestas, Apuestas, Configuración) above every page in the `/admin`
+  segment, with the current page highlighted; skipped on the login page
+  (`/admin`). Pages no longer dead-end after one "Volver al inicio" link.
+  Evidence: `npx tsc --noEmit` clean at repo root.
 - **Done 2026-10-24 (backlog 12.1, merged /admin/sales + /admin/salesBets)**: new
   `app/components/AdminSalesListPage.tsx` owns the fetch/tabs/error/grid shell
   (auth-error handling preserved); both pages are thin wrappers reusing the
