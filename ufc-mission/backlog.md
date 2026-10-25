@@ -30,9 +30,8 @@ nothing validates them. Either remove the inputs or make them clearly
 ## P1 — operational risk
 
 ### 3. `sendPurchaseNotifications` is a public, unauthenticated push endpoint
-Anyone can POST to it and push a notification to every registered device.
-Source already flags this (`TODO(hardening)`). Needs auth or rate limiting before
-it can be relied on. See item 7.
+**Fixed 2026-10-24** — see Done. Now requires admin auth via
+`rejectUnlessAdmin` and logs an `adminWriteLog` entry on each send.
 
 ### 4. Seller/admin pages duplicate logic: `/admin/sales` vs `/admin/salesBets`
 Both pages are near-identical (same fetch, same loading, same tabs, same card
@@ -150,6 +149,7 @@ a result. Resolve provider credits before building a pipeline on it.
 ## Done during the 2026-10-24 UFC test
 
 Recorded so they are not re-reported:
+- **Fixed 2026-10-24 (backlog 3)**: `sendPurchaseNotifications` now requires admin auth via `rejectUnlessAdmin` (401/403, CORS preflight handled) and appends an `adminWriteLog` entry. Evidence: `functions/src/index.ts` (~:160), `cd functions && npx tsc --noEmit` clean.
 
 - CORS headers now applied before the admin auth check on all 16 admin functions;
   preflights answer 204 with `Authorization, Content-Type, Accept`. Root cause of

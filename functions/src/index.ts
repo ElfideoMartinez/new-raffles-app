@@ -151,18 +151,15 @@ async function rejectUnlessAdmin(
   }
 }
 
-// PUBLIC: invoked by the public site. Not part of the admin surface.
-// TODO(hardening): anyone can call this and spam pushes to every registered
-// device; needs an auth or rate-limit story. Tracked as an open question.
+// ADMIN-ONLY: gated behind admin auth (backlog 3). The public site does not
+// call this today; any future caller must send an admin ID token via
+// `authedApiFetch`.
 export const sendPurchaseNotifications = functions.https.onRequest(
   async (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-
-    if (req.method == "OPTIONS") {
-      res.status(204).send("");
-      return;
-    }
+    if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
+    await logAdminAction(req.headers.authorization, "sendPurchaseNotifications", {
+      note: "manual admin push to all registered devices",
+    });
     try {
       const data = req.body;
       console.log("Data received:", data);
