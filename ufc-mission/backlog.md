@@ -107,6 +107,16 @@ undocumented endpoint to decide payouts is a real risk of paying the wrong peopl
 `/admin` calls it**. There is no button, no form, no link. Settlement is therefore
 impossible without hand-crafting an authenticated request.
 
+Verification progress (2026-10-25, static, no production data touched): payout
+maths in `functions/src/payout.ts` + `settleBet` reviewed clean — integer
+centavos throughout, pool = round(tickets × price), distributable floored after
+take, per-ticket payout floored with breakage to organizer, refund-all on VOID or
+zero winning tickets returns full stake (take not collected), counters recomputed
+from persisted verified `salesBets` docs (not live RTDB counters), idempotency
+via `settled === true`, and the admin modal's Empate maps to `"C"` matching
+`settleBet`'s accepted results. End-to-end settle-control check and winner-banner
+check remain gated on Daniel's explicit go (requires one real settlement).
+
 Consequences found on 2026-10-24:
 - No bet was settled during the entire event test.
 - The winner banner on `/bet` and `/bet/[id]` has therefore **never rendered real
