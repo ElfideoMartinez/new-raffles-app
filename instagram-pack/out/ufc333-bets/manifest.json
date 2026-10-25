@@ -1,0 +1,38 @@
+{
+  "slug": "ufc333-bets",
+  "generated_by": "scripts/instagram/generate.mjs",
+  "generated_at": "2026-10-25T18:45:43.768Z",
+  "input": "/Users/danielmartinez/Projects/new-raffles-app/scripts/instagram/examples/ufc333-bets.json",
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc",
+    "url": "https://raffleapp-dbc1b.web.app",
+    "tagline": "Rifas de comunidad · prueba de la app"
+  },
+  "event": {
+    "kicker": "HOY · SÁBADO 24/OCT",
+    "title": "UFC 333",
+    "subtitle": "Volkanovski vs. Evloev",
+    "meta": "Etihad Arena, Abu Dhabi · Early prelims 08:00 · Prelims 10:00 · Main card 12:00 — hora Chihuahua (CST)"
+  },
+  "assets": [
+    {
+      "kind": "feed",
+      "file": "feed.jpg",
+      "dimensions": "1080x1350",
+      "bytes": 258715,
+      "under_8mb": true,
+      "format": "jpeg"
+    },
+    {
+      "kind": "story",
+      "file": "story.jpg",
+      "dimensions": "1080x1920",
+      "bytes": 211309,
+      "under_8mb": true,
+      "format": "jpeg"
+    }
+  ],
+  "antwork_media_rules": "jpg/jpeg <= 8MB; upload via add_media -> PUT URL -> curl",
+  "story_note": "Publicar con countdown sticker a las 12:00 y poll — manual desde el teléfono"
+}

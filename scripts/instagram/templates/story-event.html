@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  Story template — 1080x1920 (9:16). Rendered by scripts/instagram/generate.mjs.
+  Self-contained: no external fonts, images or network assets.
+-->
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f5f0e8;
+    background:
+      radial-gradient(1100px 900px at 90% -5%, rgba(216,64,64,.5), transparent 60%),
+      radial-gradient(1000px 800px at -5% 105%, rgba(255,122,24,.3), transparent 55%),
+      linear-gradient(165deg, #12100e 0%, #1c1512 55%, #0d0b0a 100%);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 160px 110px 140px;
+  }
+  .kicker {
+    font-size: 36px; letter-spacing: .3em; text-transform: uppercase;
+    color: #ffb347; font-weight: 700;
+  }
+  .headline {
+    font-size: 190px; font-weight: 900; line-height: .95;
+    text-transform: uppercase; margin-top: 24px; letter-spacing: -.01em;
+  }
+  .sub { font-size: 66px; font-weight: 800; color: #ff4d3d; margin-top: 18px; text-transform: uppercase; }
+  .clock { margin-top: 90px; display: flex; flex-direction: column; gap: 28px; width: 100%; }
+  .line {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,179,71,.4);
+    border-radius: 999px; padding: 30px 40px;
+    font-size: 46px; font-weight: 800; letter-spacing: .04em;
+  }
+  .cta {
+    margin-top: auto; background: #f5f0e8; color: #12100e;
+    font-size: 44px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .06em; padding: 28px 60px; border-radius: 999px;
+  }
+  .brand { margin-top: 36px; font-size: 32px; color: rgba(245,240,232,.7); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="kicker">{{event.kicker}}</div>
+  <div class="headline">{{story.headline}}</div>
+  <div class="sub">{{story.sub}}</div>
+  <div class="clock">
+    {{#each story.lines}}<div class="line">{{this}}</div>{{/each}}
+  </div>
+  <div class="cta">{{cta}}</div>
+  <div class="brand">{{brand.name}} · {{brand.handle}}</div>
+</body>
+</html>

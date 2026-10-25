@@ -1,0 +1,40 @@
+{
+  "slug": "ufc333-bets",
+  "template": "event",
+  "locale": "es-MX",
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc",
+    "url": "https://raffleapp-dbc1b.web.app",
+    "tagline": "Rifas de comunidad · prueba de la app"
+  },
+  "event": {
+    "kicker": "HOY · SÁBADO 24/OCT",
+    "title": "UFC 333",
+    "subtitle": "Volkanovski vs. Evloev",
+    "meta": "Etihad Arena, Abu Dhabi · Early prelims 08:00 · Prelims 10:00 · Main card 12:00 — hora Chihuahua (CST)"
+  },
+  "highlights": [
+    { "label": "Estelar", "value": "Volkanovski (C) vs. Evloev · título pluma" },
+    { "label": "Co-estelar", "value": "Yan (C) vs. Dvalishvili · título gallo" },
+    { "label": "Prelims", "value": "Reyes vs. Murzakanov · Volkov vs. Kuniev · Pico vs. Keita" }
+  ],
+  "banner": "14 PELEAS · UNA NOCHE GIGANTE",
+  "body": "En Rifas Mtz celebramos el evento con una rifa especial de la noche de peleas. Es una prueba de nuestra app — participa, apoya y vive el evento con nosotros.",
+  "cta": "Link en la bio",
+  "caption": {
+    "text": "🥊 TARJETA COMPLETA — UFC 333 🔥\n\n14 peleas HOY desde Abu Dhabi. La estelar es gigante:\n\n🏆 Volkanovski (C) vs. Evloev — título pluma\n🏆 Yan (C) vs. Dvalishvili — título gallo\n⚡ Kavanagh vs. Temirov · Volkov vs. Kuniev · Pico vs. Keita\n\nY en prelims: Reyes vs. Murzakanov, Krylov, Dawson y más. (08:00 early prelims · 10:00 prelims · 12:00 estelar — hora Chihuahua)\n\nEn Rifas Mtz celebramos con una rifa de la noche. Es una prueba de nuestra app — participa desde el link: https://raffleapp-dbc1b.web.app 🧡",
+    "hashtags": "#UFC333 #VolkanovskiEvloev #Volkanovski #Evloev #YanVsDvalishvili #MMAToday #Rifas #RifasMtz #RifaMéxico #SorteoMéxico #MMAEspañol #UFCEnEspañol #AbuDhabi #FightNight #ComunidadMMA",
+    "first_comment": "📋 Reglas rápidas: esto es una rifa de comunidad para probar nuestra app — no es apuesta, no hay dinero en juego, solo premios de rifas. Participa desde el link de la bio. Las horas son de Chihuahua (CST). 🙌"
+  },
+  "story": {
+    "headline": "UFC 333",
+    "sub": "Volkanovski vs. Evloev",
+    "lines": [
+      "Early prelims 08:00",
+      "Prelims 10:00",
+      "Main card 12:00"
+    ],
+    "sticker_note": "Publicar con countdown sticker a las 12:00 y poll — manual desde el teléfono"
+  }
+}
