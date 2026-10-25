@@ -9,6 +9,13 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 
 ---
 
+## Done (this session)
+
+### 6. Email optional on the sale form
+**Done 2026-10-24** — sale form validates email only when non-empty; label now says "(opcional)". Confirmation copy confirmed WhatsApp-first (no email promise), no change needed there.
+
+---
+
 ## P0 — correctness / money
 
 ### 1. `oddsTie` is written as `undefined`
@@ -47,10 +54,6 @@ Focus ordered by impact:
 4. `/admin/edit/bet` and `/admin/edit/raffle` both stall-then-jump: a single
    select acts as both picker and loader with no persistent selection.
 5. Buttons need loading + failure states as a consistent pattern (items 6, 7).
-
-### 6. Email should be optional on the sale form
-Buyers currently must supply an email. Many only use WhatsApp. Make it optional
-and adjust the confirmation copy (`fewTicketsNote`) accordingly.
 
 ### 7. Confirm-payment button: error indication
 `BetSaleCard` shows a toast on failure but the card gives no persistent signal.

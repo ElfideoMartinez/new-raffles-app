@@ -40,6 +40,8 @@ export const CHECKOUT_SUCCESS_DEFAULTS: CheckoutSuccessConfig = {
     "Ojo 👀\nComo tu compra fue de mas de 5 boletos, tus boletos comprados seguiran apareciendo como disponibles,\nuna vez verificada tu transferencia te lo haremos saber por medio de whatsapp y tus boletos apareceran como vendidos.",
   fewTicketsNote:
     "✅ Hemos registrado tu compra por transferencia.\nUna vez que verifiquemos el pago, te avisaremos por WhatsApp.",
+  // Email is optional: the confirmation copy makes no promise about email
+  // notifications, so no email mention is needed here.
   homeButtonLabel: "Ir a inicio",
 };
 

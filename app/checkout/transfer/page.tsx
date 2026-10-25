@@ -107,7 +107,9 @@ const CheckoutTransferPage = () => {
 
   const emailRegex = /^[a-zA-Z0-9]+([._+-]?[a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,10})+$/;
   //const emailRegex = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
-  const isEmailValid = emailRegex.test(email) && email.length < 50;
+  // Email is optional: validate only when the buyer typed something.
+  const isEmailValid =
+    email === "" || (emailRegex.test(email) && email.length < 50);
 
   return (
     <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-card'>
@@ -204,7 +206,7 @@ const CheckoutTransferPage = () => {
       {/* Email Input (Optional) with Copy Button */}
       <div className='flex flex-col items-center'>
         <label htmlFor='email' className='text-black text-lg font-semibold'>
-          Correo Electrónico
+          Correo Electrónico (opcional)
         </label>
         <input
           id='email'
