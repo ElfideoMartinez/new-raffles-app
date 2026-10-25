@@ -10,6 +10,8 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-24 (backlog 7+8, folded into one pattern change)**: `BetSaleCard` confirm/reject now shows a persistent on-card error banner (role=alert, cleared on next attempt) on failure, and the loading button is labelled "Procesando…" alongside a compact `FadeLoader`. Evidence: `app/components/BetSaleCard.tsx`, `npx tsc --noEmit` clean.
+
 
 ### 6. Email optional on the sale form
 **Done 2026-10-24** — sale form validates email only when non-empty; label now says "(opcional)". Confirmation copy confirmed WhatsApp-first (no email promise), no change needed there.
@@ -54,14 +56,6 @@ Focus ordered by impact:
 4. `/admin/edit/bet` and `/admin/edit/raffle` both stall-then-jump: a single
    select acts as both picker and loader with no persistent selection.
 5. Buttons need loading + failure states as a consistent pattern (items 6, 7).
-
-### 7. Confirm-payment button: error indication
-`BetSaleCard` shows a toast on failure but the card gives no persistent signal.
-A failed confirm looks identical to a never-attempted one a minute later.
-
-### 8. Confirm-payment button: loading state
-`isLoading` disables the button and swaps in a `FadeLoader`, but there is no
-label change or in-place progress. Folds into the pattern work in item 12.5.
 
 ---
 

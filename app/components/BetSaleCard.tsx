@@ -37,6 +37,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
   setSalesFunction,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   /**
    * Resolves only when the function accepted the change. Any non-2xx response
@@ -72,6 +73,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
     }
   };
   const handleAction = async () => {
+    setActionError(null);
     try {
       setIsLoading(true);
       await confirmOrRejectPayment(isVerified ? "reject" : "confirm");
@@ -82,6 +84,13 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
       );
     } catch (error) {
       // State is untouched: the card keeps showing what the server still has.
+      // Persistent on-card error signal (backlog item 7): a toast alone left a
+      // failed confirm indistinguishable from a never-attempted one.
+      setActionError(
+        isVerified
+          ? "No se pudo rechazar el pago. Inténtalo de nuevo."
+          : "No se pudo confirmar el pago. Inténtalo de nuevo."
+      );
       toast.error(
         `Error al completar la compra. Inténtalo de nuevo más tarde.`,
         {
@@ -146,9 +155,24 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
       )}
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
 
+      {actionError && (
+        <div
+          role='alert'
+          className='mt-2 p-2 rounded-card bg-danger-700/20 text-danger-700 text-sm'
+        >
+          {actionError}
+        </div>
+      )}
+
       {isLoading ? (
-        <button className='bg-gray-400 text-white rounded-card p-2' disabled>
-          <FadeLoader color="var(--color-brand-700)" />
+        <button
+          className='bg-gray-400 text-white rounded-card p-2 flex items-center justify-center gap-2'
+          disabled
+        >
+          {/* Backlog item 8: labelled in-place progress instead of a bare
+              spinner, so the button reads as busy rather than broken. */}
+          <FadeLoader color="var(--color-brand-700)" height={8} width={3} />
+          <span>Procesando…</span>
         </button>
       ) : (
         <div className='w-full flex flex-col gap-2 sm:flex-row mt-2'>
