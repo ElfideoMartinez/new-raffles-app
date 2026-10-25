@@ -1,0 +1,64 @@
+{
+  "slug": "abus-magomedov",
+  "name": "Abus Magomedov",
+  "nickname": null,
+  "initials": "AM",
+  "country": "Germany",
+  "division": "Middleweight",
+  "record": {
+    "wins": 30,
+    "losses": 7,
+    "draws": 1
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1990-09-02"
+    }
+  ],
+  "facts": [
+    "Abusupiyan Magomedov Khydyvov is a Russian and German mixed martial artist. He currently competes in the middleweight division of the Ultimate Fighting Championship."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Cam Rowston",
+      "result": "W",
+      "division": "Middleweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Abusupiyan_Magomedov",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Abusupiyan_Magomedov",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Middleweight",
+        "opponent": "Cam Rowston",
+        "winner": true,
+        "result": "W"
+      }
+    ]
+  }
+}

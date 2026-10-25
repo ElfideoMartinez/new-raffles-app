@@ -1,0 +1,43 @@
+{
+  "slug": "cam-rowston",
+  "name": "Cam Rowston",
+  "nickname": null,
+  "initials": "CR",
+  "country": "Australia",
+  "division": "Middleweight",
+  "record": {
+    "wins": 15,
+    "losses": 4,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Abus Magomedov",
+      "result": "L",
+      "division": "Middleweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Middleweight",
+        "opponent": "Abus Magomedov",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

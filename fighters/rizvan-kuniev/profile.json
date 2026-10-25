@@ -1,0 +1,60 @@
+{
+  "slug": "rizvan-kuniev",
+  "name": "Rizvan Kuniev",
+  "nickname": null,
+  "initials": "RK",
+  "country": "Russia",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 14,
+    "losses": 4,
+    "draws": 1
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1992-03-10"
+    }
+  ],
+  "facts": [
+    "Rizvan Magomedovich Kuniev is a Russian professional mixed martial artist competing in the Heavyweight division of the Ultimate Fighting Championship (UFC). As of July 25, 2026, he is #5 in the Meta UFC heavyweight rankings.."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Alexander Volkov",
+      "result": "L",
+      "division": "Heavyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Rizvan_Kuniev",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Rizvan_Kuniev",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Heavyweight",
+        "opponent": "Alexander Volkov",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

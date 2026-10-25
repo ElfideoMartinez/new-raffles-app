@@ -1,0 +1,43 @@
+{
+  "slug": "asaf-chopurov",
+  "name": "Asaf Chopurov",
+  "nickname": null,
+  "initials": "AC",
+  "country": "Russia",
+  "division": "Bantamweight",
+  "record": {
+    "wins": 11,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Colby Thicknesse",
+      "result": "L",
+      "division": "Bantamweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Bantamweight",
+        "opponent": "Colby Thicknesse",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

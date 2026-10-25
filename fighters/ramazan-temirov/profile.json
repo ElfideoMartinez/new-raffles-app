@@ -1,0 +1,65 @@
+{
+  "slug": "ramazan-temirov",
+  "name": "Ramazan Temirov",
+  "nickname": "Temurlan",
+  "initials": "RT",
+  "country": "Uzbekistan",
+  "division": "Flyweight",
+  "record": {
+    "wins": 20,
+    "losses": 4,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1997-01-31"
+    }
+  ],
+  "facts": [
+    "Ramazonbek Yuldosh o‘gli “Ramazan” Temirov is an Uzbek professional mixed martial artist currently competing in the flyweight division of the Ultimate Fighting Championship (UFC). As of July 25, 2026, he is #7 in the Meta UFC flyweight rankings.."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Lone'er Kavanagh",
+      "result": "L",
+      "division": "Flyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ramazan_Temirov",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ramazan_Temirov",
+      "note": "nickname (wikibox)",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ramazan_Temirov",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Flyweight",
+        "opponent": "Lone'er Kavanagh",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

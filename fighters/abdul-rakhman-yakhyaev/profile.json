@@ -1,0 +1,64 @@
+{
+  "slug": "abdul-rakhman-yakhyaev",
+  "name": "Abdul-Rakhman Yakhyaev",
+  "nickname": null,
+  "initials": "AY",
+  "country": "Türkiye",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 11,
+    "losses": 0,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "2001-01-03"
+    }
+  ],
+  "facts": [
+    "Abdul-Rakhman Yakhyaev is a Russian mixed martial artist who competes in the Ultimate Fighting Championship (UFC He currently competes in the Light Heavyweight division of the Ultimate Fighting Championship. As of October 3, 2026, he is #15 in the Meta UFC light heavyweight rankings.."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Nikita Krylov",
+      "result": "W",
+      "division": "Light Heavyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Abdul-Rakhman_Yakhyaev",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Abdul-Rakhman_Yakhyaev",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Nikita Krylov",
+        "winner": true,
+        "result": "W"
+      }
+    ]
+  }
+}

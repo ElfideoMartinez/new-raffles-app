@@ -1,0 +1,81 @@
+{
+  "slug": "dominick-reyes",
+  "name": "Dominick Reyes",
+  "nickname": "The Devastator",
+  "initials": "DR",
+  "country": "USA",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 17,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1989-12-26"
+    }
+  ],
+  "facts": [
+    "Dominick Vincent Reyes is an American professional mixed martial artist. He currently competes in the Light Heavyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Azamat Murzakanov",
+      "result": "W",
+      "division": "Light Heavyweight"
+    }
+  ],
+  "photo": {
+    "file": "photo.jpg",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Dominick_Reyes_(54451224096).jpg",
+    "license": "Public domain",
+    "license_url": null,
+    "artist": "The White House",
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
+      "note": "nickname (wikibox)",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Dominick_Reyes_(54451224096).jpg",
+      "note": "photo, license Public domain (Wikipedia lead image)",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Azamat Murzakanov",
+        "winner": true,
+        "result": "W"
+      }
+    ]
+  }
+}

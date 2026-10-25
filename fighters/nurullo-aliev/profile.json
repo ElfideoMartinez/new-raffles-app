@@ -1,0 +1,72 @@
+{
+  "slug": "nurullo-aliev",
+  "name": "Nurullo Aliev",
+  "nickname": null,
+  "initials": "NA",
+  "country": "Tajikistan",
+  "division": "Lightweight",
+  "record": {
+    "wins": 12,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "2000-12-08"
+    }
+  ],
+  "facts": [
+    "Nurullo Aliev is a Tajik mixed martial artist. He currently competes in the Lightweight division of the Ultimate Fighting Championship (UFC).."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Grant Dawson",
+      "result": "L",
+      "division": "Lightweight"
+    }
+  ],
+  "photo": {
+    "file": "photo.jpg",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Nurullo_Aliev.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Nurullo Aliev",
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nurullo_Aliev",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nurullo_Aliev",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Nurullo_Aliev.jpg",
+      "note": "photo, license CC BY-SA 4.0 (Commons search)",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Lightweight",
+        "opponent": "Grant Dawson",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

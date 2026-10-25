@@ -1,0 +1,60 @@
+{
+  "slug": "azamat-murzakanov",
+  "name": "Azamat Murzakanov",
+  "nickname": null,
+  "initials": "AM",
+  "country": "Russia",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 16,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1989-04-12"
+    }
+  ],
+  "facts": [
+    "Azamat Anzorovich Murzakanov is a Russian professional mixed martial artist. He currently competes in the Light Heavyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Dominick Reyes",
+      "result": "L",
+      "division": "Light Heavyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Azamat_Murzakanov",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Azamat_Murzakanov",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Dominick Reyes",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

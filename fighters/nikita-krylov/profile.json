@@ -1,0 +1,60 @@
+{
+  "slug": "nikita-krylov",
+  "name": "Nikita Krylov",
+  "nickname": null,
+  "initials": "NK",
+  "country": "Russia",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 31,
+    "losses": 13,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1992-03-07"
+    }
+  ],
+  "facts": [
+    "Nikita Andreyevich Krylov is a Ukrainian-born Russian professional mixed martial artist. He currently competes in the Light Heavyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Abdul-Rakhman Yakhyaev",
+      "result": "L",
+      "division": "Light Heavyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nikita_Krylov",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nikita_Krylov",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Abdul-Rakhman Yakhyaev",
+        "winner": false,
+        "result": "L"
+      }
+    ]
+  }
+}

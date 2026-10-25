@@ -1,0 +1,64 @@
+{
+  "slug": "lone-er-kavanagh",
+  "name": "Lone'er Kavanagh",
+  "nickname": null,
+  "initials": "LK",
+  "country": "England",
+  "division": "Flyweight",
+  "record": {
+    "wins": 11,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1999-06-09"
+    }
+  ],
+  "facts": [
+    "Lone'er Kavanagh is a British professional mixed martial artist currently competing in the Flyweight division of the Ultimate Fighting Championship (UFC). He trains out of Great Britain Top Team in London."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Ramazan Temirov",
+      "result": "W",
+      "division": "Flyweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Flyweight",
+        "opponent": "Ramazan Temirov",
+        "winner": true,
+        "result": "W"
+      }
+    ]
+  }
+}

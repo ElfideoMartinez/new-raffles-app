@@ -1,0 +1,69 @@
+{
+  "slug": "alexander-volkanovski",
+  "name": "Alexander Volkanovski",
+  "nickname": "The Great",
+  "initials": "AV",
+  "country": "Australia",
+  "division": "Featherweight",
+  "record": {
+    "wins": 29,
+    "losses": 4,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1988-09-29"
+    }
+  ],
+  "facts": [
+    "Alexander Volkanovski is an Australian professional mixed martial artist. He currently competes in the Featherweight division of the Ultimate Fighting Championship (UFC), where he is the current and two-time UFC Featherweight Champion."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Movsar Evloev",
+      "result": "W",
+      "division": "Featherweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
+      "note": "short factual summary",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
+      "note": "nickname (wikibox)",
+      "checked": "2026-10-25"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-25"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Featherweight",
+        "opponent": "Movsar Evloev",
+        "winner": true,
+        "result": "W"
+      }
+    ]
+  }
+}
