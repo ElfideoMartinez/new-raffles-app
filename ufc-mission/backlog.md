@@ -15,16 +15,6 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 **Fixed 2026-10-24** — see Done. Omitted the key entirely when empty in
 `createBet`; no longer assigns `undefined`.
 
-### 2. Pari-mutuel odds are a placeholder, not a price
-`createBet` defaults `oddsTeamA`/`oddsTeamB` to `"1.0"`. The app is a pari-mutuel
-pool (`settleBet`: `pool × (1 − takeRate) / winningTickets`), so no pre-match odds
-exist. Showing `1.0` reads as a promise the system will not honour.
-**Partially fixed 2026-10-24**: the bet list card now shows live pool share
-(`Reparto actual`) instead of the odds fields. Still open: the admin forms
-(`admin/bets`, `admin/create/bet`) still expose odds inputs that do nothing, and
-nothing validates them. Either remove the inputs or make them clearly
-"cosmetic/ignored".
-
 ---
 
 ## P1 — operational risk
@@ -139,6 +129,13 @@ a result. Resolve provider credits before building a pipeline on it.
 ---
 
 ## Done during the 2026-10-24 UFC test
+
+### 2. Pari-mutuel odds are a placeholder, not a price (done 2026-10-24)
+Removed the unused odds inputs from admin forms: `admin/create/bet` no longer
+shows Cuota Equipo A/B or Cuota Empate (kept the functional "¿Permitir empate?"
+checkbox) and shows a pari-mutuel payout explanation instead; `admin/bets` edit
+modal no longer shows or submits oddsTeamA/oddsTeamB; validation no longer
+requires them. Commit `backlog(2)`.
 
 - **Fixed 2026-10-24 (backlog 9)**: post-payment navigation returns the buyer
   to their origin route. Cart page saves its pathname in sessionStorage before

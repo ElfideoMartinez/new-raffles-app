@@ -214,9 +214,7 @@ const CreateBet = () => {
       bet.title.trim() !== "" &&
       bet.description.trim() !== "" &&
       bet.date.trim() !== "" &&
-      bet.pricePerTicket !== 0 &&
-      bet.oddsTeamA.trim() !== "" &&
-      bet.oddsTeamB.trim() !== "";
+      bet.pricePerTicket !== 0;
 
     const areTeamsValid =
       bet.teams.a.trim() !== "" && bet.teams.b.trim() !== "";
@@ -352,8 +350,13 @@ const CreateBet = () => {
             {/* Odds Section */}
             <div>
               <h3 className='text-ink-900 text-lg font-semibold mb-4'>
-                Cuotas Iniciales
+                Opciones del Sorteo
               </h3>
+              <p className='text-xs text-ink-500 mb-4'>
+                Sorteo parimutual: los pagos se calculan del pool al cerrar
+                (pool &times; (1 &minus; takeRate) / boletos ganadores). No se
+                fijan cuotas previas.
+              </p>
               <div className='flex items-center mb-4'>
                 <input
                   id='enableTie'
@@ -373,59 +376,6 @@ const CreateBet = () => {
                 >
                   ¿Permitir empate?
                 </label>
-              </div>
-              {bet.oddsTie !== undefined && (
-                <div className='mb-4'>
-                  <label className='text-ink-700 block text-sm font-medium mb-2'>
-                    Cuota Empate
-                  </label>
-                  <input
-                    type='text'
-                    name='oddsTie'
-                    value={bet.oddsTie}
-                    onChange={(e) => {
-                      console.log(e.target.value);
-                      setBet((prev) => ({
-                        ...prev,
-                        oddsTie: e.target.value,
-                      }));
-                    }}
-                    required
-                    placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-warning-500 focus:ring-2 focus:ring-warning-500/20 transition-all'
-                  />
-                </div>
-              )}
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <label className='text-ink-700 block text-sm font-medium mb-2'>
-                    Cuota Equipo A *
-                  </label>
-                  <input
-                    type='text'
-                    name='oddsTeamA'
-                    value={bet.oddsTeamA}
-                    onChange={handleChange}
-                    required
-                    placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-success-500 focus:ring-2 focus:ring-success-500/20 transition-all'
-                  />
-                </div>
-
-                <div>
-                  <label className='text-ink-700 block text-sm font-medium mb-2'>
-                    Cuota Equipo B *
-                  </label>
-                  <input
-                    type='text'
-                    name='oddsTeamB'
-                    value={bet.oddsTeamB}
-                    onChange={handleChange}
-                    required
-                    placeholder='Ej: 30, 50, 100'
-                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-danger-500 focus:ring-2 focus:ring-danger-500/20 transition-all'
-                  />
-                </div>
               </div>
             </div>
 

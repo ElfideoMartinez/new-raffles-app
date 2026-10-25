@@ -35,8 +35,6 @@ interface EditBetFormData {
   date: string;
   teams: { a: string; b: string };
   image: string;
-  oddsTeamA: string;
-  oddsTeamB: string;
 }
 
 function EditBetModal({
@@ -57,8 +55,6 @@ function EditBetModal({
     pricePerTicket: bet.pricePerTicket,
     date: bet.date,
     teams: { a: bet.teams.a || "", b: bet.teams.b || "" },
-    oddsTeamA: bet.oddsTeamA || "",
-    oddsTeamB: bet.oddsTeamB || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -179,28 +175,6 @@ function EditBetModal({
                 required
               />
             </div>
-          </div>
-          <div>
-            Favor Equipo A *
-            <input
-              type='text'
-              value={formData.oddsTeamA || ""}
-              onChange={(e) => handleInputChange("oddsTeamA", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
-              required
-              placeholder='Ejemplo: -120, +110'
-            />
-          </div>
-          <div>
-            Favor Equipo B *
-            <input
-              type='text'
-              value={formData.oddsTeamB || ""}
-              onChange={(e) => handleInputChange("oddsTeamB", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
-              required
-              placeholder='Ejemplo: -120, +110'
-            />
           </div>
           <div className='text-xs text-ink-500'>
             Link de imagen (opcional):
