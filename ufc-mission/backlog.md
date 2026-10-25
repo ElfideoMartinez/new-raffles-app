@@ -1,5 +1,16 @@
 # Backlog — new-raffles-app
 
+> **Deferred from the client-login task (2026-10-25)** — for Daniel to decide:
+> 1. Deploy: `getMyPurchases`, `sendTestPush` and the `enabled` token filters
+>    are committed but NOT deployed; also the first Firestore rules deploy
+>    (rules:90-93) if not yet live — client-side settings writes depend on them.
+> 2. Legacy device association is client-side only (localStorage
+>    "purchases" groups). Server-side association for pre-login sales
+>    (userId:null docs) needs a data model decision (e.g. backfill by phone/email).
+> 3. In-app notifications feed (`notifications/*` docs written by settleBet)
+>    has no client reader yet; Notificaciones page currently covers push settings only.
+> 4. `NEXT_PUBLIC_ENABLE_MOCK_AUTH=1` exists for local screenshots only
+>    (scripts/client-shots.mjs); production builds must never set it.
 Ordered by what blocks real money and nightly operations first, then UX.
 Maintained during the UFC 333 event test (2026-10-24). Read this before starting
 any admin-side work; most items below came from live-testing failures, not
@@ -10,6 +21,43 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (client login + client sidebar: Mis compras / Notificaciones, Model A identity)**:
+  Added Firebase Auth email/password login + registration for customers at
+  `/login` (Spanish UX, UI-standard card/forms, friendly Firebase error
+  messages). `app/components/clientAuth.ts` exposes `useClientAuth`, sign-in /
+  register / logout helpers and `userApiFetch` (client endpoints, Bearer ID
+  token — any signed-in user, NOT admin-only). Client menu (`HamburgerMenu`)
+  now carries "Mis compras" (`/user/my-purchases`), "Notificaciones"
+  (`/user/notificaciones`), plus login state: anonymous visitors see "Iniciar
+  sesión", signed-in clients see their account name/email + "Cerrar sesión".
+  Anonymous browsing still works everywhere.
+  Purchases → clients: `createTransferSale` already records the Bearer token's
+  uid as `userId` on `sales`/`salesBets`; checkout already sends that token
+  when a customer is signed in. New user-gated Cloud Function `getMyPurchases`
+  returns the caller's own docs (`userId == auth.uid`); the page merges the
+  legacy localStorage "purchases" groups as the device-association fallback for
+  pre-login purchases (marked "Compra sin cuenta"). Status badges: Pendiente /
+  Confirmada / Ganada (+payout) / Perdida / reembolso, grouped per sale doc,
+  newest first, ApiErrorState on failure.
+  Notifications: fixed the WithAuth token-registration short-circuit (it used
+  to return early on a cached localStorage token and never re-register, and
+  wrote `userId:"daniel"` hardcoded). Registration now ALWAYS fetches the FCM
+  token and writes `notificationTokens/{uid}` under the SIGNED-IN user's uid
+  (matching firestore.rules:90-93 `tokenId == request.auth.uid`); anonymous
+  visitors cache locally and register on first sign-in. `/user/notificaciones`
+  manages the identity roster: device label, enable/disable toggle persisted on
+  the same doc, explicit permission request button, and an "Enviar prueba"
+  button behind the new user-gated `sendTestPush` Cloud Function (verifies the
+  caller's ID token, sends FCM ONLY to `notificationTokens/{callerUid}` — never
+  public, never cross-device). All three bulk notification paths now skip
+  tokens with `enabled === false`. Admin auth path untouched.
+  New functions are NOT deployed — deploy waits for Daniel.
+  Evidence: `npx tsc --noEmit` clean (app + functions), `npm run build` clean,
+  headless-Chrome renders against the mock (mock routes `getMyPurchases` /
+  `sendTestPush` added): `ufc-mission/client-sidebar-*.png`,
+  `client-login.png`, `client-compras-populated.png` (all badge states),
+  `client-compras-empty.png`, `client-notificaciones.png`; no horizontal
+  overflow at 390px or 1440px.
 - **Done 2026-10-25 (admin settlement + nav UI/UX alignment, per-buyer grouping)**:
   Wrote down the app's actual UI standard first (`ufc-mission/ui-standard-2026-10-25.md`:
   tokens from `tailwind.config.ts`, radius ladder, card/button/badge patterns,

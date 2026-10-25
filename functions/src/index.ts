@@ -171,7 +171,7 @@ export const sendPurchaseNotifications = functions.https.onRequest(
       const fcmTokens: string[] = [];
       tokensSnapshot.forEach((doc) => {
         const tokenData = doc.data();
-        if (tokenData.token) {
+        if (tokenData.token && tokenData.enabled !== false) {
           fcmTokens.push(tokenData.token);
         }
       });
@@ -1040,7 +1040,7 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
       const fcmTokens: string[] = [];
       tokensSnapshot.forEach((doc) => {
         const tokenData = doc.data();
-        if (tokenData.token) {
+        if (tokenData.token && tokenData.enabled !== false) {
           fcmTokens.push(tokenData.token);
         }
       });
@@ -1502,7 +1502,9 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
         const tokens: string[] = [];
         tokensSnapshot.forEach((doc) => {
           const token = doc.get("token");
-          if (typeof token === "string" && token) tokens.push(token);
+          // Respect the per-device opt-out (Notificaciones page, 2026-10-25).
+          if (typeof token === "string" && token && doc.get("enabled") !== false)
+            tokens.push(token);
         });
         if (tokens.length > 0) {
           await admin.messaging().sendEachForMulticast({
@@ -2203,7 +2205,9 @@ async function notifyBetSettlement(
     const tokens: string[] = [];
     tokensSnapshot.forEach((doc) => {
       const token = doc.get("token");
-      if (typeof token === "string" && token) tokens.push(token);
+      // Respect the per-device opt-out (Notificaciones page, 2026-10-25).
+      if (typeof token === "string" && token && doc.get("enabled") !== false)
+        tokens.push(token);
     });
 
     for (const sale of sales) {
@@ -2642,3 +2646,137 @@ export const getRemoteConfigValues = functions.https.onRequest(
     }
   }
 );
+
+// ---------------------------------------------------------------------------
+// CLIENT (CUSTOMER) ENDPOINTS — user-gated, NEVER public, NEVER admin-only.
+// Added 2026-10-25 with the client login (Model A identity). These verify the
+// caller's Firebase ID token; ANY signed-in user may call them for their OWN
+// data only. CORS runs before the auth check (see applyCors).
+// ---------------------------------------------------------------------------
+
+/** Verify the caller's ID token, returning their uid, or null (401 sent). */
+async function resolveUserId(
+  req: functionsV1.https.Request,
+  res: express.Response
+): Promise<string | null> {
+  const header = req.headers.authorization || "";
+  const [scheme, token] = header.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    res.status(401).json({ status: 401, message: "Inicia sesión para continuar." });
+    return null;
+  }
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    return decoded.uid;
+  } catch {
+    res.status(401).json({ status: 401, message: "Invalid or expired session." });
+    return null;
+  }
+}
+
+/**
+ * USER-GATED: purchase history for the signed-in client (Mis compras).
+ * Returns the caller's `sales` (raffles) and `salesBets` (bets) docs —
+ * matched server-side on `userId == auth.uid`, the identity createTransferSale
+ * captures from the checkout's Bearer token. Legacy anonymous purchases have
+ * no userId and are intentionally NOT returned here; the client merges its
+ * legacy localStorage history as the device-association fallback.
+ */
+export const getMyPurchases = functions.https.onRequest(async (req, res) => {
+  if (applyCors(req, res, "POST, OPTIONS")) return;
+  if (req.method !== "POST") {
+    res.status(405).json({ status: 405, message: "Method Not Allowed" });
+    return;
+  }
+  const uid = await resolveUserId(req, res);
+  if (!uid) return;
+
+  try {
+    const purchases: Record<string, unknown>[] = [];
+
+    const salesSnapshot = await db
+      .collection("sales")
+      .where("userId", "==", uid)
+      .get();
+    salesSnapshot.forEach((doc) => {
+      purchases.push({
+        id: doc.id,
+        kind: "raffle",
+        createdAt: doc.get("createdAt") ?? null,
+        verified: doc.get("verified") === true,
+        totalSalePrice: doc.get("totalSalePrice") ?? doc.get("totalRafflePrice") ?? 0,
+        raffles: doc.get("raffles") ?? [],
+      });
+    });
+
+    const salesBetsSnapshot = await db
+      .collection("salesBets")
+      .where("userId", "==", uid)
+      .get();
+    salesBetsSnapshot.forEach((doc) => {
+      purchases.push({
+        id: doc.id,
+        kind: "bet",
+        createdAt: doc.get("createdAt") ?? null,
+        verified: doc.get("verified") === true,
+        totalSalePrice: doc.get("totalSalePrice") ?? doc.get("totalBetsPrice") ?? 0,
+        payout: doc.get("payout") ?? null,
+        payoutStatus: doc.get("payoutStatus") ?? null,
+        settlements: doc.get("settlements") ?? null,
+        bets: doc.get("bets") ?? [],
+      });
+    });
+
+    res.status(200).json({ status: 200, purchases });
+  } catch (err) {
+    console.error("getMyPurchases failed:", err);
+    res.status(500).json({ status: 500, message: "No pudimos cargar tus compras." });
+  }
+});
+
+/**
+ * USER-GATED: send a test FCM push to the CALLER's own registered device.
+ * Reads `notificationTokens/{uid}` (the doc the rules tie to
+ * tokenId == request.auth.uid) and sends only to that single token. A caller
+ * can never push to another user's device, and there is no unauthenticated
+ * path. 404 when the device has not registered yet.
+ */
+export const sendTestPush = functions.https.onRequest(async (req, res) => {
+  if (applyCors(req, res, "POST, OPTIONS")) return;
+  if (req.method !== "POST") {
+    res.status(405).json({ status: 405, message: "Method Not Allowed" });
+    return;
+  }
+  const uid = await resolveUserId(req, res);
+  if (!uid) return;
+
+  try {
+    const tokenDoc = await db.collection("notificationTokens").doc(uid).get();
+    const token = tokenDoc.get("token");
+    if (tokenDoc.get("enabled") === false) {
+      res.status(409).json({
+        status: 409,
+        message: "Las notificaciones están desactivadas para este dispositivo.",
+      });
+      return;
+    }
+    if (typeof token !== "string" || !token) {
+      res.status(404).json({
+        status: 404,
+        message: "Este dispositivo aún no está registrado para notificaciones.",
+      });
+      return;
+    }
+    await admin.messaging().send({
+      token,
+      notification: {
+        title: "Notificación de prueba",
+        body: "Si ves esto, las notificaciones de Rifas Mtz funcionan en este dispositivo. 🔔",
+      },
+    });
+    res.status(200).json({ status: 200, message: "Notificación de prueba enviada." });
+  } catch (err) {
+    console.error("sendTestPush failed:", err);
+    res.status(500).json({ status: 500, message: "No pudimos enviar la notificación de prueba." });
+  }
+});

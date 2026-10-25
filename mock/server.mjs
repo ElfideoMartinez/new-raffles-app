@@ -226,6 +226,72 @@ const routes = {
   }),
   checkTicketAvailability: () => ({ available: true }),
   createQuickTicket: () => ({ ok: true, ticketUrl: `http://127.0.0.1:${PORT}/mock/ticket` }),
+  // Client (customer) endpoints, 2026-10-25. The mock ignores Authorization;
+  // fixtures cover a settled bet sale, a pending raffle sale, and a legacy
+  // shape so Mis compras renders every badge state.
+  getMyPurchases: () => ({
+    // Flat response, like the real function ({ status, purchases }) — do not
+    // let envelope() nest it under `result`.
+    __raw: {
+      status: 200,
+      purchases: [
+      {
+        id: "mock-sale-bet-1",
+        kind: "bet",
+        createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+        verified: true,
+        totalSalePrice: 150,
+        payout: 247.5,
+        payoutStatus: "paid",
+        settlements: { "mock-bet-1": { result: "A", status: "paid" } },
+        bets: [
+          {
+            betId: "mock-bet-1",
+            betName: "Mock Bet — Closing Soon",
+            team: "Equipo A",
+            ticketNumbers: 3,
+            totalPrice: 150,
+          },
+        ],
+      },
+      {
+        id: "mock-sale-bet-2",
+        kind: "bet",
+        createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+        verified: false,
+        totalSalePrice: 100,
+        payout: null,
+        payoutStatus: null,
+        settlements: null,
+        bets: [
+          {
+            betId: "mock-bet-1",
+            betName: "Mock Bet — Closing Soon",
+            team: "Equipo B",
+            ticketNumbers: 2,
+            totalPrice: 100,
+          },
+        ],
+      },
+      {
+        id: "transfer_mockconcept0001",
+        kind: "raffle",
+        createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+        verified: true,
+        totalSalePrice: 500,
+        raffles: [
+          {
+            raffleId: "mock-raffle-1",
+            raffleName: "Mock Raffle — Player A vs Player B",
+            ticketNumbers: [7, 13, 42, 99, 123],
+            raffleTotalPrice: 500,
+          },
+        ],
+      },
+      ],
+    },
+  }),
+  sendTestPush: () => ({ ok: true, message: "Notificación de prueba enviada." }),
 };
 
 /**

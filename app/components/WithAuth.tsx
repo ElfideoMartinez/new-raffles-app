@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebaseconfig";
 import { getMessagingToken, onMessageListener } from "../firebaseMessaging";
-import { collection, getDoc, setDoc, addDoc, doc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 const withAuth = (Component: any) => {
@@ -23,36 +23,38 @@ const withAuth = (Component: any) => {
       });
       return () => unsubscribe();
     }, [router]);
+    // Token registration (fixed 2026-10-25):
+    //   1. The old code short-circuited on a localStorage token and never
+    //      re-registered — refreshed FCM tokens were silently lost.
+    //   2. It wrote userId:"daniel" hardcoded. Now the device registers under
+    //      the SIGNED-IN user's uid (doc id = uid, as the Firestore rules
+    //      expect: tokenId == request.auth.uid). If nobody is signed in, we
+    //      cache the token locally and it registers on first sign-in — the
+    //      anonymous storefront is never blocked.
     const requestNoptificationPermission = async () => {
       try {
         const permission = await Notification.requestPermission();
         console.log("Notification permission status:", permission);
         if (permission === "granted") {
-          //chekc for token in localStorage
-          const existingToken = localStorage.getItem("notificationToken");
-          if (existingToken) {
-            console.log("Existing notification token found:", existingToken);
-            return existingToken; // Return the existing token if found
-          }
+          // Always ask FCM for the (possibly refreshed) token — no
+          // localStorage short-circuit.
           const token = await getMessagingToken();
-          console.log("Notification permission granted. Token:", token);
+          console.log("Notification token:", token);
           if (token) {
             localStorage.setItem("notificationToken", token);
-            console.log("Notification token saved to localStorage:", token);
-            const notificationTokenCollection = collection(
-              db,
-              "notificationTokens"
-            );
-            if (!notificationTokenCollection) {
-              console.error("Notification token collection not found.");
+            const user = auth.currentUser;
+            if (!user) {
+              // Anonymous (or not yet signed in): register on first login.
+              console.log("No signed-in user; notification token cached locally only.");
               return;
             }
             await setDoc(
-              doc(notificationTokenCollection, token),
+              doc(db, "notificationTokens", user.uid),
               {
-                userId: "daniel",
+                userId: user.uid,
                 token: token,
-                createdAt: new Date(),
+                enabled: true,
+                updatedAt: new Date(),
               },
               { merge: true }
             );
@@ -67,8 +69,11 @@ const withAuth = (Component: any) => {
       }
     };
     useEffect(() => {
-      requestNoptificationPermission();
-    }, []);
+      // Register once a user exists; re-run on sign-in so the token lands
+      // under the right uid (auth state is already observed above).
+      if (authenticated) requestNoptificationPermission();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authenticated]);
     useEffect(() => {
       console.log("Setting up message listener...");
       onMessageListener()
