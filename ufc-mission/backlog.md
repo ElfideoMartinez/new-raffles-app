@@ -10,6 +10,11 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-24 (backlog 12.1, merged /admin/sales + /admin/salesBets)**: new
+  `app/components/AdminSalesListPage.tsx` owns the fetch/tabs/error/grid shell
+  (auth-error handling preserved); both pages are thin wrappers reusing the
+  card components' own types. Routes and links unchanged. Evidence: `npx tsc
+  --noEmit` clean at repo root.
 - **Done 2026-10-24 (backlog 7+8, folded into one pattern change)**: `BetSaleCard` confirm/reject now shows a persistent on-card error banner (role=alert, cleared on next attempt) on failure, and the loading button is labelled "Procesando…" alongside a compact `FadeLoader`. Evidence: `app/components/BetSaleCard.tsx`, `npx tsc --noEmit` clean.
 
 
@@ -33,10 +38,8 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 `rejectUnlessAdmin` and logs an `adminWriteLog` entry on each send.
 
 ### 4. Seller/admin pages duplicate logic: `/admin/sales` vs `/admin/salesBets`
-Both pages are near-identical (same fetch, same loading, same tabs, same card
-grid). Every fix this session had to be applied twice, and the CORS bug had to be
-deployed twice because of it. **Consolidating these is the highest-value admin
-change and should be the first task of the admin UX audit (item 12).**
+**Done 2026-10-24 (backlog 12.1)** — see Done. Both routes now render through a
+shared `AdminSalesListPage` shell; routes/links unchanged.
 
 ### 5. No bet cutoff behaviour
 **Fixed 2026-10-24** — see Done. `createTransferSale` rejects bet lines whose
