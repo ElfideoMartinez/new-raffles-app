@@ -1,0 +1,18 @@
+{
+  "name": "Rifas Mtz",
+  "short_name": "Rifas Mtz",
+  "description": "Rifas Mtz — compra tus boletos en línea",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1d4ed8",
+  "gcm_sender_id": "630899937485",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

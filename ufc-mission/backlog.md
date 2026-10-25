@@ -44,6 +44,42 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
   Evidence: `npx tsc --noEmit` + `npm run build` clean; headless-Chrome
   captures `ufc-mission/notificaciones-19-unregistered-390.png` and
   `notificaciones-19-stop-confirm-390.png` (real dialog render, verified).
+- **Done 2026-10-25 (backlog 20, sendTestPush diagnosis)**:
+  Diagnosis: the token WAS registered and the FCM send path is healthy.
+  Live Firestore read (Firebase CLI ADC credential): roster has 10 docs; the
+  current-registration docs (`eQg3NpHRtwX7CPYnp21IXQRbcYV2`,
+  `rmjwwrxVv8NeMAL5GRY3020aPrM2` — same physical device/browser, two
+  accounts) each hold FCM token `fhpQY_RQRoQHL2cCKlb-TG:APA91bF…`, updated
+  2026-10-25 17:55/18:07 UTC. Sender ID matches the project
+  (messagingSenderId 630899937485 == projectNumber, verified via Firebase
+  projects API). Reproduction: a direct FCM v1 send to the real registered
+  token returned SUCCESS verbatim:
+  `{"name":"projects/raffleapp-dbc1b/messages/e8b7d7c8-5c51-4a6c-afc4-2be02583b615"}`.
+  Function logs show Daniel's earlier test calls (17:18 UTC) hit sendTestPush
+  BEFORE any token doc existed under his uid (first registration 17:55 UTC)
+  → the function 404s "device not registered" — that was the drop: he pressed
+  "Enviar prueba" before his phone finished registering. Fixes so his next
+  visit just works:
+  1. `public/manifest.json` added (name, short_name, icons, standalone,
+     gcm_sender_id 630899937485) + `manifest: "/manifest.json"` in
+     `app/layout.tsx` — iOS PWA web-push requires a manifest (prior silent
+     drop risk when added to home screen).
+  2. `sendTestPush` now surfaces the FCM-level error (`fcmError.code/message`)
+     on failure instead of a generic 500.
+  3. New `summarizeAndPruneMulticast` helper: every bulk send logs
+     sent/failed/unregistered/invalid counts and prunes UNREGISTERED tokens
+     by deleting their roster docs, so dead registrations stop being retried
+     and clients re-register naturally. Bulk sends already respected
+     `enabled !== false` (verified, unchanged).
+  **Daniel's action on his phone**: open the site, sign in, tap "Activar
+  notificaciones", then "Enviar prueba" — the roster already holds a valid
+  token and FCM accepts sends to it, so the test should arrive (for iOS he
+  must have added the site to the home screen as a PWA for background push;
+  foreground notifications show without it). If the test still fails, the
+  failure reason is now visible in the response/logs (fcmError).
+  Evidence: FCM send response above; `firebase functions:log --only
+  sendTestPush`; `npx tsc --noEmit` + `npm run build` clean (app +
+  functions). NOT deployed — deploy waits for Daniel.
 - **Done 2026-10-25 (client login + client sidebar: Mis compras / Notificaciones, Model A identity)**:
   Added Firebase Auth email/password login + registration for customers at
   `/login` (Spanish UX, UI-standard card/forms, friendly Firebase error

@@ -122,6 +122,55 @@ function applyCors(
 }
 
 /**
+ * Diagnosable multicast outcomes (item 20, 2026-10-25): log success vs
+ * unregistered vs invalid counts per send, and prune tokens FCM reports as
+ * UNREGISTERED (dead device registrations) by deleting their roster docs, so
+ * bulk sends stop retrying stale tokens and the client simply re-registers
+ * on its next visit.
+ */
+async function summarizeAndPruneMulticast(
+  label: string,
+  tokens: string[],
+  response: admin.messaging.BatchResponse
+): Promise<void> {
+  const unregisteredTokens: string[] = [];
+  let invalid = 0;
+  let other = 0;
+  response.responses.forEach((r, i) => {
+    if (r.success) return;
+    const code = r.error?.code ?? "unknown";
+    if (code === "messaging/registration-token-not-registered") {
+      if (tokens[i]) unregisteredTokens.push(tokens[i]);
+    } else if (code === "messaging/invalid-argument") {
+      invalid += 1;
+    } else {
+      other += 1;
+      console.warn(`${label}: token[${i}] FCM error ${code}: ${r.error?.message}`);
+    }
+  });
+  console.log(
+    `${label}: sent=${response.successCount} failed=${response.failureCount} ` +
+      `unregistered=${unregisteredTokens.length} invalid=${invalid} other=${other}`
+  );
+  for (const token of unregisteredTokens) {
+    try {
+      const stale = await db
+        .collection("notificationTokens")
+        .where("token", "==", token)
+        .get();
+      const batch = db.batch();
+      stale.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+      if (stale.size > 0) {
+        console.log(`${label}: pruned ${stale.size} unregistered token doc(s)`);
+      }
+    } catch (err) {
+      console.warn(`${label}: pruning stale token failed:`, err);
+    }
+  }
+}
+
+/**
  * Run the admin check for an HTTP request. Returns true when the request was
  * rejected and the caller must return immediately.
  *
@@ -202,12 +251,22 @@ export const sendPurchaseNotifications = functions.https.onRequest(
             "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
         },
       });
-      console.log("Successfully sent message:", response);
+      await summarizeAndPruneMulticast("sendPurchaseNotifications", fcmTokens, response);
 
       res.status(200).json({
         status: 200,
         message: "Notification sent successfully",
-        response,
+        response: {
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+          errors: response.responses
+            .map((r, i) =>
+              r.success
+                ? null
+                : { tokenIndex: i, code: r.error?.code, message: r.error?.message }
+            )
+            .filter(Boolean),
+        },
       });
     } catch (error) {
       console.error("Error sending notification:", error);
@@ -1075,7 +1134,7 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
             "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
         },
       });
-      console.log("Successfully sent message:", response);
+      await summarizeAndPruneMulticast("createSale", fcmTokens, response);
     } catch (error) {
       console.error("Error sending notification:", error);
     }
@@ -1507,13 +1566,14 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
             tokens.push(token);
         });
         if (tokens.length > 0) {
-          await admin.messaging().sendEachForMulticast({
+          const response = await admin.messaging().sendEachForMulticast({
             tokens,
             notification: {
               title: "Nueva compra por transferencia",
               body: `Nueva compra por $${totalSalePrice} (${ticketCount} boletos) de ${name}. Favor de confirmar ASAP.`,
             },
           });
+          await summarizeAndPruneMulticast("transferSale", tokens, response);
         }
       } catch (error) {
         console.warn("Transfer sale notification failed:", error);
@@ -2256,11 +2316,12 @@ async function notifyBetSettlement(
       });
 
       if (tokens.length > 0) {
-        await admin.messaging().sendEachForMulticast({
+        const response = await admin.messaging().sendEachForMulticast({
           tokens,
           notification: { title: pushTitle, body },
           data: { betId, saleId: sale.saleId, type: notifType },
         });
+        await summarizeAndPruneMulticast("settlement", tokens, response);
       }
     }
   } catch (err) {
@@ -2775,8 +2836,17 @@ export const sendTestPush = functions.https.onRequest(async (req, res) => {
       },
     });
     res.status(200).json({ status: 200, message: "Notificación de prueba enviada." });
-  } catch (err) {
+  } catch (err: any) {
     console.error("sendTestPush failed:", err);
-    res.status(500).json({ status: 500, message: "No pudimos enviar la notificación de prueba." });
+    // Surface the FCM-level reason (UNREGISTERED, SENDER_ID_MISMATCH, …) so a
+    // silent drop is diagnosable from the client and the logs (item 20).
+    res.status(500).json({
+      status: 500,
+      message: "No pudimos enviar la notificación de prueba.",
+      fcmError: {
+        code: err?.code ?? null,
+        message: err?.message ?? String(err),
+      },
+    });
   }
 });

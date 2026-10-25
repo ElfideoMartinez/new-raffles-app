@@ -9,6 +9,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Rifas Mtz",
   description: "Rifas Mtz — compra tus boletos en línea",
+  // Item 20 (2026-10-25): iOS PWA web-push requires a web app manifest.
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
