@@ -1,7 +1,7 @@
 {
   "date": "2026-10-24",
   "event": "UFC 333: Volkanovski vs. Evloev",
-  "fighters": 20,
+  "fighters": 6,
   "rejections": [
     "[Petr Yan] SKIP File:Samuelis Méhes de respiratione animalium commentatio - in concertatione civium Academiae Heidelbergensis 22a Novembris MDCCCVIII praemio a M. Duce Badarum constituto a medicorum ordine ornata (IA b22288776).pdf — not a jpg/png (pdf/svg/other)",
     "[Ramazan Temirov] REJECT File:Ramazan Temurov 2.jpg (wiki lead) — surname \"temirov\" not found",
@@ -30,5 +30,6 @@
     "[Grant Dawson] REJECT File:Tommy La Stella on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found",
     "[Grant Dawson] REJECT File:Ryan Doumit on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found"
   ],
-  "failures": []
+  "failures": [],
+  "note": "Pruned 2026-10-25 14:10 to the last 3 fights only (Volkanovski vs Evloev, Dvalishvili vs Yan, Temirov vs Kavanagh) per Daniel. 6 fighters retained."
 }
