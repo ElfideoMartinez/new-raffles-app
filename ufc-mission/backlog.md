@@ -58,10 +58,14 @@ event `date` has passed (409 "Esta apuesta ya cerró").
 ### 12. Admin UX/UI audit
 Focus ordered by impact:
 1. Merge `/admin/sales` and `/admin/salesBets` (item 4).
-2. Persistent admin navigation. Today there is none: every page dead-ends into a
-   "Volver al inicio" link back to the dashboard.
-3. Dashboard is 9 buttons in 2 ungrouped rows; group by task (Ventas, Apuestas,
-   Configuración, Publicación).
+2. Persistent admin navigation.
+   **Done 2026-10-25 (backlog 12.2)** — shared `app/admin/layout.tsx` renders a
+   nav bar above every /admin page (skipped on login) with active-page
+   highlight; pages no longer dead-end.
+3. Dashboard grouping.
+   **Done 2026-10-25 (backlog 12.3)** — dashboard now groups buttons under
+   Rifas / Apuestas / Boletos rápidos / Configuración headings in
+   `app/admin/dashboard/page.tsx`.
 4. `/admin/edit/bet` and `/admin/edit/raffle` both stall-then-jump: a single
    select acts as both picker and loader with no persistent selection.
 5. Buttons need loading + failure states as a consistent pattern (items 6, 7).
