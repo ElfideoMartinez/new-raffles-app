@@ -25,6 +25,25 @@ Legend: **P0** money/data correctness · **P1** operational risk · **P2** UX ·
 ---
 
 ## Done (this session)
+- **Done 2026-10-25 (backlog 19, Notificaciones copy + two stop options)**:
+  Rewrote `app/user/notificaciones/page.tsx` client copy in short plain Spanish
+  (no dev jargon: no "token FCM", "reglas de Firestore"). Two distinct stop
+  options, both working signed-in and each stating what it does:
+  (a) **Pausar en este dispositivo** — keeps the roster doc
+  (`notificationTokens/{uid}`), sets `enabled:false`; all bulk send paths in
+  `functions/src/index.ts` skip tokens with `enabled === false` (verified at
+  all four multicast sites: sendPurchaseNotifications, createSale,
+  transferSale, settlement). A **Reactivar** button restores delivery.
+  (b) **Dejar de recibir notificaciones** — deletes the roster doc
+  client-side with `deleteDoc` (simplest correct path: firestore.rules
+  `notificationTokens` write rule allows the owner delete,
+  `tokenId == request.auth.uid`); clears the localStorage token cache and
+  resets state, so the "Activar notificaciones" button offers clean
+  re-registration. Behind a confirm dialog ("¿Detener por completo?", danger
+  buttons, "no se puede deshacer") per ui-standard-2026-10-25.
+  Evidence: `npx tsc --noEmit` + `npm run build` clean; headless-Chrome
+  captures `ufc-mission/notificaciones-19-unregistered-390.png` and
+  `notificaciones-19-stop-confirm-390.png` (real dialog render, verified).
 - **Done 2026-10-25 (client login + client sidebar: Mis compras / Notificaciones, Model A identity)**:
   Added Firebase Auth email/password login + registration for customers at
   `/login` (Spanish UX, UI-standard card/forms, friendly Firebase error
@@ -207,20 +226,10 @@ sections: bets, quick bets (boletos rápidos), and raffles should be reachable
 from the menu alongside Mis compras / Notificaciones.
 
 ### 19. Notificaciones page: simplify copy + two stop options
-The client-facing notification copy is too long — simplify it. Provide two
-distinct options to stop notifications: (a) pause/disable pushes on this
-device (token stays, prefs off), and (b) stop completely / delete the device
-token. Both must work signed-in and state clearly what each does.
+**DONE 2026-10-25** — see Done below.
 
 ### 20. sendTestPush not arriving on phone
-After granting notification permission on his phone, Daniel's "Enviar prueba"
-did not deliver any notification. Suspects (verify in order): token was never
-registered to the roster (the old localStorage short-circuit was fixed in code
-— confirm the fix is in the deployed build and a doc landed in
-`notificationTokens` with `tokenId == uid`); FCM credential/VAPID config;
-iOS/PWA delivery specifics (no manifest.json yet — see notifications research
-§3); foreground vs background handler. Reproduce with a registered token,
-check the `sendEachForMulticast` response (success vs unregistered), and fix.
+**DONE 2026-10-25** — see Done below.
 
 ### 21. Merge "Editar Apuesta" into "Administrar apuesta" (Daniel, 12:11)
 Keep one admin bets tab ("Administrar apuesta") that carries both functions —

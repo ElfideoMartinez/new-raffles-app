@@ -1,23 +1,20 @@
 "use client";
 /**
- * Notificaciones — client notification settings (2026-10-25).
+ * Notificaciones — client notification settings (2026-10-25, item 19).
  *
  * Identity roster, per the Firestore rules (firestore.rules:90-93): the
  * device's FCM token registers under `notificationTokens/{uid}` where uid is
- * the signed-in client's auth.uid (the rules require
- * `tokenId == request.auth.uid`). Settings persisted on that same doc:
- *   - `label`    — human name for the device ("Mi celular", "Laptop de casa")
- *   - `enabled`  — enable/disable notifications for this device
- *   - `token`    — the current FCM token (re-registered on every visit; the
- *                  old WithAuth short-circuit that skipped re-registration is
- *                  fixed in the registration helper)
+ * the signed-in client's auth.uid. Two distinct stop options:
+ *   (a) PAUSE on this device — keeps the roster doc, sets `enabled:false`.
+ *       Bulk sends in functions/src/index.ts skip tokens with
+ *       `enabled === false`, so nothing is delivered until reactivated.
+ *   (b) STOP completely — deletes `notificationTokens/{uid}` client-side
+ *       (rules allow the owner to delete their own doc: tokenId ==
+ *       request.auth.uid). Clean re-registration afterwards via the
+ *       activate button.
  *
- * "Enviar prueba" calls the user-gated `sendTestPush` Cloud Function: the
- * server verifies the caller's ID token and sends FCM ONLY to that caller's
- * own registered token. It is never public.
- *
- * Notification permission is requested explicitly by a button press (browser
- * best practice; iOS/Android web need a user gesture).
+ * "Enviar prueba" calls the user-gated `sendTestPush` Cloud Function: sends
+ * FCM only to the caller's own registered token.
  */
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -26,6 +23,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../firebaseconfig";
@@ -49,6 +47,8 @@ const MyNotificationsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  const [confirmStop, setConfirmStop] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -116,8 +116,6 @@ const MyNotificationsPage = () => {
       return;
     }
     try {
-      // Always ask FCM for the (possibly refreshed) token — no localStorage
-      // short-circuit. The token is re-registered under the signed-in uid.
       const token = await getMessagingToken();
       if (!token) {
         setError("No pudimos obtener el token del dispositivo. Reintenta en un momento.");
@@ -131,16 +129,17 @@ const MyNotificationsPage = () => {
           userId: user.uid,
           token,
           label: settings.label || "",
-          enabled: settings.enabled,
+          enabled: true,
           updatedAt: serverTimestamp(),
         },
         { merge: true }
       );
-      setNotice("Dispositivo registrado para notificaciones.");
+      setSettings((s) => ({ ...s, enabled: true }));
+      setNotice("Listo. Este dispositivo recibirá notificaciones.");
     } catch (err) {
       setError("No pudimos registrar el dispositivo. Inténtalo de nuevo.");
     }
-  }, [user, settings.label, settings.enabled]);
+  }, [user, settings.label]);
 
   const save = async () => {
     if (!user) return;
@@ -164,6 +163,78 @@ const MyNotificationsPage = () => {
       setError("No pudimos guardar tu configuración. Inténtalo de nuevo.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // (a) PAUSE: keep the roster doc, set enabled:false. The functions skip
+  // tokens with enabled === false on every bulk send.
+  const pauseDevice = async () => {
+    setSettings((s) => ({ ...s, enabled: false }));
+    setNotice(null);
+    setError(null);
+    setSaving(true);
+    try {
+      await setDoc(
+        doc(db, "notificationTokens", user!.uid),
+        {
+          userId: user!.uid,
+          label: settings.label || "",
+          enabled: false,
+          ...(settings.token ? { token: settings.token } : {}),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      setNotice("Pausado. No recibirás notificaciones en este dispositivo hasta que las actives de nuevo.");
+    } catch {
+      setError("No pudimos pausar las notificaciones. Inténtalo de nuevo.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resumeDevice = async () => {
+    setSettings((s) => ({ ...s, enabled: true }));
+    setNotice(null);
+    setError(null);
+    setSaving(true);
+    try {
+      await setDoc(
+        doc(db, "notificationTokens", user!.uid),
+        {
+          userId: user!.uid,
+          label: settings.label || "",
+          enabled: true,
+          ...(settings.token ? { token: settings.token } : {}),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      setNotice("Notificaciones reactivadas en este dispositivo.");
+    } catch {
+      setError("No pudimos reactivar las notificaciones. Inténtalo de nuevo.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // (b) STOP completely: delete the roster doc client-side (owner delete is
+  // allowed by the Firestore rules). After this the device is fully
+  // unregistered; the activate button offers clean re-registration.
+  const stopCompletely = async () => {
+    if (!user) return;
+    setStopping(true);
+    setError(null);
+    try {
+      await deleteDoc(doc(db, "notificationTokens", user.uid));
+      localStorage.removeItem("notificationToken");
+      setSettings({ label: "", enabled: true, token: null });
+      setConfirmStop(false);
+      setNotice("Registro eliminado. Este dispositivo ya no recibirá notificaciones.");
+    } catch {
+      setError("No pudimos eliminar el registro. Inténtalo de nuevo.");
+    } finally {
+      setStopping(false);
     }
   };
 
@@ -217,10 +288,15 @@ const MyNotificationsPage = () => {
     );
   }
 
+  const registered = !!settings.token;
+
   return (
     <div className="flex flex-col w-full items-center px-4">
       <div className="w-full max-w-3xl my-6 space-y-6">
         <h1 className="text-center text-xl font-bold text-ink-900">Notificaciones</h1>
+        <p className="text-center text-sm text-ink-500">
+          Recibe avisos de tus compras y resultados en este dispositivo.
+        </p>
 
         {error && (
           <p
@@ -242,20 +318,21 @@ const MyNotificationsPage = () => {
         {/* --- Device registration --- */}
         <section className="bg-white rounded-card border border-ink-100 shadow-card p-4">
           <h2 className="text-lg font-bold text-ink-900">Este dispositivo</h2>
-          <p className="mt-1 text-sm text-ink-500">
-            Registro del token FCM bajo tu cuenta ({user.email ?? user.uid}) —
-            las reglas de Firestore solo permiten escribir el token con tu
-            propio uid.
-          </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span
               className={`px-2 py-1 rounded-pill text-xs ${
-                settings.token
-                  ? "bg-success-50 text-success-700"
+                registered
+                  ? settings.enabled
+                    ? "bg-success-50 text-success-700"
+                    : "bg-warning-50 text-ink-900"
                   : "bg-warning-50 text-ink-900"
               }`}
             >
-              {settings.token ? "✓ Dispositivo registrado" : "Dispositivo sin registrar"}
+              {registered
+                ? settings.enabled
+                  ? "✓ Activo"
+                  : "Pausado"
+                : "Sin registrar"}
             </span>
             <span className="px-2 py-1 rounded-pill text-xs bg-ink-100 text-ink-700">
               Permiso: {permission === "granted" ? "concedido" : permission === "denied" ? "denegado" : permission === "unsupported" ? "no soportado" : "pendiente"}
@@ -267,7 +344,16 @@ const MyNotificationsPage = () => {
               onClick={requestPermissionAndRegister}
               className="mt-3 bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
             >
-              Activar notificaciones en este dispositivo
+              Activar notificaciones
+            </button>
+          )}
+          {permission === "granted" && !registered && (
+            <button
+              type="button"
+              onClick={requestPermissionAndRegister}
+              className="mt-3 bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
+            >
+              Registrar este dispositivo
             </button>
           )}
         </section>
@@ -278,7 +364,7 @@ const MyNotificationsPage = () => {
           <div className="mt-3 space-y-4">
             <div>
               <label htmlFor="deviceLabel" className="block text-sm font-medium text-ink-700 mb-1">
-                Etiqueta del dispositivo
+                Nombre del dispositivo
               </label>
               <input
                 id="deviceLabel"
@@ -290,15 +376,6 @@ const MyNotificationsPage = () => {
                 placeholder="Mi celular"
               />
             </div>
-            <label className="flex items-center gap-3 text-sm font-medium text-ink-700">
-              <input
-                type="checkbox"
-                checked={settings.enabled}
-                onChange={(e) => setSettings((s) => ({ ...s, enabled: e.target.checked }))}
-                className="h-4 w-4"
-              />
-              Recibir notificaciones (confirmaciones de compra y resultados)
-            </label>
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -306,13 +383,13 @@ const MyNotificationsPage = () => {
                 disabled={saving}
                 className="bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {saving ? "Guardando…" : "Guardar configuración"}
+                {saving ? "Guardando…" : "Guardar cambios"}
               </button>
               <button
                 type="button"
                 onClick={sendTest}
-                disabled={testing || !settings.token}
-                title={settings.token ? undefined : "Registra el dispositivo primero"}
+                disabled={testing || !registered || !settings.enabled}
+                title={registered ? undefined : "Registra el dispositivo primero"}
                 className="bg-ink-100 text-ink-900 rounded-sm hover:bg-ink-300 transition-colors px-4 py-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {testing ? "Enviando…" : "Enviar prueba"}
@@ -320,7 +397,102 @@ const MyNotificationsPage = () => {
             </div>
           </div>
         </section>
+
+        {/* --- Stop options (item 19): pause vs stop completely --- */}
+        <section className="bg-white rounded-card border border-ink-100 shadow-card p-4">
+          <h2 className="text-lg font-bold text-ink-900">Detener notificaciones</h2>
+          {settings.enabled ? (
+            <>
+              <p className="mt-2 text-sm text-ink-500">
+                Pausar: detiene los avisos en este dispositivo hasta que los actives de nuevo. Tu registro se conserva.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={pauseDevice}
+                  disabled={saving || !registered}
+                  title={registered ? undefined : "Registra el dispositivo primero"}
+                  className="bg-ink-100 text-ink-900 rounded-sm hover:bg-ink-300 transition-colors px-4 py-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Pausar en este dispositivo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmStop(true)}
+                  className="bg-danger-700 text-white rounded-sm hover:bg-danger-800 font-semibold transition-colors px-4 py-2"
+                >
+                  Dejar de recibir notificaciones
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-sm text-ink-500">
+                Las notificaciones están pausadas en este dispositivo.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={resumeDevice}
+                  disabled={saving}
+                  className="bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Reactivar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmStop(true)}
+                  className="bg-danger-700 text-white rounded-sm hover:bg-danger-800 font-semibold transition-colors px-4 py-2"
+                >
+                  Dejar de recibir notificaciones
+                </button>
+              </div>
+            </>
+          )}
+        </section>
       </div>
+
+      {/* --- Confirm dialog before destructive stop (b) --- */}
+      {confirmStop && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="stop-confirm-title"
+        >
+          <div className="w-full max-w-md bg-white rounded-card border border-ink-100 shadow-card p-6">
+            <h3 id="stop-confirm-title" className="text-xl font-bold text-ink-900">
+              ¿Detener por completo?
+            </h3>
+            <p className="mt-2 text-sm text-ink-700">
+              Se elimina el registro de este dispositivo. No volverás a recibir
+              ninguna notificación aquí. Si más adelante las quieres, tendrás
+              que activarlas de nuevo.
+            </p>
+            <p className="mt-2 text-sm text-ink-500">
+              Esta acción no se puede deshacer.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmStop(false)}
+                disabled={stopping}
+                className="bg-ink-100 text-ink-900 rounded-sm hover:bg-ink-300 transition-colors px-4 py-2 font-semibold disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={stopCompletely}
+                disabled={stopping}
+                className="bg-danger-700 text-white rounded-sm hover:bg-danger-800 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {stopping ? "Eliminando…" : "Sí, eliminar registro"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
