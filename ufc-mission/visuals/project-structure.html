@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Raffles App — Project Structure</title>
+<style>
+  :root{
+    --bg:#12100e; --panel:#1c1815; --panel2:#241f1a; --line:#3a3128;
+    --txt:#e8ded2; --dim:#a89a8a; --red:#e05a3a; --orange:#f0923f; --gold:#d8b25f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;padding:28px 20px 40px;max-width:1200px;margin:0 auto}
+  h1{font-size:1.4rem;letter-spacing:.04em}
+  h1 span{color:var(--orange)}
+  .sub{color:var(--dim);font-size:.8rem;margin:6px 0 22px}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .group{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;border-top:3px solid var(--red)}
+  .group.g2{border-top-color:var(--orange)}
+  .group.g3{border-top-color:var(--gold)}
+  .group.g4{border-top-color:#7fae8a}
+  .group h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;color:var(--txt)}
+  .note{color:var(--dim);font-size:.72rem;margin:4px 0 10px;line-height:1.4}
+  ul{list-style:none;font-size:.74rem;line-height:1.75}
+  li{padding-left:14px;position:relative}
+  li::before{content:"▸";position:absolute;left:0;color:var(--red)}
+  li b{color:var(--orange);font-weight:600}
+  li i{color:var(--dim);font-style:normal}
+  .deep{padding-left:16px;color:var(--dim)}
+  .deep li::before{content:"·";color:var(--gold)}
+  .foot{margin-top:20px;color:var(--dim);font-size:.7rem;border-top:1px solid var(--line);padding-top:10px}
+  .foot b{color:var(--txt)}
+</style>
+</head>
+<body>
+<h1>new-raffles-app <span>·</span> project structure</h1>
+<p class="sub">branch <b style="color:var(--red)">design/ratified-decisions</b> · verified on disk 2026-10-25 · node_modules/.git/.next/functions-lib/test-results omitted</p>
+
+<div class="grid">
+  <section class="group g1">
+    <h2>Web app — Next.js (app/)</h2>
+    <p class="note">Client-facing storefront and internal admin, all under the App Router.</p>
+    <ul>
+      <li><b>raffle/[id]</b>, <i>bet/[id]</i>, <i>quickTicket/play</i> — public product pages</li>
+      <li><b>checkout</b>/success, /transfer · <i>user/</i> cart, purchases, my-purchases, notificaciones</li>
+      <li>login · contact · soporte · terms-conditions</li>
+      <li><b>admin/</b>
+        <ul class="deep">
+          <li>dashboard · create · edit (raffle + bet)</li>
+          <li>sales · salesBets · bets · settlement</li>
+          <li>quickTickets · config</li>
+        </ul>
+      </li>
+      <li><b>api/raffle</b> · components · config · helpers · utils</li>
+    </ul>
+  </section>
+
+  <section class="group g2">
+    <h2>Backend — Firebase Cloud Functions (functions/src)</h2>
+    <p class="note">HTTPS endpoints for sales, bets, raffles and notifications; Firestore + RTDB.</p>
+    <ul>
+      <li><b>index.ts</b> — createSale, confirmSale, rejectSale, createTransferSale, createBet, settleBet, getSalesBets, confirmRejectBetSale, sendPurchaseNotifications, sendTestPush, getRemoteConfigValues…</li>
+      <li><b>payout.ts</b> — pari-mutuel pool math, single source of truth (integer centavos)</li>
+      <li><i>firebase.json, firestore.rules, storage.rules, database.rules.json</i></li>
+    </ul>
+  </section>
+
+  <section class="group g3">
+    <h2>Content &amp; design — Instagram pipeline</h2>
+    <p class="note">UFC 333 fighter content, templates and generated social media assets.</p>
+    <ul>
+      <li><b>fighters/</b> — 6 profiles: volkanovski, kavanagh, dvalishvili, evloev, yan, temirov <i>(profile.json + sources.md each)</i> + README + _gather-report.json</li>
+      <li><b>scripts/instagram/</b> — generate.mjs, templates/ (feed-event, feed-hype, feed-vs, story-event, story-hype, story-survey), examples/ (ufc333-bets.json)</li>
+      <li><b>scripts/fighters/</b> — gather.mjs</li>
+      <li><b>instagram-pack/</b> — templates/ (bet-card, fighter-card, story-hype, story-survey), graphics/, out/, captions.md, schedule.md</li>
+    </ul>
+  </section>
+
+  <section class="group g4">
+    <h2>Data &amp; ops — tests, mocks, mission</h2>
+    <p class="note">Quality, fixtures and the mission working area.</p>
+    <ul>
+      <li><b>e2e/</b> — Playwright end-to-end tests <i>(playwright.config.ts)</i></li>
+      <li><b>mock/</b> · <b>public/</b> — fixtures and static assets</li>
+      <li><b>ufc-mission/</b> — reports, fixtures, backlog, final-report.md, visuals/</li>
+      <li><i>audit docs:</i> DESIGN-AUDIT.md, BETS-MATH-AUDIT.md, SECURITY-AUDIT.md, PERF-AUDIT.md, PAYMENTS-RESEARCH.md</li>
+    </ul>
+  </section>
+</div>
+
+<p class="foot"><b>6 fighters × UFC 333</b> profiles drive the content pipeline; <b>payout.ts</b> governs bet settlement math ratified 2026-10-22.</p>
+</body>
+</html>
