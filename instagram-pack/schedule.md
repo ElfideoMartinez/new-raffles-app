@@ -30,7 +30,9 @@
 
 ## Nota de cumplimiento
 
-- Todo es **manual**: Daniel abre Instagram y publica; sin programación, sin API, sin bots, sin cuentas nuevas.
-- Contenido **inerte**: nada se publica automáticamente, nada contacta servicios externos.
+- **Feed posts: vía Antwork** (MCP) en la cuenta real `@bet.mx.ufc` (`gUi1o3IWQLG6ws6vHnYi`, conectada 2026-10-24, token healthy): `create_post` → `add_media` → `schedule_post`. Primer post exitoso: 2026-10-24 18:55 UTC.
+- **Stories: manuales** desde el teléfono (stickers de encuesta/countdown/link). Antwork publica feed, no stories.
+- Nunca publicar contenido de la rifa desde `@elfideomartinez`.
+- Nada se publica sin un `schedule_post`/`publish_post` explícito; los drafts no envían nada.
 - Lenguaje honesto: es una prueba de la app; sin apuestas, sin dinero real, sin promesas de ganancias.
 - Regla del proyecto: al iniciar (real, verificado) cada pelea, se detienen las acciones de la prueba para esa pelea.
