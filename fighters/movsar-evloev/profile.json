@@ -3,7 +3,7 @@
   "name": "Movsar Evloev",
   "nickname": null,
   "initials": "ME",
-  "country": "Russia",
+  "country": null,
   "division": "Featherweight",
   "record": {
     "wins": 20,
@@ -39,22 +39,22 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Movsar_Evloev",
       "note": "short factual summary",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Movsar_Evloev",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://commons.wikimedia.org/wiki/File:Movsar_Evloev_M-1_Challenge_2018.jpg",
       "note": "photo, license CC BY 4.0 (Commons search)",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     }
   ],
   "_event": {
@@ -65,7 +65,8 @@
         "division": "Featherweight",
         "opponent": "Alexander Volkanovski",
         "winner": false,
-        "result": "L"
+        "result": "L",
+        "record": "20-1-0"
       }
     ]
   }

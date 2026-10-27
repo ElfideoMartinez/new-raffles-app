@@ -3,7 +3,7 @@
   "name": "Petr Yan",
   "nickname": "No Mercy",
   "initials": "PY",
-  "country": "Russia",
+  "country": null,
   "division": "Bantamweight",
   "record": {
     "wins": 21,
@@ -13,7 +13,7 @@
   "stats": [
     {
       "label": "Evento",
-      "value": "Ganó en UFC Volkanovski vs. Evloev"
+      "value": "Ganó en UFC 333: Volkanovski vs. Evloev"
     },
     {
       "label": "Nac.",
@@ -43,27 +43,27 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Petr_Yan",
       "note": "short factual summary",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Petr_Yan",
       "note": "nickname (wikibox)",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Petr_Yan",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://commons.wikimedia.org/wiki/File:PetrYan.jpg",
       "note": "photo, license CC BY 3.0 (Commons search)",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     }
   ],
   "_event": {
@@ -74,7 +74,8 @@
         "division": "Bantamweight",
         "opponent": "Merab Dvalishvili",
         "winner": true,
-        "result": "W"
+        "result": "W",
+        "record": "21-5-0"
       }
     ]
   }

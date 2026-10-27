@@ -1,0 +1,65 @@
+{
+  "slug": "grant-dawson",
+  "name": "Grant Dawson",
+  "nickname": null,
+  "initials": "GD",
+  "country": null,
+  "division": "Lightweight",
+  "record": {
+    "wins": 25,
+    "losses": 3,
+    "draws": 1
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC 333: Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1994-02-20"
+    }
+  ],
+  "facts": [
+    "Grant Michael Dawson is an American mixed martial artist currently competing in the Lightweight division of the Ultimate Fighting Championship (UFC). As of September 5, 2026, he is #14 in the Meta UFC lightweight rankings.."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Nurullo Aliev",
+      "result": "W",
+      "division": "Lightweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-27"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Grant_Dawson",
+      "note": "short factual summary",
+      "checked": "2026-10-27"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Grant_Dawson",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-27"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Lightweight",
+        "opponent": "Nurullo Aliev",
+        "winner": true,
+        "result": "W",
+        "record": "25-3-1"
+      }
+    ]
+  }
+}

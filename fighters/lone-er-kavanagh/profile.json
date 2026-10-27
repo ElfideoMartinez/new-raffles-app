@@ -3,7 +3,7 @@
   "name": "Lone'er Kavanagh",
   "nickname": null,
   "initials": "LK",
-  "country": "England",
+  "country": null,
   "division": "Flyweight",
   "record": {
     "wins": 11,
@@ -13,7 +13,7 @@
   "stats": [
     {
       "label": "Evento",
-      "value": "Ganó en UFC Volkanovski vs. Evloev"
+      "value": "Ganó en UFC 333: Volkanovski vs. Evloev"
     },
     {
       "label": "Nac.",
@@ -36,17 +36,17 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
       "note": "short factual summary",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-25"
+      "checked": "2026-10-27"
     }
   ],
   "_event": {
@@ -57,7 +57,8 @@
         "division": "Flyweight",
         "opponent": "Ramazan Temirov",
         "winner": true,
-        "result": "W"
+        "result": "W",
+        "record": "11-2-0"
       }
     ]
   }

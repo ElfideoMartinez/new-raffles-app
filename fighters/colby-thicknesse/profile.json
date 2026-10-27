@@ -1,0 +1,65 @@
+{
+  "slug": "colby-thicknesse",
+  "name": "Colby Thicknesse",
+  "nickname": null,
+  "initials": "CT",
+  "country": null,
+  "division": "Bantamweight",
+  "record": {
+    "wins": 10,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Evento",
+      "value": "Ganó en UFC 333: Volkanovski vs. Evloev"
+    },
+    {
+      "label": "Nac.",
+      "value": "1999-06-23"
+    }
+  ],
+  "facts": [
+    "Colby Thicknesse is a Australian mixed martial artist. He currently competes in the Bantamweight division of the Ultimate Fighting Championship (UFC).."
+  ],
+  "previousFights": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "opponent": "Asaf Chopurov",
+      "result": "W",
+      "division": "Bantamweight"
+    }
+  ],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-10-27"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Colby_Thicknesse",
+      "note": "short factual summary",
+      "checked": "2026-10-27"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Colby_Thicknesse",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-10-27"
+    }
+  ],
+  "_event": {
+    "name": "UFC 333: Volkanovski vs. Evloev",
+    "date": "2026-10-24",
+    "bouts": [
+      {
+        "division": "Bantamweight",
+        "opponent": "Asaf Chopurov",
+        "winner": true,
+        "result": "W",
+        "record": "10-1-0"
+      }
+    ]
+  }
+}
