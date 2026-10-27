@@ -1,5 +1,6 @@
 {
   "slug": "story-hype-demo",
+  "only": "story",
   "locale": "es-MX",
   "templates": { "story": "scripts/instagram/templates/story-hype.html" },
   "brand": { "name": "Rifas Mtz", "handle": "@bet.mx.ufc", "url": "https://raffleapp-dbc1b.web.app", "tagline": "Rifas de comunidad" },

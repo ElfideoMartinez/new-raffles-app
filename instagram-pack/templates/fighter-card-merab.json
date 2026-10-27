@@ -1,0 +1,10 @@
+{
+  "slug": "fighter-merab-dvalishvili",
+  "locale": "es-MX",
+  "templates": { "feed": "scripts/instagram/templates/feed-hype.html" },
+  "brand": { "name": "Rifas Mtz", "handle": "@bet.mx.ufc" },
+  "event": { "kicker": "UFC 333 · PERFIL", "title": "Merab Dvalishvili", "subtitle": "Mach Machine" },
+  "cta": "Ficha del peleador",
+  "caption": { "text": "Perfil del peleador", "hashtags": "#RifasMtz" },
+  "fighter": "merab-dvalishvili"
+}

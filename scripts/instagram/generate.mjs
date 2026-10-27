@@ -80,15 +80,37 @@ function readTemplate(kind) {
   return fill(readFileSync(p, "utf8"), input);
 }
 
-// ---- 1b. Optional fighter photo -> data URI (local file only) -------------
-if (input.fighter && input.fighter.image && !input.fighter.photoDataUri) {
-  const img = resolve(ROOT, input.fighter.image);
-  if (existsSync(img)) {
-    const ext = img.toLowerCase().endsWith(".png") ? "png" : "jpeg";
-    input.fighter.photoDataUri = `data:image/${ext};base64,${readFileSync(img).toString("base64")}`;
-    console.log(`  photo embedded: ${input.fighter.image}`);
-  } else {
-    console.warn(`  photo not found (initials fallback): ${input.fighter.image}`);
+// ---- 1b. Fighter profile + photo -> data URI (local files only) -----------
+// input.fighter may be a slug string ("merab-dvalishvili") or an object with a
+// "slug" key: the profile is loaded from fighters/<slug>/profile.json and the
+// photo from fighters/<slug>/photo.jpg automatically. Explicit input keys win.
+if (input.fighter) {
+  if (typeof input.fighter === "string") input.fighter = { slug: input.fighter };
+  const slug = input.fighter.slug;
+  const fightersDir = join(ROOT, "fighters", slug || "");
+  if (slug) {
+    const profilePath = join(fightersDir, "profile.json");
+    if (existsSync(profilePath)) {
+      const profile = JSON.parse(readFileSync(profilePath, "utf8"));
+      input.fighter = { ...profile, ...input.fighter };
+      console.log(`  fighter profile loaded: fighters/${slug}/profile.json`);
+    } else {
+      console.warn(`  fighter profile not found: ${profilePath}`);
+    }
+  }
+  // photo: explicit fighter.photoDataUri > fighter.image path > profile photo.file
+  if (!input.fighter.photoDataUri && !input.fighter.image && input.fighter.photo?.file && slug) {
+    input.fighter.image = `fighters/${slug}/${input.fighter.photo.file}`;
+  }
+  if (input.fighter.image && !input.fighter.photoDataUri) {
+    const img = resolve(ROOT, input.fighter.image);
+    if (existsSync(img)) {
+      const ext = img.toLowerCase().endsWith(".png") ? "png" : "jpeg";
+      input.fighter.photoDataUri = `data:image/${ext};base64,${readFileSync(img).toString("base64")}`;
+      console.log(`  photo embedded: ${input.fighter.image}`);
+    } else {
+      console.warn(`  photo not found (initials fallback): ${input.fighter.image}`);
+    }
   }
 }
 

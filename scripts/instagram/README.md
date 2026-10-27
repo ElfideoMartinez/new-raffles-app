@@ -10,6 +10,24 @@ reference look; CSS/typography only, no AI image generation needed).
 - **caption.txt** — caption + hashtags + first-comment suggestion
 - **manifest.json** — metadata, verified dimensions, file sizes, Antwork media notes
 
+### Per-fighter cards (fighter photo wiring, fixed 2026-10-26)
+
+Set `fighter` in the input to a fighter slug and the generator wires everything
+itself: it loads `fighters/<slug>/profile.json` (name, initials, stats, facts)
+and embeds `fighters/<slug>/photo.jpg` as a data URI when the profile has a
+photo (`photo.file`). No photo / `photo: null` -> initials fallback from the
+profile. Explicit keys in an object-form `fighter` still win over the profile.
+
+```jsonc
+{ "slug": "fighter-merab-dvalishvili", "fighter": "merab-dvalishvili", ... }
+```
+
+You can also set `"fighter": { "slug": "…", "image": "fighters/<slug>/x.jpg" }
+to override the photo file, or pass `photoDataUri` directly.
+
+Examples: `instagram-pack/templates/fighter-card-merab.json` (renders the real
+photo), `fighter-card-temirov.json` (photo: null -> initials fallback).
+
 ## Publishing constraints enforced
 
 Per `ufc-mission/promotion-options.md` §7 (Antwork route, account
