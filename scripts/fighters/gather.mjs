@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 // fighters gatherer (backlog 22) — build fighter profiles for a UFC event card.
 //
-// Usage: node scripts/fighters/gather.mjs --date=2026-10-24 [--max=20] [--dir=fighters]
+// Usage: node scripts/fighters/gather.mjs --date=2026-10-24 [--max=20] [--dir=fighters] [--any-license]
 //
 // Sources (priority order):
 //  1. ESPN scoreboard  -> card, bout order, winner, record, division, country flag
 //  2. Wikipedia REST summary + action API -> short facts, birth date, URL
 //  3. Wikimedia Commons (search) + Wikipedia pageimage -> photos (license-gated)
 //
-// License policy: only CC0 / Public Domain / CC BY* / CC BY-SA* are downloaded.
+// License policy (default): only CC0 / Public Domain / CC BY* / CC BY-SA* are downloaded.
+// --any-license: accept any image regardless of license (recorded for later review).
 // Non-free, "all rights reserved", missing license, and GFDL-only are skipped (logged).
 // Matching rule: file title/description must contain BOTH surname and one given
 // name (case-insensitive, accent-insensitive). No guesses, no renames.
@@ -25,6 +26,9 @@ const args = Object.fromEntries(
 );
 const DATE = args.date || "2026-10-24";
 const MAX = parseInt(args.max || "20", 10);
+// --any-license: download regardless of license (small production, Daniel's call
+// 2026-10-26). The license string is still recorded everywhere for later review.
+const ANY_LICENSE = !!args["any-license"];
 const ROOT = path.resolve(process.cwd(), args.dir || "fighters");
 const UA = "raffles-fighters-gatherer/1.0 (local research script; contact: repo owner)";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -76,6 +80,7 @@ function matchesName(displayName, ...texts) {
 
 const OK_LICENSE = (l) => {
   const s = (l || "").toLowerCase();
+  if (ANY_LICENSE) return { ok: true, name: l || "(none recorded)", relaxed: true };
   if (!s) return { ok: false, note: "missing license" };
   if (s.startsWith("cc0") || s.includes("public domain")) return { ok: true, name: l };
   if (/^cc by(-sa)?[ \d.-]/.test(s) || s.startsWith("cc by") || s.startsWith("cc by-sa"))
@@ -407,7 +412,7 @@ for (const f of card.fighters) {
     "",
     `## Photo`,
     chosen
-      ? `- ${chosen.title}\n- License: ${chosen.license} (${chosen.licenseUrl || "n/a"})\n- Artist: ${chosen.artist || "n/a"}\n- Credit: ${chosen.credit || "n/a"}\n- File page: ${chosen.filePage || chosen.url}`
+      ? `- ${chosen.title}\n- License: ${chosen.license}${chosen.relaxed ? " (RELAXED: accepted under --any-license; review before wide use)" : ` (${chosen.licenseUrl || "n/a"})`}\n- Artist: ${chosen.artist || "n/a"}\n- Credit: ${chosen.credit || "n/a"}\n- File page: ${chosen.filePage || chosen.url}`
       : `- No photo: no Commons/Wikipedia image passed the license policy (CC0/PD/CC BY*/CC BY-SA*) and the name-match rule. Initials fallback (${profile.initials}).`,
     "",
     `## Notes`,
