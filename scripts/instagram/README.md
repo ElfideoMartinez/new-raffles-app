@@ -43,9 +43,22 @@ Per `ufc-mission/promotion-options.md` §7 (Antwork route, account
 ## Run
 
 ```sh
+# one card from a JSON input
 node scripts/instagram/generate.mjs scripts/instagram/examples/ufc333-bets.json
 # output -> instagram-pack/out/ufc333-bets/
+
+# every fighter that has fighters/<slug>/profile.json
+node scripts/instagram/generate.mjs --all
+# output -> instagram-pack/out/<slug>/ (one folder per fighter)
+
+# only some fighters
+node scripts/instagram/generate.mjs --all --only=merab-dvalishvili,ramazan-temirov
 ```
+
+Bulk mode builds each card input from the profile (name, record, division,
+nickname, stats, facts) and renders `feed-hype.html` + `story-fighter.html`.
+A missing photo is not an error: the card falls back to the profile initials.
+The single-input path is unchanged.
 
 Requires: Node + `puppeteer-core` (already a repo dependency pattern — see
 `scripts/viewport-shot.mjs`) and local Google Chrome

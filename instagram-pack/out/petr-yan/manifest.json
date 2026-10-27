@@ -1,0 +1,35 @@
+{
+  "slug": "petr-yan",
+  "generated_by": "scripts/instagram/generate.mjs",
+  "generated_at": "2026-10-27T03:01:26.996Z",
+  "input": "/Users/danielmartinez/Projects/new-raffles-app/fighters/petr-yan/profile.json",
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc"
+  },
+  "event": {
+    "kicker": "UFC 333 · PERFIL",
+    "title": "Petr Yan",
+    "subtitle": "No Mercy"
+  },
+  "assets": [
+    {
+      "kind": "feed",
+      "file": "feed.jpg",
+      "dimensions": "1080x1350",
+      "bytes": 195985,
+      "under_8mb": true,
+      "format": "jpeg"
+    },
+    {
+      "kind": "story",
+      "file": "story.jpg",
+      "dimensions": "1080x1920",
+      "bytes": 224136,
+      "under_8mb": true,
+      "format": "jpeg"
+    }
+  ],
+  "antwork_media_rules": "jpg/jpeg <= 8MB; upload via add_media -> PUT URL -> curl",
+  "story_note": null
+}

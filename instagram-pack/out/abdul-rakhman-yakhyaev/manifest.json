@@ -1,0 +1,35 @@
+{
+  "slug": "abdul-rakhman-yakhyaev",
+  "generated_by": "scripts/instagram/generate.mjs",
+  "generated_at": "2026-10-27T03:01:10.218Z",
+  "input": "/Users/danielmartinez/Projects/new-raffles-app/fighters/abdul-rakhman-yakhyaev/profile.json",
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc"
+  },
+  "event": {
+    "kicker": "UFC 333 · PERFIL",
+    "title": "Abdul-Rakhman Yakhyaev",
+    "subtitle": "Light Heavyweight"
+  },
+  "assets": [
+    {
+      "kind": "feed",
+      "file": "feed.jpg",
+      "dimensions": "1080x1350",
+      "bytes": 186240,
+      "under_8mb": true,
+      "format": "jpeg"
+    },
+    {
+      "kind": "story",
+      "file": "story.jpg",
+      "dimensions": "1080x1920",
+      "bytes": 190035,
+      "under_8mb": true,
+      "format": "jpeg"
+    }
+  ],
+  "antwork_media_rules": "jpg/jpeg <= 8MB; upload via add_media -> PUT URL -> curl",
+  "story_note": null
+}

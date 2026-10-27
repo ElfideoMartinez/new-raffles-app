@@ -14,13 +14,22 @@
  *   - no external network assets: templates are pure CSS/typography; page
  *     requests are blocked anyway (request interception denies everything)
  *
- * RUN:  node scripts/instagram/generate.mjs scripts/instagram/examples/ufc333-bets.json
+ * RUN:
+ *   single card:   node scripts/instagram/generate.mjs <input.json>
+ *   every fighter: node scripts/instagram/generate.mjs --all
+ *   a subset:      node scripts/instagram/generate.mjs --all --only=merab-dvalishvili,petr-yan
+ *
+ * Bulk mode iterates every fighters/<slug>/ that has a profile.json and builds
+ * that fighter's card input from the profile (output -> instagram-pack/out/<slug>/).
+ * Fighters without a photo render initials.
+ *
  * Requires: puppeteer-core + local Google Chrome (already in repo dev flow).
  */
 import puppeteer from "puppeteer-core";
-import { readFileSync, writeFileSync, mkdirSync, statSync, unlinkSync, existsSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync, mkdirSync, statSync, unlinkSync, existsSync, readdirSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -28,9 +37,64 @@ const ROOT = resolve(HERE, "../..");
 const CHROME = process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const MAX_BYTES = 8 * 1024 * 1024; // Instagram/Antwork limit
 
-const inputPath = process.argv[2];
+// ---- 0. Arguments: single input JSON or bulk --all -----------------------
+const argv = process.argv.slice(2);
+const isBulk = argv.includes("--all");
+const onlyArg = argv.find((a) => a.startsWith("--only="));
+const inputPath = argv.find((a) => !a.startsWith("--"));
+
+if (isBulk) {
+  if (inputPath) {
+    console.error("Use either an input JSON or --all, not both.");
+    process.exit(1);
+  }
+  const only = onlyArg
+    ? onlyArg.slice("--only=".length).split(",").map((s) => s.trim()).filter(Boolean)
+    : null;
+  const allSlugs = readdirSync(join(ROOT, "fighters"), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && existsSync(join(ROOT, "fighters", e.name, "profile.json")))
+    .map((e) => e.name)
+    .sort();
+  const slugs = only ? allSlugs.filter((s) => only.includes(s)) : allSlugs;
+  const unknown = only ? only.filter((s) => !allSlugs.includes(s)) : [];
+  if (unknown.length) {
+    console.error(`Unknown or profile-less fighter slug(s): ${unknown.join(", ")}`);
+    process.exit(1);
+  }
+  if (!slugs.length) {
+    console.error("No fighters with profile.json found.");
+    process.exit(1);
+  }
+
+  console.log(`Bulk mode: ${slugs.length} fighter card(s) -> instagram-pack/out/<slug>/`);
+  const failed = [];
+  for (const slug of slugs) {
+    const tmpInput = join(tmpdir(), `instagram-${slug}-${process.pid}.json`);
+    writeFileSync(tmpInput, JSON.stringify(buildFighterInput(slug), null, 2) + "\n");
+    console.log(`\n=== ${slug} ===`);
+    const res = spawnSync(process.execPath, [fileURLToPath(import.meta.url), tmpInput], {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        INSTAGRAM_INPUT_SOURCE: `fighters/${slug}/profile.json`,
+      },
+    });
+    unlinkSync(tmpInput);
+    if (res.status !== 0) failed.push(slug);
+  }
+  console.log(`\nBulk summary: ${slugs.length - failed.length}/${slugs.length} generated.`);
+  if (failed.length) {
+    console.error(`Failed: ${failed.join(", ")}`);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 if (!inputPath) {
-  console.error("Usage: node scripts/instagram/generate.mjs <input.json>");
+  console.error(
+    "Usage: node scripts/instagram/generate.mjs <input.json>\n" +
+    "       node scripts/instagram/generate.mjs --all [--only=slug,slug]"
+  );
   process.exit(1);
 }
 const input = JSON.parse(readFileSync(inputPath, "utf8"));
@@ -114,6 +178,58 @@ if (input.fighter) {
   }
 }
 
+// ---- 1c. Bulk input builder: profile.json -> card input -------------------
+// Used only by --all/--only. The single-input path above is untouched: bulk
+// mode writes a temporary JSON that goes through exactly the same generator.
+function buildFighterInput(slug) {
+  const profile = JSON.parse(readFileSync(join(ROOT, "fighters", slug, "profile.json"), "utf8"));
+  const name = profile.name || slug;
+  const rec = profile.record || {};
+  const record = rec.wins != null
+    ? `${rec.wins}-${rec.losses ?? 0}${rec.draws ? `-${rec.draws}` : ""}`
+    : null;
+  const division = profile.division || null;
+  const eventName = profile._event?.name || "";
+  const kickerEvent = eventName.split(":")[0].trim();
+
+  const clamp = (text, max = 150) => {
+    const first = String(text).split(/(?<=\.)\s+/)[0].trim();
+    return first.length > max ? first.slice(0, max - 1).replace(/\s+\S*$/, "") + "…" : first;
+  };
+  const facts = (profile.facts || []).map((f) => clamp(f)).filter(Boolean).slice(0, 2);
+  const stats = [
+    ...(record ? [{ label: "Récord", value: record }] : []),
+    // Only short stat pills: long values (e.g. "Ganó en UFC 333: ...") blow the
+    // feed layout out sideways in a narrow fighter card.
+    ...(profile.stats || []).filter(
+      (st) => st.label !== "Récord" && String(st.value).length <= 18
+    ),
+  ].slice(0, 3);
+
+
+  return {
+    slug,
+    locale: "es-MX",
+    templates: {
+      feed: "scripts/instagram/templates/feed-hype.html",
+      story: "scripts/instagram/templates/story-fighter.html",
+    },
+    brand: { name: "Rifas Mtz", handle: "@bet.mx.ufc" },
+    event: {
+      kicker: kickerEvent ? `${kickerEvent} · PERFIL` : "PERFIL",
+      title: name,
+      subtitle: profile.nickname || division || "",
+    },
+    story: { sticker_note: null },
+    cta: "Ficha del peleador",
+    caption: {
+      text: `${name}${record ? ` · récord ${record}` : ""}${division ? ` · ${division}` : ""}.`,
+      hashtags: "#RifasMtz #UFC",
+    },
+    fighter: { slug, stats, facts },
+  };
+}
+
 // ---- 2. Render with headless Chrome ---------------------------------------
 const CHROME_ARGS = ["--hide-scrollbars", "--disable-remote-fonts", "--disable-dev-shm-usage"];
 const sizes = { feed: [1080, 1350], story: [1080, 1920] };
@@ -181,7 +297,10 @@ writeFileSync(join(outDir, "caption.txt"), captionTxt + "\n");
 const manifest = {
   slug: input.slug, generated_by: "scripts/instagram/generate.mjs",
   generated_at: new Date().toISOString(),
-  input: resolve(inputPath), brand: input.brand, event: input.event,
+  input: process.env.INSTAGRAM_INPUT_SOURCE
+    ? resolve(ROOT, process.env.INSTAGRAM_INPUT_SOURCE)
+    : resolve(inputPath),
+  brand: input.brand, event: input.event,
   assets: results.map((r) => ({
     kind: r.kind, file: `${r.kind}.jpg`,
     dimensions: `${r.verifiedDims[0]}x${r.verifiedDims[1]}`,

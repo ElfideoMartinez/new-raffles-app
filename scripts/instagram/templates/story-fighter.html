@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+  Story template — FIGHTER PROFILE — 1080x1920 (9:16).
+  Rendered by scripts/instagram/generate.mjs for fighter cards. Self-contained:
+  portrait is an embedded local file (data URI) or the profile initials.
+  Separate from story-hype.html because long surnames overflow that headline.
+-->
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f5f0e8;
+    background:
+      radial-gradient(1100px 900px at 88% -6%, rgba(216,64,64,.55), transparent 62%),
+      radial-gradient(900px 700px at -8% 106%, rgba(255,122,24,.32), transparent 55%),
+      linear-gradient(165deg, #12100e 0%, #1c1512 55%, #0d0b0a 100%);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 90px 80px 110px;
+  }
+  .kicker { font-size: 32px; letter-spacing: .28em; text-transform: uppercase; color: #ffb347; font-weight: 700; }
+  .portrait {
+    position: relative;
+    width: 720px; height: 680px; margin-top: 40px; border-radius: 24px; overflow: hidden;
+    background: linear-gradient(160deg, rgba(216,64,64,.35), rgba(255,122,24,.18));
+    border: 1px solid rgba(255,179,71,.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .initials { font-size: 240px; font-weight: 900; color: rgba(245,240,232,.75); }
+  .name { margin-top: 44px; font-size: 92px; font-weight: 900; line-height: .98; text-transform: uppercase; }
+  .nick { margin-top: 14px; font-size: 38px; font-weight: 700; color: #ff4d3d; text-transform: uppercase; letter-spacing: .06em; }
+  .statline { margin-top: 36px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+  .stat { background: rgba(255,255,255,.06); border: 1px solid rgba(255,179,71,.35); border-radius: 14px; padding: 16px 24px; }
+  .stat b { display: block; font-size: 42px; font-weight: 900; }
+  .stat span { font-size: 19px; letter-spacing: .14em; text-transform: uppercase; color: #ffb347; }
+  .spacer { flex: 1; }
+  .cta {
+    background: #f5f0e8; color: #12100e; font-size: 42px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .06em; padding: 26px 56px; border-radius: 999px;
+  }
+  .brand { margin-top: 32px; font-size: 30px; color: rgba(245,240,232,.65); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="kicker">{{event.kicker}}</div>
+  <div class="portrait">
+    <div class="initials">{{fighter.initials}}</div>
+    {{#if fighter.photoDataUri}}<img src="{{fighter.photoDataUri}}" alt="{{fighter.name}}" onerror="this.remove()">{{/if}}
+  </div>
+  <div class="name">{{fighter.name}}</div>
+  {{#if fighter.nickname}}<div class="nick">{{fighter.nickname}}</div>{{/if}}
+  <div class="statline">
+    {{#each fighter.stats}}<div class="stat"><b>{{value}}</b><span>{{label}}</span></div>{{/each}}
+  </div>
+  <div class="spacer"></div>
+  <div class="cta">{{cta}} 🎲🥊🔥</div>
+  <div class="brand">{{brand.name}} · {{brand.handle}}</div>
+</body>
+</html>
