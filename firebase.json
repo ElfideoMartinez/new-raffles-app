@@ -10,13 +10,6 @@
         "**/dist/**",
         "**.local",
         "*.local"
-      ],
-      "redirects": [
-        {
-          "source": "**",
-          "destination": "https://rifasmtz.web.app/**",
-          "type": 301
-        }
       ]
     },
     {
