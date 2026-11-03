@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "raffleapp-dbc1b",
-      "source": ".",
+      "source": "legacy",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -10,6 +10,13 @@
         "**/dist/**",
         "**.local",
         "*.local"
+      ],
+      "redirects": [
+        {
+          "source": "**",
+          "destination": "https://rifasmtz.web.app/:splat",
+          "type": 301
+        }
       ]
     },
     {
