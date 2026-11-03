@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "raffleapp-dbc1b"
-  }
+  },
+  "targets": {
+    "raffleapp-dbc1b": {
+      "hosting": {
+        "raffleapp-dbc1b": [
+          "raffleapp-dbc1b"
+        ],
+        "rifasmtz": [
+          "rifasmtz"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
