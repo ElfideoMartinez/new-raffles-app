@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Domain regularization: 301 any legacy host to the canonical URL (rifasmtz.web.app),
- * preserving the exact path + query string. Runs on every site that serves this build;
- * only the legacy hosts trigger a redirect, so the canonical host passes through untouched.
+ * preserving the exact path + query string. The canonical host passes through untouched.
+ *
+ * When Firebase Hosting proxies to the SSR function it rewrites the `Host` header and
+ * delivers the original hostname in `X-Forwarded-Host`, so BOTH headers are checked.
  */
 const LEGACY_HOSTS = new Set([
   "raffleapp-dbc1b.web.app",
@@ -12,14 +14,17 @@ const LEGACY_HOSTS = new Set([
 
 const CANONICAL_BASE = "https://rifasmtz.web.app";
 
-export function middleware(request: NextRequest) {
-  const host = (request.headers.get("host") || "").toLowerCase();
+function requestHost(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-host");
+  const raw = forwarded ? forwarded.split(",")[0] : request.headers.get("host") || "";
+  return raw.replace(/:\d+$/, "").trim().toLowerCase();
+}
 
-  if (LEGACY_HOSTS.has(host)) {
+export function middleware(request: NextRequest) {
+  if (LEGACY_HOSTS.has(requestHost(request))) {
     const { pathname, search } = request.nextUrl;
     return NextResponse.redirect(`${CANONICAL_BASE}${pathname}${search}`, 301);
   }
-
   return NextResponse.next();
 }
 
