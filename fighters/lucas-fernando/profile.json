@@ -1,0 +1,38 @@
+{
+  "slug": "lucas-fernando",
+  "name": "Lucas Fernando",
+  "nickname": null,
+  "initials": "LF",
+  "country": "Brazil",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 14,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Billy Elekana",
+        "winner": null,
+        "result": null,
+        "record": "14-3-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

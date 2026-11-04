@@ -1,0 +1,68 @@
+{
+  "slug": "tatiana-suarez",
+  "name": "Tatiana Suarez",
+  "nickname": null,
+  "initials": "TS",
+  "country": "USA",
+  "division": "W Strawweight",
+  "record": {
+    "wins": 13,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1990-12-19"
+    }
+  ],
+  "facts": [
+    "Tatiana Yadira Suarez Padilla is an American professional mixed martial artist and former wrestler who currently competes in the women's Strawweight division of the Ultimate Fighting Championship (UFC). She was the strawweight tournament winner in the 23rd season of The Ultimate Fighter reality show."
+  ],
+  "previousFights": [],
+  "photo": {
+    "file": "photo.jpg",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tatiana_Suarez_at_UFC_228.jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Tatiana_Suarez_at_UFC_228.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "artist": "MMAnytt",
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Tatiana_Suarez",
+      "note": "short factual summary",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Tatiana_Suarez",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Tatiana_Suarez_at_UFC_228.jpg",
+      "note": "photo, license CC BY 3.0 (Commons search)",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "W Strawweight",
+        "opponent": "Virna Jandiroba",
+        "winner": null,
+        "result": null,
+        "record": "13-1-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

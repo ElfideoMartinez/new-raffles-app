@@ -1,0 +1,38 @@
+{
+  "slug": "thomas-petersen",
+  "name": "Thomas Petersen",
+  "nickname": null,
+  "initials": "TP",
+  "country": "USA",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 11,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Heavyweight",
+        "opponent": "Gabriel Lorenço",
+        "winner": null,
+        "result": null,
+        "record": "11-5-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

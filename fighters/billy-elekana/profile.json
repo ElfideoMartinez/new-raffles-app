@@ -1,0 +1,55 @@
+{
+  "slug": "billy-elekana",
+  "name": "Billy Elekana",
+  "nickname": null,
+  "initials": "BE",
+  "country": "USA",
+  "division": "Light Heavyweight",
+  "record": {
+    "wins": 10,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1995-05-28"
+    }
+  ],
+  "facts": [
+    "Billy Joseph Elekana is an American professional mixed martial artist. He currently competes in the Light Heavyweight division for the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Billy_Elekana",
+      "note": "short factual summary",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Billy_Elekana",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Light Heavyweight",
+        "opponent": "Lucas Fernando",
+        "winner": null,
+        "result": null,
+        "record": "10-2-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

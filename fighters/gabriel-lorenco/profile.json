@@ -1,0 +1,38 @@
+{
+  "slug": "gabriel-lorenco",
+  "name": "Gabriel Lorenço",
+  "nickname": null,
+  "initials": "GL",
+  "country": "Brazil",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 8,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Heavyweight",
+        "opponent": "Thomas Petersen",
+        "winner": null,
+        "result": null,
+        "record": "8-1-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

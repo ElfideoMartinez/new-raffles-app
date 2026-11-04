@@ -1,0 +1,55 @@
+{
+  "slug": "priscila-cachoeira",
+  "name": "Priscila Cachoeira",
+  "nickname": null,
+  "initials": "PC",
+  "country": "Brazil",
+  "division": "W Bantamweight",
+  "record": {
+    "wins": 13,
+    "losses": 9,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1988-08-19"
+    }
+  ],
+  "facts": [
+    "Priscila Cachoeira Gomes da Silva is a Brazilian mixed martial artist. She currently competes in the women's Flyweight division in the Ultimate Fighting Championship.."
+  ],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Priscila_Cachoeira",
+      "note": "short factual summary",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Priscila_Cachoeira",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "W Bantamweight",
+        "opponent": "Nina Milošević",
+        "winner": null,
+        "result": null,
+        "record": "13-9-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

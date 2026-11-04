@@ -1,0 +1,55 @@
+{
+  "slug": "karine-silva",
+  "name": "Karine Silva",
+  "nickname": null,
+  "initials": "KS",
+  "country": "Brazil",
+  "division": "W Flyweight",
+  "record": {
+    "wins": 19,
+    "losses": 7,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1993-12-02"
+    }
+  ],
+  "facts": [
+    "Karine Silva de Almeida is a Brazilian professional mixed martial artist who competes in the women's Flyweight division of the Ultimate Fighting Championship (UFC). As of September 19, 2026, she is #14 in the Meta UFC women's flyweight rankings.."
+  ],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Karine_Silva",
+      "note": "short factual summary",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Karine_Silva",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "W Flyweight",
+        "opponent": "Gabriella Fernandes",
+        "winner": null,
+        "result": null,
+        "record": "19-7-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

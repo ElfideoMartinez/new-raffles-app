@@ -1,0 +1,38 @@
+{
+  "slug": "nina-milosevic",
+  "name": "Nina Milošević",
+  "nickname": null,
+  "initials": "NM",
+  "country": "Serbia",
+  "division": "W Bantamweight",
+  "record": {
+    "wins": 9,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "W Bantamweight",
+        "opponent": "Priscila Cachoeira",
+        "winner": null,
+        "result": null,
+        "record": "9-1-0",
+        "country": "Serbia"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "slug": "ollie-schmid",
+  "name": "Ollie Schmid",
+  "nickname": null,
+  "initials": "OS",
+  "country": "New Zealand",
+  "division": "Featherweight",
+  "record": {
+    "wins": 4,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "photo": null,
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Featherweight",
+        "opponent": "Keiichiro Nakamura",
+        "winner": null,
+        "result": null,
+        "record": "4-3-0",
+        "country": "New Zealand"
+      }
+    ]
+  }
+}

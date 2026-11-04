@@ -1,0 +1,68 @@
+{
+  "slug": "johnny-walker",
+  "name": "Johnny Walker",
+  "nickname": null,
+  "initials": "JW",
+  "country": "Brazil",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 23,
+    "losses": 10,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1992-03-30"
+    }
+  ],
+  "facts": [
+    "Walker Johnny Silva Barra de Souza, known as Johnny Walker, is a Brazilian professional mixed martial artist. He currently competes in the Heavyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [],
+  "photo": {
+    "file": "photo.jpg",
+    "source_url": "https://commons.wikimedia.org/wiki/File:CoreyAnderson.jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/CoreyAnderson.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "artist": "MMAnytt",
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Johnny_Walker_(fighter)",
+      "note": "short factual summary",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Johnny_Walker_(fighter)",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-04"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:CoreyAnderson.jpg",
+      "note": "photo, license CC BY 3.0 (Commons search)",
+      "checked": "2026-11-04"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+    "date": "2026-11-07",
+    "bouts": [
+      {
+        "division": "Heavyweight",
+        "opponent": "Waldo Cortes Acosta",
+        "winner": null,
+        "result": null,
+        "record": "23-10-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}
