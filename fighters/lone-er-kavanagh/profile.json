@@ -3,7 +3,7 @@
   "name": "Lone'er Kavanagh",
   "nickname": null,
   "initials": "LK",
-  "country": null,
+  "country": "England",
   "division": "Flyweight",
   "record": {
     "wins": 11,
@@ -21,7 +21,7 @@
     }
   ],
   "facts": [
-    "Lone'er Kavanagh is a British professional mixed martial artist currently competing in the Flyweight division of the Ultimate Fighting Championship (UFC). He trains out of Great Britain Top Team in London."
+    "Lone'er Kavanagh is a English professional mixed martial artist currently competing in the Flyweight division of the Ultimate Fighting Championship (UFC). He trains out of Great Britain Top Team in London."
   ],
   "previousFights": [
     {
@@ -36,17 +36,17 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Lone'er_Kavanagh",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -58,7 +58,8 @@
         "opponent": "Ramazan Temirov",
         "winner": true,
         "result": "W",
-        "record": "11-2-0"
+        "record": "11-2-0",
+        "country": "England"
       }
     ]
   }

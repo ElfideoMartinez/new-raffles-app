@@ -3,7 +3,7 @@
   "name": "Movsar Evloev",
   "nickname": null,
   "initials": "ME",
-  "country": null,
+  "country": "Russia",
   "division": "Featherweight",
   "record": {
     "wins": 20,
@@ -30,6 +30,7 @@
   "photo": {
     "file": "photo.jpg",
     "source_url": "https://commons.wikimedia.org/wiki/File:Movsar_Evloev_M-1_Challenge_2018.jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Movsar_Evloev_M-1_Challenge_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
     "license": "CC BY 4.0",
     "license_url": "https://creativecommons.org/licenses/by/4.0",
     "artist": "Press Service of the Head and Government of the Republic of Ingushetia",
@@ -39,22 +40,22 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Movsar_Evloev",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Movsar_Evloev",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://commons.wikimedia.org/wiki/File:Movsar_Evloev_M-1_Challenge_2018.jpg",
       "note": "photo, license CC BY 4.0 (Commons search)",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -66,7 +67,8 @@
         "opponent": "Alexander Volkanovski",
         "winner": false,
         "result": "L",
-        "record": "20-1-0"
+        "record": "20-1-0",
+        "country": "Russia"
       }
     ]
   }

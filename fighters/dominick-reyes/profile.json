@@ -3,7 +3,7 @@
   "name": "Dominick Reyes",
   "nickname": "The Devastator",
   "initials": "DR",
-  "country": null,
+  "country": "USA",
   "division": "Light Heavyweight",
   "record": {
     "wins": 17,
@@ -34,6 +34,7 @@
   "photo": {
     "file": "photo.jpg",
     "source_url": "https://commons.wikimedia.org/wiki/File:Dominick_Reyes_(54451224096).jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Dominick_Reyes_%2854451224096%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
     "license": "Public domain",
     "license_url": null,
     "artist": "The White House",
@@ -43,27 +44,27 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
       "note": "nickname (wikibox)",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Dominick_Reyes",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://commons.wikimedia.org/wiki/File:Dominick_Reyes_(54451224096).jpg",
       "note": "photo, license Public domain (Wikipedia lead image)",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -75,7 +76,8 @@
         "opponent": "Azamat Murzakanov",
         "winner": true,
         "result": "W",
-        "record": "17-5-0"
+        "record": "17-5-0",
+        "country": "USA"
       }
     ]
   }

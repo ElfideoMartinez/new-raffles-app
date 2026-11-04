@@ -3,7 +3,7 @@
   "name": "Alexander Volkanovski",
   "nickname": "The Great",
   "initials": "AV",
-  "country": null,
+  "country": "Australia",
   "division": "Featherweight",
   "record": {
     "wins": 29,
@@ -36,22 +36,22 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
       "note": "nickname (wikibox)",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Alexander_Volkanovski",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -63,7 +63,8 @@
         "opponent": "Movsar Evloev",
         "winner": true,
         "result": "W",
-        "record": "29-4-0"
+        "record": "29-4-0",
+        "country": "Australia"
       }
     ]
   }

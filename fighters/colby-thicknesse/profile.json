@@ -3,7 +3,7 @@
   "name": "Colby Thicknesse",
   "nickname": null,
   "initials": "CT",
-  "country": null,
+  "country": "Australia",
   "division": "Bantamweight",
   "record": {
     "wins": 10,
@@ -36,17 +36,17 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Colby_Thicknesse",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Colby_Thicknesse",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -58,7 +58,8 @@
         "opponent": "Asaf Chopurov",
         "winner": true,
         "result": "W",
-        "record": "10-1-0"
+        "record": "10-1-0",
+        "country": "Australia"
       }
     ]
   }

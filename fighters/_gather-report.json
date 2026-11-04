@@ -4,6 +4,7 @@
   "fighters": 20,
   "rejections": [
     "[Petr Yan] SKIP File:Samuelis Méhes de respiratione animalium commentatio - in concertatione civium Academiae Heidelbergensis 22a Novembris MDCCCVIII praemio a M. Duce Badarum constituto a medicorum ordine ornata (IA b22288776).pdf — not a jpg/png (pdf/svg/other)",
+    "[Petr Yan] SKIP File:The temple. ... 1656 (IA bim early-english-books-1641-1700 the-temple- herbert-george 1656 0).pdf — not a jpg/png (pdf/svg/other)",
     "[Ramazan Temirov] REJECT File:Ramazan Temurov 2.jpg (wiki lead) — surname \"temirov\" not found",
     "[Aaron Pico] SKIP File:A great collection of original source material relating to the early West and the Far West (IA greatcollectiono00ande).pdf — not a jpg/png (pdf/svg/other)",
     "[Aaron Pico] SKIP File:A great collection of original source material relating to the early West and Far West (IA greatcollectiono00anderich).pdf — not a jpg/png (pdf/svg/other)",
@@ -19,6 +20,7 @@
     "[Azamat Murzakanov] REJECT File:NS85, Professional MotorSport World Expo Awards 2024, Cologne (P1031308).jpg — name mismatch: surname \"murzakanov\" not found",
     "[Azamat Murzakanov] REJECT File:Lighting Effects at the Professional Bull Riders.jpg — name mismatch: surname \"murzakanov\" not found",
     "[Azamat Murzakanov] REJECT File:Westbury Square Professional Building.jpg — name mismatch: surname \"murzakanov\" not found",
+    "[Abdul-Rakhman Yakhyaev] REJECT File:Yellow striped hunter mating.jpg — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:Hunter × Hunter logo.png — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:Hunter Peak.JPG — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:Dogon Hunter.JPG — name mismatch: surname \"yakhyaev\" not found",
@@ -27,7 +29,6 @@
     "[Abdul-Rakhman Yakhyaev] REJECT File:Heidenheimer-Hunter Building -- Galveston.jpg — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:Hunter baby chameleon.jpg — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:Hunter Schafer-64205.jpg — name mismatch: surname \"yakhyaev\" not found",
-    "[Abdul-Rakhman Yakhyaev] REJECT File:Hunter Schafer-64987.jpg — name mismatch: surname \"yakhyaev\" not found",
     "[Abdul-Rakhman Yakhyaev] REJECT File:(Castre) Philip IV as a Hunter - Velazquez - Musée Goya.jpg — name mismatch: surname \"yakhyaev\" not found",
     "[Grant Dawson] SKIP File:Carry on; letters in war-time (IA carryonlettersin01daws).pdf — not a jpg/png (pdf/svg/other)",
     "[Grant Dawson] SKIP File:Carry on; letters in war-time (IA carryonlettersin00daws).pdf — not a jpg/png (pdf/svg/other)",
@@ -38,7 +39,7 @@
     "[Grant Dawson] REJECT File:Addison Reed on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found",
     "[Grant Dawson] REJECT File:Dave McKay on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found",
     "[Grant Dawson] REJECT File:Tommy La Stella on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found",
-    "[Grant Dawson] REJECT File:Ryan Doumit on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found"
+    "[Grant Dawson] REJECT File:Christian Bethancourt on July 6, 2014.jpg — name mismatch: surname \"dawson\" not found"
   ],
   "failures": []
 }

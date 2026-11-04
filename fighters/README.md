@@ -40,3 +40,20 @@ fighters/<slug>/
 - Facts only from verifiable sources; list them in `sourceUrls`. No invented stats.
 - Images: keep the source URL in `image_source`; only files we may reuse (press/CC).
 - Never overwrite a card's facts to make a nicer graphic.
+
+## Photo integrity
+
+The gatherer uses `scripts/fighters/photo.mjs` (macOS `sips` required). It checks
+HTTP status, MIME type, JPEG/PNG signatures and end markers, then fully decodes
+the pixels before conversion and again after metadata removal. Photos are JPEG,
+at most 1200px on their longest edge and ≤2 MB. New files are staged and only
+renamed over the saved photo once validation succeeds; conversion failures are
+not accepted as successful downloads. Exact download URLs are recorded in new
+`profile.photo.download_url` entries, alongside the Commons attribution page.
+
+JPEG DHT/Huffman tables are coding data, **not metadata**. Never remove them.
+Reading dimensions alone (`sips -g`) or a browser's permissive `Image.decode()`
+can miss this corruption. Regression checks: `node --test scripts/fighters/photo.test.mjs`.
+
+The admin roster embeds these files at build time. Local photo repairs do not
+update a previously deployed build; that requires a separately authorized deploy.

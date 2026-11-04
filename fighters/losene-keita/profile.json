@@ -3,7 +3,7 @@
   "name": "Losene Keita",
   "nickname": null,
   "initials": "LK",
-  "country": null,
+  "country": "Belgium",
   "division": "Featherweight",
   "record": {
     "wins": 17,
@@ -32,17 +32,17 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261024",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Losene_Keita",
       "note": "short factual summary",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Losene_Keita",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-10-27"
+      "checked": "2026-11-04"
     }
   ],
   "_event": {
@@ -54,7 +54,8 @@
         "opponent": "Aaron Pico",
         "winner": false,
         "result": "L",
-        "record": "17-3-0"
+        "record": "17-3-0",
+        "country": "Belgium"
       }
     ]
   }
