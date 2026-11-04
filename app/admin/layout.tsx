@@ -41,10 +41,6 @@ const NAV_SECTIONS: {
     ],
   },
   {
-    title: "Contenido",
-    links: [{ href: "/admin/fighters", label: "Fighters" }],
-  },
-  {
     title: "Liquidación",
     links: [{ href: "/admin/settlement", label: "Liquidar apuestas" }],
   },
