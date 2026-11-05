@@ -2,20 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Token variables (2026-11-05). Every Tailwind colour token in
+ * tailwind.config.ts reads from these `--*-<step>` triplets, so dark mode is
+ * just the `.dark` override block below — the class is toggled on <html> by
+ * the boot script in app/layout.tsx (pre-paint, no flash) and by
+ * app/components/theme.ts (toggle button).
+ *
+ * Light palette: unchanged from the 2026-10-20 UI rework (blue→teal brand).
+ * Dark palette: the Instagram story colours ratified in HANDOFF-2026-11-04 —
+ *   brand → gold  #ffb347 / #f09d2d / #d9861f
+ *   accent → red   #ff4d3d / #e63e2e / #c93527
+ *   page surface  → #12100e → #1c1512 vertical gradient (on body)
+ *   ink ramp flips: 900 (body text) → cream #f4ede2, 100 (cards) → #241f19,
+ *   300 (borders) → #3a342c. `surface` (was bg-white) → #241f19.
+ *
+ * Semantic ramps (success/warning/danger) stay identical in both modes:
+ * state tints (50) keep light boxes that read fine on dark, and 700 fills keep
+ * their white text. `on-brand` is the text colour for brand-filled surfaces:
+ * ink-900 light (ratified A1a), #12100e dark (gold keeps ~9:1 on text).
+ */
+
 :root {
-  /* Brand tokens mirrored from tailwind.config.ts so inline props
-     (spinner colours, style={{backgroundColor}}) can reference the same
-     values instead of hard-coded hex. Keep in sync with the Tailwind theme. */
-  --color-ink-900: #0f172a;
+  --brand-50: 239 246 255;
+  --brand-100: 219 234 254;
+  --brand-300: 147 197 253;
+  --brand-500: 59 130 246;
+  --brand-600: 37 99 235;
+  --brand-700: 29 78 216;
+
+  --accent-400: 45 212 191;
+  --accent-500: 20 184 166;
+  --accent-600: 13 148 136;
+
+  --ink-900: 15 23 42;
+  --ink-700: 51 65 85;
+  --ink-500: 100 116 139;
+  --ink-300: 203 213 225;
+  --ink-100: 241 245 249;
+
+  --surface: 255 255 255;
+  --on-brand: 15 23 42;
+
+  --success-50: 236 253 245;
+  --success-500: 16 185 129;
+  --success-700: 4 120 87;
+  --warning-50: 255 251 235;
+  --warning-500: 245 158 11;
+  --warning-700: 180 83 9;
+  --danger-50: 254 242 242;
+  --danger-500: 239 68 68;
+  --danger-700: 185 28 28;
+  --danger-800: 153 27 27;
+
+  /* Single-value mirrors for inline style props (spinner colours, etc.).
+  Keep in sync with the Tailwind theme. */
+  --color-ink-900: rgb(var(--ink-900));
   --color-ink-inverse: #ffffff;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
-  --color-accent-400: #2dd4bf;
-  --color-accent-500: #14b8a6;
+  --color-on-brand: rgb(var(--on-brand));
+  --color-brand-500: rgb(var(--brand-500));
+  --color-brand-600: rgb(var(--brand-600));
+  --color-brand-700: rgb(var(--brand-700));
+  --color-accent-400: rgb(var(--accent-400));
+  --color-accent-500: rgb(var(--accent-500));
   /* Referenced by OfferStar's default fill. Was missing, so the star rendered
      black (an invalid var() falls back to the initial fill). */
-  --color-warning-500: #f59e0b;
+  --color-warning-500: rgb(var(--warning-500));
+}
+
+.dark {
+  --brand-50: 255 246 230;
+  --brand-100: 255 233 201;
+  --brand-300: 255 200 115;
+  --brand-500: 255 179 71;
+  --brand-600: 240 157 45;
+  --brand-700: 217 134 31;
+
+  --accent-400: 255 77 61;
+  --accent-500: 230 62 46;
+  --accent-600: 201 53 39;
+
+  --ink-900: 244 237 226;
+  --ink-700: 221 213 201;
+  --ink-500: 168 158 144;
+  --ink-300: 58 52 44;
+  --ink-100: 36 31 25;
+
+  --surface: 36 31 25;
+  --on-brand: 18 16 14;
 }
 
 body {
@@ -24,8 +98,15 @@ body {
      document, so on short pages it produced a hard horizontal seam under the
      content that read as a broken palette divider. The header keeps its own
      brand gradient; the page behind it stays uniform. */
-  background-color: #ffffff;
+  background-color: rgb(var(--surface));
   min-height: 100vh;
+}
+
+/* Dark page surface: the story background gradient, fixed so short pages
+   don't show the seam the light mode comment above describes. */
+.dark body {
+  background: linear-gradient(180deg, #12100e 0%, #1c1512 100%);
+  background-attachment: fixed;
 }
 
 @layer utilities {
@@ -38,8 +119,10 @@ body {
   .random-ticket-button {
     background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-400));
     /* Ratified 2026-10-21 (A1a): dark text on the gradient for AA. White is
-       1.86:1 at the accent-400 end; ink-900 is 9.59:1. Do not revert. */
-    color: var(--color-ink-900);
+       1.86:1 at the accent-400 end; ink-900 is 9.59:1. Do not revert.
+       2026-11-05: reads --color-on-brand so dark mode (#12100e on gold)
+       keeps the same ratio. */
+    color: var(--color-on-brand);
     font-weight: bold;
     /* F17: aligned with Tailwind text-lg (1.125rem); was a 1.1rem oddity. */
     font-size: 1.125rem;
@@ -50,12 +133,12 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease, background 0.3s ease;
   }
-  
+
   .random-ticket-button:hover {
     background: linear-gradient(135deg, var(--color-brand-600), var(--color-accent-500));
     transform: scale(1.05);
   }
-  
+
   .random-ticket-button:active {
     transform: scale(0.98);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -94,4 +177,3 @@ body {
     scroll-behavior: auto !important;
   }
 }
-

@@ -148,7 +148,7 @@ const RafflePageClient = ({
           🎯 ¡Dame un número!
         </button>
       </div>
-      <div className='bg-white shadow-lg rounded-md overflow-hidden w-10/12'>
+      <div className='bg-surface shadow-lg rounded-md overflow-hidden w-10/12'>
         {/* Raw <img>: the URL comes from Firestore and next/image would need a
             remotePatterns entry per storage host. object-cover fixes the
             distortion caused by object-fill. */}
@@ -158,17 +158,17 @@ const RafflePageClient = ({
           alt={raffleData.awardName || raffleData.raffleName}
           className='w-full h-64 object-cover'
         />
-        <div className="text-black font-bold text-lg md:text-xl text-center pt-3 px-3 md:px-2">
+        <div className="text-ink-900 font-bold text-lg md:text-xl text-center pt-3 px-3 md:px-2">
           <p>Premio: {raffleData.awardName}</p>
           <p>Descripción del premio: {raffleData.awardDescription}</p>
         </div>
         {thereIsWinner && (
-        <div className="flex flex-col items-center text-center mt-4 p-4 bg-gray-100 rounded-card shadow-md">
-          <p className="text-black text-2xl font-semibold">🎉 Boleto Ganador 🎉</p>
-          <div className="flex justify-center items-center rounded-pill bg-green-600 text-white font-bold text-3xl h-20 w-20 mt-3 shadow-lg">
+        <div className="flex flex-col items-center text-center mt-4 p-4 bg-ink-100 rounded-card shadow-md">
+          <p className="text-ink-900 text-2xl font-semibold">🎉 Boleto Ganador 🎉</p>
+          <div className="flex justify-center items-center rounded-pill bg-success-700 text-white font-bold text-3xl h-20 w-20 mt-3 shadow-lg">
             {raffleData.ticketWinner}
           </div>
-          <p className="text-black text-xl mt-2">Gracias por tu participación, Rifas Mtz se pondrá en contacto con el ganador</p>
+          <p className="text-ink-900 text-xl mt-2">Gracias por tu participación, Rifas Mtz se pondrá en contacto con el ganador</p>
         </div>)}
         <div className={`p-4 text-center grid-cols-6 ${thereIsWinner ? 'cursor-not-allowed opacity-80 pointer-events-none' : ''}`}>
         {raffleData.data.map((ticket, index) => (      

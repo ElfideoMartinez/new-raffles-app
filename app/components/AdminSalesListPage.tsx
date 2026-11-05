@@ -73,8 +73,8 @@ function AdminSalesListPage<T extends { id: string }>({
             aria-selected={activeTab === tab.key}
             className={`p-2 border-b-2 ${
               activeTab === tab.key
-                ? "bg-blue-500 text-white border-blue-700"
-                : "bg-gray-300 text-gray-600 border-transparent"
+                ? "bg-brand-600 text-on-brand border-brand-700"
+                : "bg-ink-300 text-ink-500 border-transparent"
             }`}
             onClick={() => setActiveTab(tab.key)}
           >
@@ -100,7 +100,7 @@ function AdminSalesListPage<T extends { id: string }>({
           )}
         </div>
       )}
-      <Link href='../' className='p-2 bg-blue-500 border-white border-2 mt-4 mb-1 '>
+      <Link href='../' className='p-2 bg-brand-600 border-white border-2 mt-4 mb-1 '>
         Volver al inicio
       </Link>
     </div>

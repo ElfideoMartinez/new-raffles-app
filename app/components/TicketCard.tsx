@@ -15,20 +15,20 @@ const TicketCard: React.FC<TicketCardProps> = ({
   children,
   isWinner = false,
 }) => (
-  <div className='bg-white text-black p-4 rounded-card mb-4 shadow flex justify-between items-center'>
+  <div className='bg-surface text-ink-900 p-4 rounded-card mb-4 shadow flex justify-between items-center'>
     <div>
       <div>
-        <span className='text-3xl text-center ml-auto text-green-600 font-extrabold tracking-widest'>
+        <span className='text-3xl text-center ml-auto text-success-700 font-extrabold tracking-widest'>
           {activationCode}
         </span>
       </div>
-      <div className='text-sm text-gray-500'>
+      <div className='text-sm text-ink-500'>
         <strong>Created:</strong> {createdAt}
       </div>
       <div className='text-sm'>
         <strong>Symbols:</strong> {symbols?.join(", ")}
         {isWinner && (
-          <span className='text-green-500 ml-2 font-bold'>Winner</span>
+          <span className='text-success-700 ml-2 font-bold'>Winner</span>
         )}
       </div>
     </div>

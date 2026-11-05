@@ -272,14 +272,14 @@ const MyNotificationsPage = () => {
   if (!user) {
     return (
       <div className="flex flex-col w-full items-center px-4">
-        <div className="w-full max-w-3xl my-6 bg-white rounded-card border border-ink-100 shadow-card p-6 text-center">
+        <div className="w-full max-w-3xl my-6 bg-surface rounded-card border border-ink-100 shadow-card p-6 text-center">
           <h1 className="text-xl font-bold text-ink-900">Notificaciones</h1>
           <p className="mt-2 text-sm text-ink-700">
             Inicia sesión para administrar las notificaciones de este dispositivo.
           </p>
           <Link
             href="/login?next=/user/notificaciones"
-            className="mt-4 inline-block bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
+            className="mt-4 inline-block bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
           >
             Iniciar sesión
           </Link>
@@ -316,7 +316,7 @@ const MyNotificationsPage = () => {
         )}
 
         {/* --- Device registration --- */}
-        <section className="bg-white rounded-card border border-ink-100 shadow-card p-4">
+        <section className="bg-surface rounded-card border border-ink-100 shadow-card p-4">
           <h2 className="text-lg font-bold text-ink-900">Este dispositivo</h2>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span
@@ -342,7 +342,7 @@ const MyNotificationsPage = () => {
             <button
               type="button"
               onClick={requestPermissionAndRegister}
-              className="mt-3 bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
+              className="mt-3 bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
             >
               Activar notificaciones
             </button>
@@ -351,7 +351,7 @@ const MyNotificationsPage = () => {
             <button
               type="button"
               onClick={requestPermissionAndRegister}
-              className="mt-3 bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
+              className="mt-3 bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2"
             >
               Registrar este dispositivo
             </button>
@@ -359,7 +359,7 @@ const MyNotificationsPage = () => {
         </section>
 
         {/* --- Settings --- */}
-        <section className="bg-white rounded-card border border-ink-100 shadow-card p-4">
+        <section className="bg-surface rounded-card border border-ink-100 shadow-card p-4">
           <h2 className="text-lg font-bold text-ink-900">Configuración</h2>
           <div className="mt-3 space-y-4">
             <div>
@@ -372,7 +372,7 @@ const MyNotificationsPage = () => {
                 value={settings.label}
                 onChange={(e) => setSettings((s) => ({ ...s, label: e.target.value }))}
                 maxLength={40}
-                className="w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500"
+                className="w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500"
                 placeholder="Mi celular"
               />
             </div>
@@ -381,7 +381,7 @@ const MyNotificationsPage = () => {
                 type="button"
                 onClick={save}
                 disabled={saving}
-                className="bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Guardando…" : "Guardar cambios"}
               </button>
@@ -399,7 +399,7 @@ const MyNotificationsPage = () => {
         </section>
 
         {/* --- Stop options (item 19): pause vs stop completely --- */}
-        <section className="bg-white rounded-card border border-ink-100 shadow-card p-4">
+        <section className="bg-surface rounded-card border border-ink-100 shadow-card p-4">
           <h2 className="text-lg font-bold text-ink-900">Detener notificaciones</h2>
           {settings.enabled ? (
             <>
@@ -435,7 +435,7 @@ const MyNotificationsPage = () => {
                   type="button"
                   onClick={resumeDevice}
                   disabled={saving}
-                  className="bg-brand-600 text-white rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 font-semibold transition-colors px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Reactivar
                 </button>
@@ -460,7 +460,7 @@ const MyNotificationsPage = () => {
           aria-modal="true"
           aria-labelledby="stop-confirm-title"
         >
-          <div className="w-full max-w-md bg-white rounded-card border border-ink-100 shadow-card p-6">
+          <div className="w-full max-w-md bg-surface rounded-card border border-ink-100 shadow-card p-6">
             <h3 id="stop-confirm-title" className="text-xl font-bold text-ink-900">
               ¿Detener por completo?
             </h3>

@@ -83,7 +83,7 @@ function EditBetModal({
 
   return (
     <Dialog open={isOpen} onClose={onClose} labelledBy="edit-bet-title">
-      <div className='bg-white rounded-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
+      <div className='bg-surface rounded-card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
         <div className='flex justify-between items-center mb-4'>
           <h2 id='edit-bet-title' className='text-xl font-bold text-ink-900'>Editar Apuesta</h2>
           <button
@@ -103,7 +103,7 @@ function EditBetModal({
               type='text'
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+              className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
               required
             />
           </div>
@@ -115,7 +115,7 @@ function EditBetModal({
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500 h-24'
+              className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500 h-24'
               required
             />
           </div>
@@ -132,7 +132,7 @@ function EditBetModal({
                 onChange={(e) =>
                   handleInputChange("pricePerTicket", e.target.value)
                 }
-                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+                className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
@@ -146,7 +146,7 @@ function EditBetModal({
               type='datetime-local'
               value={formData.date}
               onChange={(e) => handleInputChange("date", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+              className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
               required
             />
           </div>
@@ -160,7 +160,7 @@ function EditBetModal({
                 type='text'
                 value={formData.teams.a}
                 onChange={(e) => handleTeamChange(0, e.target.value)}
-                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+                className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
@@ -173,7 +173,7 @@ function EditBetModal({
                 type='text'
                 value={formData.teams.b}
                 onChange={(e) => handleTeamChange(1, e.target.value)}
-                className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+                className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
                 required
               />
             </div>
@@ -184,7 +184,7 @@ function EditBetModal({
               type='text'
               value={formData.image || ""}
               onChange={(e) => handleInputChange("image", e.target.value)}
-              className='w-full p-2 rounded-sm bg-white text-ink-900 border border-ink-300 focus:border-brand-500'
+              className='w-full p-2 rounded-sm bg-surface text-ink-900 border border-ink-300 focus:border-brand-500'
               placeholder='URL de la imagen'
             />
           </div>
@@ -198,7 +198,7 @@ function EditBetModal({
             </button>
             <button
               type='submit'
-              className='flex-1 px-4 py-2 bg-brand-600 text-white rounded-sm hover:bg-brand-700 transition-colors'
+              className='flex-1 px-4 py-2 bg-brand-600 text-on-brand rounded-sm hover:bg-brand-700 transition-colors'
             >
               Guardar cambios
             </button>
@@ -310,7 +310,7 @@ function SettleBetModal({
 
   return (
     <Dialog open={isOpen} onClose={onClose} labelledBy="settle-bet-title">
-      <div className='bg-white rounded-card p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
+      <div className='bg-surface rounded-card p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-card border border-ink-100'>
         <div className='flex justify-between items-center mb-4'>
           <h2
             id='settle-bet-title'
@@ -358,8 +358,8 @@ function SettleBetModal({
                   }}
                   className={`py-2 px-3 rounded-sm border text-sm font-semibold transition-colors ${
                     outcome === o
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "bg-white text-ink-900 border-ink-300 hover:bg-ink-100"
+                      ? "bg-brand-600 text-on-brand border-brand-600"
+                      : "bg-surface text-ink-900 border-ink-300 hover:bg-ink-100"
                   }`}
                 >
                   {SETTLE_OUTCOME_LABELS[o]}
@@ -476,7 +476,7 @@ function AdminBetCard({
   };
 
   return (
-    <div className='bg-white rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-shadow duration-300 border border-ink-100'>
+    <div className='bg-surface rounded-card overflow-hidden shadow-card hover:shadow-card-hover transition-shadow duration-300 border border-ink-100'>
       {bet.image && (
         <div className='relative h-48 w-full'>
           <Image
@@ -579,7 +579,7 @@ function AdminBetCard({
           <Link
             target='_blank'
             href={`${process.env.NEXT_PUBLIC_BASE_URL}/bet/${bet.id}`}
-            className='block w-full text-center py-2 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-sm font-semibold transition-colors duration-300'
+            className='block w-full text-center py-2 px-4 bg-brand-600 hover:bg-brand-700 text-on-brand rounded-sm font-semibold transition-colors duration-300'
           >
             Ver Apuesta
           </Link>
@@ -594,7 +594,9 @@ function AdminBetCard({
 
             <button
               onClick={() =>
-                copyToClipboard(`https://raffleapp-dbc1b.web.app/bet/${bet.id}`)
+                copyToClipboard(
+                  `${process.env.NEXT_PUBLIC_BASE_URL || ""}/bet/${bet.id}`
+                )
               }
               className='w-full py-2 px-4 bg-ink-100 text-ink-900 hover:bg-ink-300 rounded-sm font-semibold transition-colors duration-300'
             >
@@ -748,7 +750,7 @@ export default function BetsPage() {
         <div className='flex justify-center mb-4'>
           <Link
             href={`${process.env.NEXT_PUBLIC_BASE_URL}/admin/create/bet`}
-            className='focus-ring px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-sm font-semibold transition-colors duration-300'
+            className='focus-ring px-4 py-2 bg-brand-600 hover:bg-brand-700 text-on-brand rounded-sm font-semibold transition-colors duration-300'
           >
             + Crear Nueva Apuesta
           </Link>

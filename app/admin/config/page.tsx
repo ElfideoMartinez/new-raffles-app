@@ -159,7 +159,7 @@ const ConfigPage = () => {
   return (
     <div className='flex flex-col w-full items-center px-4 mt-6'>
       <h1 className='my-1 text-xl font-bold'>Textos y datos de la tienda</h1>
-      <p className='text-sm text-gray-600 text-center mb-4 max-w-xl'>
+      <p className='text-sm text-ink-500 text-center mb-4 max-w-xl'>
         Estos textos y datos aparecen en la página de agradecimiento, en la de
         contacto y en el pago por transferencia. Los cambios se publican al
         guardar, sin necesidad de recompilar ni volver a desplegar.
@@ -180,25 +180,25 @@ const ConfigPage = () => {
         <div className='w-full max-w-2xl flex flex-col gap-6'>
           {/* -------- contact + payment details -------- */}
           <section className='flex flex-col gap-4'>
-            <h2 className='text-lg font-semibold border-b border-gray-300 pb-1'>
+            <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
               Contacto y pago
             </h2>
             {STOREFRONT_FORM_FIELDS.map(({ key, label, multiline, hint }) => (
               <label key={key} className='flex flex-col gap-1'>
-                <span className='text-sm font-medium text-gray-800'>{label}</span>
-                {hint && <span className='text-xs text-gray-500'>{hint}</span>}
+                <span className='text-sm font-medium text-ink-700'>{label}</span>
+                {hint && <span className='text-xs text-ink-500'>{hint}</span>}
                 {multiline ? (
                   <textarea
                     value={storeForm[key]}
                     onChange={(e) => updateStore(key, e.target.value)}
                     rows={key === "contactPhonesText" ? 2 : 3}
-                    className='w-full p-2 border border-gray-300 rounded-card text-sm text-black'
+                    className='w-full p-2 border border-ink-300 rounded-card text-sm text-ink-900'
                   />
                 ) : (
                   <input
                     value={storeForm[key]}
                     onChange={(e) => updateStore(key, e.target.value)}
-                    className='w-full p-2 border border-gray-300 rounded-card text-sm text-black'
+                    className='w-full p-2 border border-ink-300 rounded-card text-sm text-ink-900'
                   />
                 )}
               </label>
@@ -207,24 +207,24 @@ const ConfigPage = () => {
 
           {/* -------- checkout thank-you copy -------- */}
           <section className='flex flex-col gap-4'>
-            <h2 className='text-lg font-semibold border-b border-gray-300 pb-1'>
+            <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
               Textos de confirmación de compra
             </h2>
             {CHECKOUT_SUCCESS_FIELDS.map(({ key, label, multiline }) => (
               <label key={key} className='flex flex-col gap-1'>
-                <span className='text-sm font-medium text-gray-800'>{label}</span>
+                <span className='text-sm font-medium text-ink-700'>{label}</span>
                 {multiline ? (
                   <textarea
                     value={copyForm[key]}
                     onChange={(e) => updateCopy(key, e.target.value)}
                     rows={3}
-                    className='w-full p-2 border border-gray-300 rounded-card text-sm text-black'
+                    className='w-full p-2 border border-ink-300 rounded-card text-sm text-ink-900'
                   />
                 ) : (
                   <input
                     value={copyForm[key]}
                     onChange={(e) => updateCopy(key, e.target.value)}
-                    className='w-full p-2 border border-gray-300 rounded-card text-sm text-black'
+                    className='w-full p-2 border border-ink-300 rounded-card text-sm text-ink-900'
                   />
                 )}
               </label>
@@ -232,7 +232,7 @@ const ConfigPage = () => {
           </section>
 
           {warnings.length > 0 && (
-            <ul className='text-sm text-yellow-800 bg-yellow-50 border border-yellow-300 rounded-card p-3 list-disc pl-6'>
+            <ul className='text-sm text-warning-700 bg-warning-50 border border-warning-500 rounded-card p-3 list-disc pl-6'>
               {warnings.map((w) => (
                 <li key={w}>{w}</li>
               ))}
@@ -240,13 +240,13 @@ const ConfigPage = () => {
           )}
 
           {saveError && (
-            <p className='text-sm text-red-700 bg-red-50 border border-red-300 rounded-card p-3'>
+            <p className='text-sm text-danger-700 bg-danger-50 border border-danger-500 rounded-card p-3'>
               Error al guardar: {saveError}
             </p>
           )}
 
           {savedAt && !saveError && (
-            <p className='text-sm text-green-800 bg-green-50 border border-green-300 rounded-card p-3'>
+            <p className='text-sm text-success-700 bg-success-50 border border-success-500 rounded-card p-3'>
               Guardado a las {savedAt}. Ya está visible para los compradores.
             </p>
           )}
@@ -257,7 +257,7 @@ const ConfigPage = () => {
               onClick={save}
               disabled={saving}
               className={`p-2 rounded-card text-white ${
-                saving ? "bg-gray-400 cursor-not-allowed" : ""
+                saving ? "bg-ink-300 cursor-not-allowed" : ""
               }`}
               style={saving ? undefined : { backgroundColor: "var(--color-brand-700)" }}
             >
@@ -267,7 +267,7 @@ const ConfigPage = () => {
               type='button'
               onClick={load}
               disabled={saving}
-              className='p-2 rounded-card bg-gray-200 text-gray-800'
+              className='p-2 rounded-card bg-ink-100 text-ink-700'
             >
               Descartar y recargar
             </button>
@@ -275,7 +275,7 @@ const ConfigPage = () => {
         </div>
       ) : null}
 
-      <Link href='../' className='p-2 bg-blue-500 text-white border-white border-2 mt-6 mb-1'>
+      <Link href='../' className='p-2 bg-brand-600 text-on-brand border-white border-2 mt-6 mb-1'>
         Volver al inicio
       </Link>
     </div>

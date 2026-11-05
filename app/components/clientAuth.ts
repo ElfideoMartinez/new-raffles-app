@@ -25,8 +25,10 @@
 import { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
   type User,
@@ -87,6 +89,18 @@ export function useClientAuth(): { user: User | MockClientUser | null; loading: 
 
 export async function clientLogin(email: string, password: string): Promise<User> {
   const credential = await signInWithEmailAndPassword(auth, email, password);
+  return credential.user;
+}
+
+/**
+ * Google sign-in (2026-11-05). The provider was enabled in the Firebase
+ * console by Daniel (project-630899937485, support email
+ * fideomartinez52@gmail.com — Daniel plans to move the support email later).
+ * Popup keeps the storefront flow (no full-page redirect); the returned user
+ * is a normal Model A identity for purchases and notification tokens.
+ */
+export async function clientGoogleLogin(): Promise<User> {
+  const credential = await signInWithPopup(auth, new GoogleAuthProvider());
   return credential.user;
 }
 

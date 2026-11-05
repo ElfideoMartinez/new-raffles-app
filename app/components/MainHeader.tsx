@@ -1,58 +1,86 @@
 "use client";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import CartButton from "./CartButton";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import HamburgerMenu from "./HamburgerMenu";
 
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useClientAuth, clientLogout } from "./clientAuth";
+import CartButton from "./CartButton";
+import { navigationItems, isNavItemActive } from "@/app/config/navigation";
+import HamburgerMenu from "./HamburgerMenu";
+import ThemeToggle from "./ThemeToggle";
+
+// Mirrors `accountLabel` in clientAuth: prefers the signed-in name, else email.
+function accountDisplay(user: { displayName?: string | null; email?: string | null } | null): string {
+  if (!user) return "";
+  if (user.displayName) return user.displayName;
+  return user.email ?? "";
+}
 
 const MainHeader = () => {
-
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const { user } = useClientAuth();
   const router = useRouter();
-  const pathName = usePathname();
-  const isMain = pathName === '/' || pathName === '/admin/dashboard' || pathName === '/checkout/success';
-  //console.log(pathName);
+  const pathname = usePathname();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
-  }, [pathName]);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [menuOpen]);
 
   return (
-    <div className="relative">
-      <div className="sticky top-0 z-40 bg-gradient-to-b from-brand-500 to-accent-400 text-ink-900 shadow-sm">
+    <div className="relative" ref={rootRef}>
+      <div className="sticky top-0 z-40 bg-gradient-to-b from-brand-500 to-accent-400 text-on-brand shadow-sm">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4">
-          {pathName === '/' ? (
-            <button
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-white/15 transition-colors hover:bg-white/25"
-              aria-label="Abrir menu"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' className='w-6 h-6 text-white' fill='currentColor' aria-hidden='true'>
-                <path d='M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z' />
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill bg-white/15 text-on-brand transition-colors hover:bg-white/25"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? (
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18" />
               </svg>
-            </button>
-          ) : (
-            <button
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-white/15 transition-colors hover:bg-white/25 ${isMain ? 'hidden' : ''}`}
-              aria-label="Regresar"
-              onClick={() => {
-                router.back();
-              }}
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' className='w-6 h-6 text-white' fill='currentColor' aria-hidden='true'>
-                <path d='M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z' />
+            ) : (
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-            </button>
-          )}
+            )}
+          </button>
 
-          <Link href="/" className="flex min-w-0 items-center gap-2">
+          <Link href="/" className="flex min-w-0 items-center gap-2" aria-label="Rifas Mtz — inicio">
             <Image
               className="h-10 w-10 rounded-pill ring-2 ring-white/40"
               src="/icon.jpg"
-              alt="Rifas Mtz"
+              alt=""
               width={40}
               height={40}
             />
@@ -61,12 +89,70 @@ const MainHeader = () => {
             </span>
           </Link>
 
-          <div className='flex h-10 w-10 shrink-0 items-center justify-center'>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center">
             <CartButton />
           </div>
         </div>
+
+        {/* Desktop+ rail: the shared primary links that the mobile hamburger
+            hides behind a menu. Desktop gets a persistent rail; mobile keeps
+            the hamburger. Both surfaces draw from `navigationItems`. */}
+        <nav
+          aria-label="Navegación de escritorio"
+          className="border-t border-white/10 hidden sm:flex"
+        >
+          <div className="mx-auto flex max-w-7xl items-center gap-1 px-4">
+            {navigationItems.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center rounded-sm px-3 py-2 text-sm font-medium transition-colors sm:px-4 sm:py-2.5 ${
+                  isNavItemActive(href, pathname)
+                    ? "bg-white/20 font-bold text-on-brand"
+                    : "text-on-brand/80 hover:bg-white/10 hover:text-on-brand"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+
+            {user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  void clientLogout();
+                  setMenuOpen(false);
+                  router.refresh();
+                }}
+                className="flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-on-brand/80 transition-colors hover:bg-white/10 hover:text-on-brand"
+              >
+                <span className="truncate max-w-[140px] text-left text-ink-100">
+                  {accountDisplay(user)}
+                </span>
+                <span className="rounded border border-white/20 px-2 py-0.5 text-xs font-semibold text-white/70">
+                  Cerrar sesión
+                </span>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="flex min-h-11 items-center rounded-sm px-3 py-2 text-sm font-medium text-on-brand/80 transition-colors hover:bg-white/10 hover:text-on-brand"
+              >
+                Iniciar sesión
+              </Link>
+            )}
+            <div className="ml-auto flex items-center">
+              <ThemeToggle />
+            </div>
+          </div>
+        </nav>
       </div>
-      <HamburgerMenu className={menuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"} />
+
+      <HamburgerMenu
+        id="main-navigation"
+        hidden={!menuOpen}
+        onNavigate={() => setMenuOpen(false)}
+      />
     </div>
   );
 };

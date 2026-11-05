@@ -12,26 +12,31 @@
 // Near-duplicate history pages (sales vs salesBets) are NOT merged here —
 // noted in ufc-mission/backlog.md instead.
 import Link from "next/link";
+import ThemeToggle from "../components/ThemeToggle";
 import { usePathname } from "next/navigation";
 
 const NAV_SECTIONS: {
   title: string;
   links: { href: string; label: string }[];
 }[] = [
+  // Regrouped 2026-11-05 (Daniel): six labelled sections wrapped into four,
+  // with shorter labels — the nav is a wayfinder, the dashboard remains the
+  // full hub. No route was removed; the near-duplicate history pages (sales
+  // vs salesBets) stay separate, still flagged in the backlog.
   {
     title: "Inicio",
     links: [{ href: "/admin/dashboard", label: "Dashboard" }],
   },
   {
-    title: "Ventas/Compras",
+    title: "Ventas",
     links: [
-      { href: "/admin/sales", label: "Ventas de rifas" },
-      { href: "/admin/salesBets", label: "Ventas de apuestas" },
-      { href: "/admin/quickTickets/active", label: "Ventas rápidas" },
+      { href: "/admin/sales", label: "Rifas" },
+      { href: "/admin/salesBets", label: "Apuestas" },
+      { href: "/admin/quickTickets/active", label: "Rápidas" },
     ],
   },
   {
-    title: "Apuestas y rifas",
+    title: "Rifas y apuestas",
     links: [
       { href: "/admin/bets", label: "Administrar apuestas" },
       { href: "/admin/create/bet", label: "Crear apuesta" },
@@ -41,12 +46,11 @@ const NAV_SECTIONS: {
     ],
   },
   {
-    title: "Liquidación",
-    links: [{ href: "/admin/settlement", label: "Liquidar apuestas" }],
-  },
-  {
-    title: "Ajustes",
-    links: [{ href: "/admin/config", label: "Textos y datos de la tienda" }],
+    title: "Liquidación y ajustes",
+    links: [
+      { href: "/admin/settlement", label: "Liquidar apuestas" },
+      { href: "/admin/config", label: "Textos y datos" },
+    ],
   },
 ];
 
@@ -86,7 +90,7 @@ export default function AdminLayout({
                   aria-current={active ? "page" : undefined}
                   className={`focus-ring px-3 py-1.5 text-sm rounded-sm ${
                     active
-                      ? "bg-brand-700 text-white"
+                      ? "bg-brand-700 text-on-brand"
                       : "bg-ink-100 text-ink-900 hover:bg-ink-300"
                   }`}
                 >
@@ -97,6 +101,11 @@ export default function AdminLayout({
           </div>
         ))}
       </nav>
+      {/* Dark-mode switch (2026-11-05): lives in the admin sidebar on every
+          authenticated admin page. */}
+      <div className="mx-auto mt-2 w-fit px-2">
+        <ThemeToggle />
+      </div>
       {children}
     </>
   );

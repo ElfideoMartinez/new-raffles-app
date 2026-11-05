@@ -39,7 +39,7 @@ export default async function Home() {
               ))}
             </div>
           ) : (
-            <div className="rounded-card border border-ink-100 bg-white p-10 text-center shadow-card">
+            <div className="rounded-card border border-ink-100 bg-surface p-10 text-center shadow-card">
               <p className="text-lg font-semibold text-ink-900">
                 No hay rifas activas
               </p>
@@ -57,7 +57,7 @@ export default async function Home() {
       error instanceof Error ? error.message : "Error desconocido";
     return (
       <main className="mt-16 flex items-center justify-center">
-        <div className="max-w-md rounded-card border border-danger-500/20 bg-white p-8 text-center shadow-card">
+        <div className="max-w-md rounded-card border border-danger-500/20 bg-surface p-8 text-center shadow-card">
           <h1 className="text-lg font-bold text-ink-900">
             No se pudieron cargar las rifas
           </h1>

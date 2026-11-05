@@ -137,10 +137,10 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
               <span
                 className={`px-3 py-1 rounded-card ${
                   bet.letterTeam === "A"
-                    ? "bg-green-600 text-white"
+                    ? "bg-success-700 text-white"
                     : bet.letterTeam === "C"
-                    ? "bg-yellow-500 text-gray-900"
-                    : "bg-red-600 text-white"
+                    ? "bg-warning-500 text-ink-900"
+                    : "bg-danger-700 text-white"
                 }`}
               >
                 {bet.letterTeam === "C" ? "Empate" : bet.team}
@@ -166,7 +166,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
 
       {isLoading ? (
         <button
-          className='bg-gray-400 text-white rounded-card p-2 flex items-center justify-center gap-2'
+          className='bg-ink-300 text-white rounded-card p-2 flex items-center justify-center gap-2'
           disabled
         >
           {/* Backlog item 8: labelled in-place progress instead of a bare

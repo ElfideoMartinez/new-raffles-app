@@ -112,13 +112,13 @@ const CheckoutTransferPage = () => {
     email === "" || (emailRegex.test(email) && email.length < 50);
 
   return (
-    <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-white shadow-md rounded-card'>
-      <h2 className='text-black text-2xl font-bold'>
+    <div className='flex flex-col items-center p-6 space-y-6 max-w-md mx-auto bg-surface shadow-md rounded-card'>
+      <h2 className='text-ink-900 text-2xl font-bold'>
         Pago por Transferencia
       </h2>
       
       {/* General Explanation */}
-      <div className='w-full p-4 text-sm text-gray-800 bg-blue-100 rounded-card border border-blue-300'>       
+      <div className='w-full p-4 text-sm text-ink-700 bg-brand-100 rounded-card border border-brand-300'>       
         <p>
           Para completar tu compra, realiza una transferencia bancaria al número
           de cuenta a continuación. Asegúrate de pegar la clave del concepto de
@@ -127,31 +127,31 @@ const CheckoutTransferPage = () => {
         <div className="flex flex-col items-center justify-center sm:flex-row gap-2">
           <button
             onClick={() => copyToClipboard(storefront.bankAccount)}
-            className='mt-2 text-lg font-mono px-4 py-2 bg-gray-100 rounded-sm border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+            className='mt-2 text-lg font-mono px-4 py-2 bg-ink-100 rounded-sm border border-ink-300 hover:bg-ink-100 active:bg-ink-300'
           >
             {storefront.bankAccount}
           </button>
-          <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+          <span className='text-sm text-ink-500'>(Toca para copiar)</span>
         </div>
         {(storefront.bankName || storefront.bankHolder) && (
-          <p className='mt-2 text-sm text-gray-700 text-center'>
+          <p className='mt-2 text-sm text-ink-700 text-center'>
             {storefront.bankName ? <>Banco: {storefront.bankName}<br/></> : null}
             {storefront.bankHolder ? <>Titular: {storefront.bankHolder}</> : null}
           </p>
         )}
         {storefront.bankNote ? (
-          <p className='mt-2 text-sm text-gray-700 text-center whitespace-pre-line'>
+          <p className='mt-2 text-sm text-ink-700 text-center whitespace-pre-line'>
             {storefront.bankNote}
           </p>
         ) : null}
-        <h1 className='text-black text-xl font-bold text-center mt-2'>
+        <h1 className='text-ink-900 text-xl font-bold text-center mt-2'>
           Monto total ${total}
         </h1>
       </div>
 
       {/* Conditional Verification Message */}
       {ticketCount > 5 && (
-        <div className='w-full p-4 mb-4 text-sm text-yellow-800 bg-yellow-100 rounded-card border border-yellow-400'>
+        <div className='w-full p-4 mb-4 text-sm text-warning-700 bg-warning-50 rounded-card border border-warning-500'>
           <p>
             Nota: Dado que estás comprando más de 5 boletos, se necesitará verificar
             tu transferencia antes de que los boletos se confirmen como
@@ -162,20 +162,20 @@ const CheckoutTransferPage = () => {
 
       {/* Payment Concept Key */}
       <div className='flex flex-col items-center'>
-        <p className='text-black text-lg font-semibold'>
+        <p className='text-ink-900 text-lg font-semibold'>
           Clave del Concepto de Pago
         </p>
         <button
           onClick={() => copyToClipboard(paymentConceptKey)}
-          className='mt-2 text-xl text-black font-mono px-4 py-2 bg-gray-100 rounded-sm border border-gray-300 hover:bg-gray-200 active:bg-gray-300'
+          className='mt-2 text-xl text-ink-900 font-mono px-4 py-2 bg-ink-100 rounded-sm border border-ink-300 hover:bg-ink-100 active:bg-ink-300'
         >
           {paymentConceptKey}
         </button>
-        <span className='text-sm text-gray-500'>(Toca para copiar)</span>
+        <span className='text-sm text-ink-500'>(Toca para copiar)</span>
       </div>
 
       <div className='flex flex-col items-center'>
-        <label htmlFor='phone' className='text-black text-lg font-semibold'>
+        <label htmlFor='phone' className='text-ink-900 text-lg font-semibold'>
           Nombre
         </label>
         <input
@@ -183,14 +183,14 @@ const CheckoutTransferPage = () => {
           type='text'
           value={name}
           onChange={(e) => handleName(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface text-ink-900'
           placeholder='Ingresa tu nombre completo'
         />
       </div>
 
       {/* Phone Input with Copy Button */}
       <div className='flex flex-col items-center'>
-        <label htmlFor='phone' className='text-black text-lg font-semibold'>
+        <label htmlFor='phone' className='text-ink-900 text-lg font-semibold'>
           Teléfono
         </label>
         <input
@@ -198,14 +198,14 @@ const CheckoutTransferPage = () => {
           type='tel'
           value={phone}
           onChange={(e) => handlePhone(e.target.value)}
-          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-950'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface text-ink-900'
           placeholder='Ingresa tu número de teléfono'
         />
       </div>
 
       {/* Email Input (Optional) with Copy Button */}
       <div className='flex flex-col items-center'>
-        <label htmlFor='email' className='text-black text-lg font-semibold'>
+        <label htmlFor='email' className='text-ink-900 text-lg font-semibold'>
           Correo Electrónico (opcional)
         </label>
         <input
@@ -213,18 +213,18 @@ const CheckoutTransferPage = () => {
           type='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='mt-2 bg-white text-gray-950 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 bg-surface text-ink-900 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-brand-500'
           placeholder='Ingresa tu correo electrónico (opcional)'
         />
       </div>
 
       {/* Image Input */}
       <div className='flex flex-col items-center'>
-        <label htmlFor='image' className='text-black text-lg font-semibold'>
+        <label htmlFor='image' className='text-ink-900 text-lg font-semibold'>
           Subir Imagen
         </label>
         {/* add small description */}
-        <p className='text-sm text-gray-500'>
+        <p className='text-sm text-ink-500'>
           Sube una imagen de tu comprobante de transferencia. Puede ser una
           foto o captura de pantalla.
         </p>
@@ -233,10 +233,10 @@ const CheckoutTransferPage = () => {
           type='file'
           accept='image/*'
           onChange={handleImageChange}
-          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='mt-2 px-4 py-2 w-full border rounded-sm focus:outline-none focus:ring-2 focus:ring-brand-500'
         />
         {isImageValid && (
-          <p className='text-sm text-green-600'>
+          <p className='text-sm text-success-700'>
             Imagen seleccionada: {image.name || "Ninguna"}
           </p>
         )}
@@ -317,7 +317,7 @@ const CheckoutTransferPage = () => {
             });
           }
         }}
-        className={`px-4 py-2 mt-4 text-white bg-blue-500 rounded-pill hover:bg-blue-600 ${
+        className={`px-4 py-2 mt-4 text-white bg-brand-600 rounded-pill hover:bg-brand-600 ${
           !(isPhoneValid && isImageValid && isEmailValid && isNameValid) && "opacity-50 cursor-not-allowed"
         }`}
         disabled={!(isPhoneValid && isImageValid && isEmailValid && isNameValid)}

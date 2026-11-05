@@ -33,7 +33,7 @@ export default function SupportPage() {
         <li>Un teléfono o correo de contacto.</li>
       </ul>
 
-      <div className='mt-5 rounded-card border border-blue-300 bg-blue-50 p-4 text-sm text-gray-800'>
+      <div className='mt-5 rounded-card border border-brand-300 bg-brand-50 p-4 text-sm text-ink-700'>
         <p className='font-semibold'>Envíanos tu reporte</p>
         <p className='mt-1'>
           Los datos de contacto actualizados están en la página de{" "}
@@ -54,7 +54,7 @@ export default function SupportPage() {
         </Link>
         <Link
           href='/contact'
-          className='rounded-card bg-gray-200 px-5 py-2 text-center font-semibold text-gray-800'
+          className='rounded-card bg-ink-100 px-5 py-2 text-center font-semibold text-ink-700'
         >
           Contacto
         </Link>

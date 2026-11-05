@@ -227,10 +227,10 @@ const CreateBet = () => {
   }, [bet]);
 
   return (
-    <div className='min-h-screen bg-white py-8 px-4'>
+    <div className='min-h-screen bg-surface py-8 px-4'>
       <div className='max-w-2xl mx-auto'>
         {/* Header */}
-        <div className='bg-white rounded-t-card p-6 border-b border-ink-100 shadow-card'>
+        <div className='bg-surface rounded-t-card p-6 border-b border-ink-100 shadow-card'>
           <h2 className='text-ink-900 text-3xl font-bold text-center'>
             Crear Nueva Apuesta
           </h2>
@@ -240,7 +240,7 @@ const CreateBet = () => {
         </div>
 
         {/* Form */}
-        <div className='bg-white rounded-b-card p-6 shadow-card border border-t-0 border-ink-100'>
+        <div className='bg-surface rounded-b-card p-6 shadow-card border border-t-0 border-ink-100'>
           <form ref={formRef} onSubmit={handleSubmit} className='space-y-6'>
             {/* Title */}
             <div>
@@ -254,7 +254,7 @@ const CreateBet = () => {
                 onChange={handleChange}
                 required
                 placeholder='Ej: Real Madrid vs Barcelona'
-                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
+                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
               />
             </div>
 
@@ -270,7 +270,7 @@ const CreateBet = () => {
                 required
                 rows={4}
                 placeholder='Describe los detalles de la apuesta...'
-                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none'
+                className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none'
               />
             </div>
 
@@ -291,7 +291,7 @@ const CreateBet = () => {
                     step='0.01'
                     min='0'
                     placeholder='0.00'
-                    className='w-full pl-8 pr-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
+                    className='w-full pl-8 pr-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
                   />
                 </div>
               </div>
@@ -306,7 +306,7 @@ const CreateBet = () => {
                   value={bet.date}
                   onChange={handleChange}
                   required
-                  className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
+                  className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
                 />
               </div>
             </div>
@@ -327,7 +327,7 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("a", e.target.value)}
                     required
                     placeholder='Nombre del primer equipo'
-                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-success-500 focus:ring-2 focus:ring-success-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-success-500 focus:ring-2 focus:ring-success-500/20 transition-all'
                   />
                 </div>
 
@@ -341,7 +341,7 @@ const CreateBet = () => {
                     onChange={(e) => handleTeamChange("b", e.target.value)}
                     required
                     placeholder='Nombre del segundo equipo'
-                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-white focus:outline-none focus:border-danger-500 focus:ring-2 focus:ring-danger-500/20 transition-all'
+                    className='w-full px-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-danger-500 focus:ring-2 focus:ring-danger-500/20 transition-all'
                   />
                 </div>
               </div>

@@ -30,13 +30,13 @@ export default function NotFound() {
         </Link>
         <Link
           href='/bet'
-          className='rounded-card bg-gray-200 px-5 py-2 font-semibold text-gray-800'
+          className='rounded-card bg-ink-100 px-5 py-2 font-semibold text-ink-700'
         >
           Ver apuestas
         </Link>
         <Link
           href='/user/purchases'
-          className='rounded-card bg-gray-200 px-5 py-2 font-semibold text-gray-800'
+          className='rounded-card bg-ink-100 px-5 py-2 font-semibold text-ink-700'
         >
           Mis compras
         </Link>

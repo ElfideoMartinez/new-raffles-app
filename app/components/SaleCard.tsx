@@ -112,7 +112,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
             <div className="flex flex-wrap"> 
               Boletos vendidos:
               {raffle.ticketNumbers.map((tn) => (
-                <span key={tn} className='p-1 bg-blue-400 rounded-card mr-1 ml-1'>
+                <span key={tn} className='p-1 bg-brand-500 rounded-card mr-1 ml-1'>
                   {tn}
                 </span>
               ))}
@@ -124,7 +124,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       <div>Pago confirmado: {isVerified ? "Si" : "No"}</div>
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
-        <button className='bg-gray-400 text-white rounded-card p-2' disabled>
+        <button className='bg-ink-300 text-white rounded-card p-2' disabled>
           <FadeLoader color="var(--color-brand-700)" />
         </button>
       ) : (

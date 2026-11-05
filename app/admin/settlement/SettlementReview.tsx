@@ -291,7 +291,7 @@ export function SettlementReview({
         ← Otra apuesta
       </button>
 
-      <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4">
+      <div className="bg-surface rounded-card border border-ink-100 shadow-card p-4 mb-4">
         <h2 className="text-lg font-bold text-ink-900">{bet.title || bet.id}</h2>
         <p className="text-sm text-ink-500">
           {bet.teams?.a} vs {bet.teams?.b} — {formatDate(bet.date)} ·{" "}
@@ -315,7 +315,7 @@ export function SettlementReview({
       ) : (
         <>
           {/* Pool summary */}
-          <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4 text-sm">
+          <div className="bg-surface rounded-card border border-ink-100 shadow-card p-4 mb-4 text-sm">
             <p className="font-semibold text-ink-900 mb-2">
               Resumen del pool (ventas verificadas)
             </p>
@@ -357,7 +357,7 @@ export function SettlementReview({
 
           {/* Payout list — ONE group per buyer even when the buyer holds
               several sale documents; per-buyer totals in the group header. */}
-          <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4">
+          <div className="bg-surface rounded-card border border-ink-100 shadow-card p-4 mb-4">
             <p className="font-semibold text-ink-900 mb-3 text-sm">
               Lista de pagos ({groups.length}{" "}
               {groups.length === 1 ? "comprador" : "compradores"} · {rows.length}{" "}
@@ -398,7 +398,7 @@ export function SettlementReview({
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                          <span className="px-2 py-0.5 rounded-pill bg-white border border-ink-300 font-semibold text-ink-900">
+                          <span className="px-2 py-0.5 rounded-pill bg-surface border border-ink-300 font-semibold text-ink-900">
                             {g.tickets} boletos
                           </span>
                           <span className="text-ink-700">
@@ -480,7 +480,7 @@ export function SettlementReview({
           </div>
 
           {/* Confirm gate — the only path to settleBet */}
-          <div className="bg-white rounded-card border border-ink-100 shadow-card p-4 mb-4">
+          <div className="bg-surface rounded-card border border-ink-100 shadow-card p-4 mb-4">
             <p className="font-semibold text-ink-900 mb-2 text-sm">
               Resultado oficial (mismo parámetro que acepta settleBet)
             </p>
@@ -496,8 +496,8 @@ export function SettlementReview({
                   }}
                   className={`py-2 px-3 rounded-sm border text-sm font-semibold transition-colors ${
                     outcome === o
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "bg-white text-ink-900 border-ink-300 hover:bg-ink-100"
+                      ? "bg-brand-600 text-on-brand border-brand-600"
+                      : "bg-surface text-ink-900 border-ink-300 hover:bg-ink-100"
                   }`}
                 >
                   {OUTCOME_LABELS[o]}

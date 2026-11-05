@@ -108,7 +108,7 @@ const QuickTicketsActivePage = () => {
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
         <button
           className='
-            bg-gradient-to-b from-blue-400 to-blue-700
+            bg-gradient-to-b from-brand-500 to-brand-700
             text-white px-4 py-2 rounded-sm shadow
           '
           onClick={() => setSelectedTab("pending")}
@@ -117,7 +117,7 @@ const QuickTicketsActivePage = () => {
         </button>
         <button
           className='
-            bg-gradient-to-b from-gray-400 to-gray-700
+            bg-gradient-to-b from-ink-300 to-ink-700
             text-white px-4 py-2 rounded-sm shadow
           '
           onClick={() => setSelectedTab("all")}
@@ -127,7 +127,7 @@ const QuickTicketsActivePage = () => {
         <button
           onClick={() => setSelectedTab("winners")}
           className='
-            bg-gradient-to-b from-green-400 to-green-700
+            bg-gradient-to-b from-success-500 to-success-700
             text-white px-4 py-2 rounded-sm shadow
           '
         >
@@ -147,7 +147,7 @@ const QuickTicketsActivePage = () => {
                   isWinner={ticket.isWinner}
                 >
                   <button
-                    className='bg-green-500 text-white border-none rounded-sm px-4 py-2 cursor-pointer'
+                    className='bg-success-500 text-white border-none rounded-sm px-4 py-2 cursor-pointer'
                     onClick={async () => {
                       const ticketRef = ref(
                         realtimeDB,
@@ -217,18 +217,18 @@ const QuickTicketsActivePage = () => {
         </div>
       )}
       {activeTickets.length === 0 && selectedTab === "pending" && (
-        <div className='bg-white text-black p-4 rounded-card shadow'>
+        <div className='bg-surface text-ink-900 p-4 rounded-card shadow'>
           <p>No pending tickets available.</p>
         </div>
       )}
       {tickets.length === 0 && selectedTab === "all" && (
-        <div className='bg-white text-black p-4 rounded-card shadow'>
+        <div className='bg-surface text-ink-900 p-4 rounded-card shadow'>
           <p>No tickets available.</p>
         </div>
       )}
       {tickets.filter((t) => t.isWinner).length === 0 &&
         selectedTab === "winners" && (
-          <div className='bg-white text-black p-4 rounded-card shadow'>
+          <div className='bg-surface text-ink-900 p-4 rounded-card shadow'>
             <p>No winning tickets available.</p>
           </div>
         )}

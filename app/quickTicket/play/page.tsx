@@ -74,7 +74,7 @@ export default function PlayPage() {
     try {
       // Call backend to create a new ticket
       const response = await fetch(
-        quickTicketUrl(),
+        quickTicketUrl("createQuickTicket"),
         {
           method: "GET",
           headers: {
@@ -177,9 +177,9 @@ export default function PlayPage() {
     return (
       <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
         <h1 className='text-2xl font-bold mb-2 mt-10'>Error</h1>
-        <p className='text-red-500'>{error.message}</p>
+        <p className='text-danger-700'>{error.message}</p>
         <button
-          className='mt-4 bg-blue-500 text-white px-4 py-2 rounded-pill'
+          className='mt-4 bg-brand-600 text-on-brand px-4 py-2 rounded-pill'
           onClick={createNewTicket}
         >
           Try Again
@@ -192,26 +192,26 @@ export default function PlayPage() {
     <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
       <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
       {isLoading ? (
-        <p className='text-gray-500'>Cargando tu boleto...</p>
+        <p className='text-ink-500'>Cargando tu boleto...</p>
       ) : (
-        <p className='text-gray-600 mb-4'>
+        <p className='text-ink-500 mb-4'>
           {ticket?.id ? `Boleto: ${ticket.id}` : "No se encontró ningún boleto."}
         </p>
       )}
       {!isLoading && !ticket && (
-        <p className='text-red-500'>No se encontró ningún boleto. Por favor, inténtalo de nuevo.</p>
+        <p className='text-danger-700'>No se encontró ningún boleto. Por favor, inténtalo de nuevo.</p>
       )}
       {ticket?.id && ticket?.status === "pending" && (
         <div className='mb-6'>
           <p className='text-lg text-white font-semibold'>
             Muestra este código al cajero para activar tu boleto.
           </p>
-          <div className='bg-white rounded-card shadow-lg p-8'>
-            <p className='text-4xl text-black font-bold text-center'>
+          <div className='bg-surface rounded-card shadow-lg p-8'>
+            <p className='text-4xl text-ink-900 font-bold text-center'>
               {ticket?.activationCode}
             </p>
           </div>
-          <p className='text-sm text-gray-600'>
+          <p className='text-sm text-ink-500'>
             Espera a que el cajero escanee o ingrese el código para participar.
           </p>
         </div>
@@ -219,15 +219,15 @@ export default function PlayPage() {
 
       {(ticket?.status === "active" || ticket?.status === "finnished") &&
         ticket.symbols && (
-          <div className='bg-white flex flex-col rounded-card shadow-lg p-4 w-full'>
+          <div className='bg-surface flex flex-col rounded-card shadow-lg p-4 w-full'>
             {scratchedCardsCount >= 6 ? (
-              <p className='text-2xl text-blue-700 font-bold mb-4'>
+              <p className='text-2xl text-brand-700 font-bold mb-4'>
                 {ticket.isWinner
                   ? "¡Felicidades! Has ganado un premio."
                   : "Gracias por participar. Tu boleto ha sido procesado."}
               </p>
             ) : (
-              <p className='mb-2 text-green-600 font-semibold'>
+              <p className='mb-2 text-success-700 font-semibold'>
                 ¡Tu boleto está activo! Raspa los símbolos para descubrir tu
                 premio.
               </p>
@@ -267,16 +267,16 @@ export default function PlayPage() {
             {scratchedCardsCount === ticket.symbols.length && (
               <>
                 {ticket.isWinner ? (
-                  <p className='text-2xl text-green-700 font-bold'>
+                  <p className='text-2xl text-success-700 font-bold'>
                     🎉 Ganaste {WinnerLevelPrizes[String(ticket.winnerLevel)]}
                   </p>
                 ) : (
-                  <p className='text-2xl text-red-700 font-bold'>
+                  <p className='text-2xl text-danger-700 font-bold'>
                     Lo sentimos, no ganaste esta vez.
                   </p>
                 )}
                 <button
-                  className='mt-4 text-white px-4 py-2 w-max self-center rounded-card bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-700 transition-colors'
+                  className='mt-4 text-white px-4 py-2 w-max self-center rounded-card bg-gradient-to-r from-brand-500 to-success-500 hover:from-brand-600 hover:to-success-700 transition-colors'
                   onClick={createNewTicket}
                 >
                   Jugar de nuevo
@@ -287,7 +287,7 @@ export default function PlayPage() {
         )}
 
       {ticket?.claimed && (
-        <p className='text-red-500'>
+        <p className='text-danger-700'>
           Ticket finalizado. Para jugar de nuevo, refresca la página.
         </p>
       )}

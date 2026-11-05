@@ -82,7 +82,7 @@ const UserCartPage = () => {
                   {ticket.ticketNumbers.map((number: number) => (
                     <li key={number} className='ml-2 mb-2'>
                       <button type="button"
-                        className='p-2 rounded-card bg-green-500 flex justify-center hover:cursor-pointer hover:bg-red-500'
+                        className='p-2 rounded-card bg-success-500 flex justify-center hover:cursor-pointer hover:bg-danger-500'
                         onClick={() => {
                         useTicketStore.getState().removeTicketFromCart(ticket.raffleId, number);
                         toast.success('Boleto borrado',{
@@ -105,7 +105,7 @@ const UserCartPage = () => {
                       .getState()
                       .removeItemFromCart(ticket.raffleId);
                   }}
-                  className='bg-red-600 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2'
+                  className='bg-danger-700 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2'
                   aria-label="Borrar todos los boletos"
                 >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' className='w-6 h-6 text-white' fill='currentColor' aria-hidden='true'>
@@ -132,7 +132,7 @@ const UserCartPage = () => {
                 onClick={() => {
                   removeBet(bet.betId);
                 }}
-                className='bg-red-600 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2 relative top-16 left-2'
+                className='bg-danger-700 p-2 h-12 w-12 rounded-card flex items-center justify-center mr-2 relative top-16 left-2'
                 aria-label="Borrar apuesta"
               >{/* eslint-disable-next-line @next/next/no-img-element -- 24px static icon, next/image adds a request hop for no gain */}
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' className='w-6 h-6 text-white' fill='currentColor' aria-hidden='true'>
@@ -151,13 +151,13 @@ const UserCartPage = () => {
             onClick={() => {
               try { sessionStorage.setItem("checkoutOrigin", pathname); } catch { /* private mode */ }
             }}
-            className='bg-brand-600 text-white p-2 rounded-card w-full flex justify-center'
+            className='bg-brand-600 text-on-brand p-2 rounded-card w-full flex justify-center'
           >
             Pago por transferencia
           </Link>
         </div>
       ) : (
-        <div className="mx-2 mt-6 rounded-card border border-ink-100 bg-white p-10 text-center shadow-card">
+        <div className="mx-2 mt-6 rounded-card border border-ink-100 bg-surface p-10 text-center shadow-card">
           <p className="text-lg font-semibold text-ink-900">Tu carrito está vacío</p>
           <p className="mt-1 text-sm text-ink-500">
             Elige boletos en una rifa activa para continuar.

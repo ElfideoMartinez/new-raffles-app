@@ -19,9 +19,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/faviconApp.ico" type="image/x-icon" />
+        {/* Dark mode boot (2026-11-05): applies the stored theme class before
+            first paint so there is no light→dark flash. Keep the key in sync
+            with app/components/theme.ts. suppressHydrationWarning above is
+            required because this script mutates <html> before React hydrates. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(localStorage.getItem('rmtz-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();",
+          }}
+        />
       </head>
       <body className={`${inter.variable} font-sans`}>
         <header>

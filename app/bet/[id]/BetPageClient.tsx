@@ -1,9 +1,7 @@
 "use client";
-import OfferStar from "@/app/components/OfferStar";
 import useTicketStore from "@/app/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { motion } from "framer-motion";
 import { realtimeDB } from "@/app/firebaseconfig";
 import { ref, onValue, off } from "firebase/database";
 
@@ -72,8 +70,8 @@ function WinnerBanner({
       role='status'
       className={`mb-4 w-full max-w-2xl rounded-card border p-4 text-center ${
         isVoid
-          ? "border-gray-300 bg-gray-100 text-gray-800"
-          : "border-yellow-400 bg-yellow-50 text-yellow-900"
+          ? "border-ink-300 bg-ink-100 text-ink-700"
+          : "border-warning-500 bg-warning-50 text-warning-700"
       }`}
     >
       {isVoid ? (
@@ -308,7 +306,8 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     router,
   ]);
 
-  // Team card component for better organization
+  // Keep selection and quantity controls as sibling buttons so touch and
+  // keyboard users never encounter nested interactive controls.
   const TeamCard = ({
     teamKey,
     teamName,
@@ -332,86 +331,90 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     }
 
     return (
-      <div
-        className={`flex w-full sm:w-1/2 flex-col items-center justify-between rounded-card text-white shadow cursor-pointer transition p-4 ${color}
-        ${
-          disabled
-            ? "bg-gray-500 hover:bg-gray-500 opacity-50 pointer-events-none"
-            : ""
+      <section
+        aria-label={`Apuesta por ${teamName}`}
+        className={`flex w-full flex-col rounded-card p-4 text-white shadow-card transition-colors sm:max-w-sm ${color} ${
+          disabled ? "opacity-50" : ""
         }`}
-        onClick={() => updateTickets(teamKey, 1)}
-        role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            updateTickets(teamKey, 1);
-          }
-        }}
       >
-        {teamKey !== "C" && (
-          <p className=''>
+        {teamKey !== "C" ? (
+          <p className="text-center text-sm font-medium">
             {favorite === "Equals"
               ? `Empate: ${stakeShare}%`
-              : `${
-                  teamName === favorite ? "Favorito: " : "Menos favorito: "
-                } ${stakeShare}%`}
+              : `${teamName === favorite ? "Favorito" : "Menos favorito"}: ${stakeShare}%`}
           </p>
+        ) : (
+          <p className="text-center text-sm font-medium">Empate: {stakeShare}%</p>
         )}
 
-        {teamKey === "C" && <p className=''>Empate: {stakeShare}%</p>}
-
-        <button className='w-full py-4 text-xl font-bold cursor-pointer'>
-          {emoji} {teamName}
+        <button
+          type="button"
+          className="mt-2 flex min-h-12 w-full items-center justify-center rounded-sm bg-black/10 px-3 py-2 text-center text-lg font-bold hover:bg-black/20 disabled:cursor-not-allowed"
+          aria-label={`${tickets > 0 ? "Agregar otro boleto para" : "Elegir"} ${teamName}`}
+          aria-pressed={tickets > 0}
+          disabled={disabled}
+          onClick={() => updateTickets(teamKey, 1)}
+        >
+          {emoji ? `${emoji} ` : ""}{teamName}
         </button>
 
-        {/* Ticket Selector */}
-        <div className='flex items-center gap-2 mt-4 mb-1'>
+        <div className="mt-3 flex items-center justify-center gap-4" aria-label={`Boletos para ${teamName}`}>
           <button
-            className={`bg-white rounded-pill w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-gray-200 ${
-              teamKey === "A"
-                ? "text-green-700"
-                : teamKey === "B"
-                ? "text-red-700"
-                : "text-gray-700"
-            }`}
+            type="button"
+            className="h-11 w-11 rounded-pill bg-surface text-2xl font-bold text-ink-900 hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Quitar un boleto de ${teamName}`}
             disabled={tickets === 0}
-            onClick={(e) => {
-              updateTickets(teamKey, -1);
-              e.stopPropagation();
-            }}
+            onClick={() => updateTickets(teamKey, -1)}
           >
             −
           </button>
-          <span className='text-lg font-semibold'>{tickets}</span>
+          <output className="min-w-8 text-center text-xl font-bold" aria-live="polite">
+            {tickets}
+          </output>
+          <button
+            type="button"
+            className="h-11 w-11 rounded-pill bg-surface text-2xl font-bold text-ink-900 hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Agregar un boleto de ${teamName}`}
+            disabled={disabled}
+            onClick={() => updateTickets(teamKey, 1)}
+          >
+            +
+          </button>
         </div>
 
-        <div className='mt-2 bg-yellow-300 text-green-900 rounded-sm px-3 py-1 text-sm font-semibold text-center'>
-          Pagas ${realtimeBetData.pricePerTicket} — si gana {teamName} te
-          llevas ~${estimatedPayout.toFixed(2)}
-          <span className='block text-xs font-normal'>(estimado)</span>
-        </div>
-      </div>
+        <p className="mt-3 rounded-sm bg-warning-500 px-3 py-2 text-center text-sm font-semibold text-success-700">
+          Cada boleto cuesta ${realtimeBetData.pricePerTicket}. Si gana {teamName},
+          recibirías aproximadamente ${estimatedPayout.toFixed(2)}.
+          <span className="block text-xs font-normal">Estimación; puede cambiar antes del cierre.</span>
+        </p>
+      </section>
     );
   };
 
   return (
-    <div className='flex min-h-screen flex-col items-center bg-gray-100 p-4 text-gray-800'>
+    <main className="-mx-4 flex min-h-screen flex-col items-center bg-ink-100 px-4 pb-[calc(13rem+env(safe-area-inset-bottom))] pt-4 text-ink-900 sm:mx-0 sm:rounded-card sm:px-6 sm:pb-36">
+      <a
+        href="/bet"
+        className="inline-flex items-center gap-2 rounded-pill bg-white/10 px-4 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-white/20 sm:mb-3"
+        aria-label="Volver a las apuestas"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path d="m19 12-7 7-7-7" />
+        </svg>
+        Volver a Apuestas
+      </a>
       {loading ? (
-        <div className='flex justify-center items-center h-96'>
-          <div className='animate-spin rounded-pill h-16 w-16 border-b-2 border-blue-600'></div>
+        <div role="status" aria-label="Cargando apuesta" className="flex h-96 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-pill border-4 border-ink-200 border-b-brand-600" />
         </div>
       ) : (
         <>
-          {/* Main Image */}
           <img
-            className='mb-6 h-[33vh] w-full rounded-card bg-cover bg-center shadow-lg'
+            className="mb-5 aspect-video max-h-72 w-full max-w-4xl rounded-card bg-ink-100 object-cover shadow-card"
             src={realtimeBetData.image}
             alt={realtimeBetData.title}
           />
 
-          {/* Settled result: winner + payout, or refund notice. */}
           <WinnerBanner
             result={realtimeBetData.result}
             teams={realtimeBetData.teams}
@@ -419,32 +422,27 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             settled={realtimeBetData.settled}
           />
 
-          {/* Title and Description */}
-          <h1 className='mb-2 text-xl font-bold text-center'>
-            🏆 ¡Haz tu apuesta ahora!
-          </h1>
-          <h1 className='mb-2 text-3xl font-bold text-center'>
-            {realtimeBetData.title}
-          </h1>
-          <h2 className='mb-3 text-xl font-bold text-center'>
-            {realtimeBetData.description}
-          </h2>
-          <p className='mb-4 text-center text-sm text-gray-600'>
-            Apuesta por tu equipo favorito y gana
-          </p>
-
-          {/* Price Star */}
-          <motion.div
-            className='fixed mb-2 top-40 left-1 cursor-pointer'
-            drag
-            dragMomentum={false}
-          >
-            <OfferStar text={realtimeBetData.pricePerTicket.toString()} />
-          </motion.div>
+          <div className="mb-5 w-full max-w-4xl text-center">
+            <p className="mb-1 text-sm font-bold uppercase tracking-wide text-brand-700">
+              {realtimeBetData.isFinished ? "Apuesta finalizada" : "Elige un resultado"}
+            </p>
+            <h1 className="text-balance text-2xl font-extrabold tracking-tight sm:text-3xl">
+              {realtimeBetData.title}
+            </h1>
+            <p className="mt-2 text-base font-semibold text-ink-700 sm:text-lg">
+              {realtimeBetData.description}
+            </p>
+            <p className="mt-2 text-sm text-ink-500">
+              Elige un equipo y agrega boletos. El pago potencial es estimado.
+            </p>
+            <div className="mx-auto mt-4 inline-flex min-h-11 items-center rounded-pill border border-brand-100 bg-surface px-5 text-sm font-semibold text-ink-900 shadow-sm">
+              Precio por boleto: ${realtimeBetData.pricePerTicket}
+            </div>
+          </div>
 
           {/* Team Selection Cards */}
           <div
-            className={`flex w-full sm:max-w-4xl items-center flex-col md:flex-row justify-center gap-6 ${
+            className={`grid w-full max-w-5xl grid-cols-1 items-stretch justify-center gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 ${
               realtimeBetData.isFinished ? "pointer-events-none opacity-40" : ""
             }`}
           >
@@ -452,81 +450,76 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             <TeamCard
               teamKey='A'
               teamName={realtimeBetData.teams.a}
-              color='bg-green-600 hover:bg-green-700'
+              color='bg-success-700 hover:bg-success-700'
               emoji='⚪'
               tickets={ticketsTeamA}
               stakeShare={stakeSharePercent("A")}
-              disabled={ticketsTeamB > 0 || tieTickets > 0}
+              disabled={realtimeBetData.isFinished || ticketsTeamB > 0 || tieTickets > 0}
             />
 
             {/* Tie */}
             <TeamCard
               teamKey='C'
               teamName='Empate'
-              color='bg-gray-600 hover:bg-gray-700'
+              color='bg-ink-500 hover:bg-ink-700'
               emoji=''
               tickets={tieTickets}
               stakeShare={stakeSharePercent("C")}
-              disabled={ticketsTeamA > 0 || ticketsTeamB > 0}
+              disabled={realtimeBetData.isFinished || ticketsTeamA > 0 || ticketsTeamB > 0}
             />
 
             {/* Team B */}
             <TeamCard
               teamKey='B'
               teamName={realtimeBetData.teams.b}
-              color='bg-red-600 hover:bg-red-700'
+              color='bg-danger-700 hover:bg-danger-700'
               emoji='🔴'
               tickets={ticketsTeamB}
               stakeShare={stakeSharePercent("B")}
-              disabled={ticketsTeamA > 0 || tieTickets > 0}
+              disabled={realtimeBetData.isFinished || ticketsTeamA > 0 || tieTickets > 0}
             />
           </div>
 
-          {/* Warning Message */}
-          <p className='mt-4 mb-3 text-center text-sm text-gray-500'>
-            ⚠️ Las ganancias pueden cambiar según nuevas apuestas antes del
-            cierre
+          <p className="mx-auto mt-4 max-w-3xl text-center text-sm text-ink-500">
+            Las ganancias estimadas pueden cambiar según las apuestas que se reciban antes del cierre.
           </p>
 
-          {/* Bottom Cart Bar */}
-          <div className='w-full bg-blue-600 shadow-lg flex sm:flex-row justify-between sm:items-center px-4 py-4 fixed bottom-0'>
-            <div className='flex flex-col sm:flex-row sm:items-center sm:gap-2'>
-              <span className='text-white font-bold text-lg'>
-                Total: ${totalPrice}
-              </span>
-              <span className='text-white font-semibold'>
-                🎟️ <span id='cartTickets'>{totalTickets}</span> boletos
-              </span>
-              <div>
-                <span className='text-white font-semibold text-base text-start'>
-                  🏆 Gana hasta (estimado):{" "}
-                  <span id='cartWinnings' className='ml-8 sm:ml-0'>
-                    ~$
-                    {potentialWinnings.toFixed(2)}
-                  </span>
-                </span>
+          <section
+            aria-label="Resumen de apuesta"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-100 bg-white/95 px-4 pt-3 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur supports-[backdrop-filter]:bg-white/90 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+          >
+            <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1" aria-live="polite" aria-atomic="true">
+                <div className="flex items-baseline justify-between gap-3 sm:justify-start sm:gap-6">
+                  <p className="text-lg font-extrabold text-ink-900">
+                    Total: ${totalPrice}
+                  </p>
+                  <p className="font-semibold text-ink-700">
+                    {totalTickets} {totalTickets === 1 ? "boleto" : "boletos"}
+                  </p>
+                </div>
+                <p className="mt-0.5 text-sm text-ink-600">
+                  Pago potencial estimado: <span className="font-bold">~${potentialWinnings.toFixed(2)}</span>
+                </p>
+                {priceUnusable && (
+                  <p className="mt-1 text-sm font-semibold text-danger-700" role="status">
+                    Esta apuesta no está disponible por ahora.
+                  </p>
+                )}
               </div>
-            </div>
-            <div className='flex justify-start'>
               <button
-                className='bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-4 mt-2 sm:mt-0 py-2 rounded-card shadow transition text-base sm:text-lg disabled:opacity-50
-                disabled:hover:bg-yellow-400 disabled:cursor-not-allowed'
+                type="button"
+                className="min-h-12 w-full shrink-0 rounded-pill bg-warning-500 px-6 py-3 text-base font-bold text-brand-700 shadow-sm transition hover:bg-warning-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-lg"
                 disabled={totalTickets === 0 || priceUnusable}
                 onClick={addToCart}
               >
                 Agregar al carrito
               </button>
             </div>
-          </div>
-          {priceUnusable && (
-            <p className='fixed bottom-20 sm:bottom-16 w-full text-center text-sm font-semibold text-red-700'>
-              Esta apuesta no está disponible por ahora.
-            </p>
-          )}
-          <div className='h-36 sm:h-16'></div>
+          </section>
         </>
       )}
-    </div>
+    </main>
   );
 };
 

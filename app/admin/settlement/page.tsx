@@ -126,7 +126,7 @@ function BetSelector({
               <li key={bet.id}>
                 <button
                   onClick={() => onSelect(bet.id)}
-                  className="w-full text-left bg-white rounded-card border border-ink-100 shadow-card hover:shadow-card-hover transition-shadow p-4"
+                  className="w-full text-left bg-surface rounded-card border border-ink-100 shadow-card hover:shadow-card-hover transition-shadow p-4"
                 >
                   <div className="flex flex-wrap justify-between gap-2 items-center">
                     <div>

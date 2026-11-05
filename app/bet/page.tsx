@@ -68,9 +68,14 @@ export default async function BetsPage() {
       >
         <main className='min-h-screen p-4'>
           <div className='max-w-7xl mx-auto'>
-            <h1 className='text-3xl font-bold text-ink-900 text-center mb-8'>
-              Apuestas Disponibles
-            </h1>
+            <header className='mb-8 text-center'>
+              <h1 className='text-balance text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl'>
+                Apuestas
+              </h1>
+              <p className='mt-2 text-sm text-ink-500 sm:text-base'>
+                Participa en las que siguen abiertas o consulta las finalizadas.
+              </p>
+            </header>
 
             <div className='grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
               {result.map((bet: IBetData) => (
@@ -85,7 +90,7 @@ export default async function BetsPage() {
     console.error("Error rendering Bets page:", error);
     return (
       <main className='min-h-screen flex items-center justify-center'>
-        <div className='text-red-500 text-center'>
+        <div className='text-danger-700 text-center'>
           <h1 className='text-2xl font-bold mb-4'>No se pudieron cargar las apuestas</h1>
           <p>{error.message}</p>
           <p className='text-ink-500 mt-2'>Intenta de nuevo en un momento.</p>
@@ -107,7 +112,7 @@ function BetCard({ bet }: { bet: IBetData }) {
       : "0";
 
   return (
-    <div className='rounded-card overflow-hidden border border-ink-100 bg-white shadow-card transition-shadow duration-300 hover:shadow-lg'>
+    <div className='rounded-card overflow-hidden border border-ink-100 bg-surface shadow-card transition-shadow duration-300 hover:shadow-lg'>
       {bet.image && (
         <div className='relative h-48 w-full'>
           <Image
@@ -161,19 +166,19 @@ function BetCard({ bet }: { bet: IBetData }) {
               <ShareRow
                 label={bet.teams.a}
                 percent={teamAPercentage}
-                barClass='bg-green-600'
+                barClass='bg-success-700'
               />
               <ShareRow
                 label={bet.teams.b}
                 percent={teamBPercentage}
-                barClass='bg-red-600'
+                barClass='bg-danger-700'
               />
               {Number(bet.tieBets) > 0 && (
                 <ShareRow
                   label='Empate'
                   percent={tiePercentage}
-                  barClass='bg-yellow-500'
-                  labelClass='text-yellow-700'
+                  barClass='bg-warning-500'
+                  labelClass='text-warning-700'
                 />
               )}
             </>
@@ -183,17 +188,17 @@ function BetCard({ bet }: { bet: IBetData }) {
         <div className='flex flex-col gap-2'>
           <Link
             href={`/bet/${bet.id}`}
-            className={`w-full text-center py-2 px-4 rounded-card font-semibold transition-colors duration-300 ${
+            className={`min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold transition-colors duration-300 ${
               bet.isFinished
                 ? "bg-ink-100 text-ink-500 cursor-not-allowed"
-                : "bg-brand-600 hover:bg-brand-700 text-white"
+                : "bg-brand-600 hover:bg-brand-700 text-on-brand"
             }`}
           >
             {bet.isFinished ? "Apuesta Finalizada" : "Participar"}
           </Link>
 
           {bet.isFinished && (
-            <span className='text-center text-xs text-gray-500'>
+            <span className='text-center text-xs text-ink-500'>
               {winnerLabel(bet)
                 ? winnerLabel(bet)
                 : "Esta apuesta ha terminado"}

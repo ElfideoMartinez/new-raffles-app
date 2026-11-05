@@ -147,13 +147,13 @@ const CreateRaffle = () => {
   }
 
   return (
-    <div className='max-w-lg mx-auto bg-white p-6 rounded-card shadow-lg mt-5'>
-      <h2 className='text-black text-2xl font-bold mb-6 text-center'>
+    <div className='max-w-lg mx-auto bg-surface p-6 rounded-card shadow-lg mt-5'>
+      <h2 className='text-ink-900 text-2xl font-bold mb-6 text-center'>
         Crear nueva rifa
       </h2>
       <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Titulo de la Rifa:
           </label>
           <input
@@ -162,12 +162,12 @@ const CreateRaffle = () => {
             value={raffle.title}
             onChange={handleChange}
             required
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div>
 
         {/* <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Numero de Tickets (Boletos):
           </label>
           <input
@@ -177,12 +177,12 @@ const CreateRaffle = () => {
             onChange={handleChange}
             required
             min='1'
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div> */}
 
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Precio por Ticket:
           </label>
           <input
@@ -193,12 +193,12 @@ const CreateRaffle = () => {
             required
             step='0.01'
             min='0'
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div>
 
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Nombre del Premio:
           </label>
           <input
@@ -207,12 +207,12 @@ const CreateRaffle = () => {
             value={raffle.awardName}
             onChange={handleChange}
             required
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div>
 
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Descripcion del Premio:
           </label>
           <textarea
@@ -220,11 +220,11 @@ const CreateRaffle = () => {
             value={raffle.awardDescription}
             onChange={handleChange}
             required
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div>
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Fecha de Sorteo:
           </label>
           <input
@@ -233,11 +233,11 @@ const CreateRaffle = () => {
             value={raffle.date}
             onChange={handleChange}
             required
-            className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+            className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
           />
         </div>
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Imagen del Premio:
           </label>
           <input
@@ -245,16 +245,16 @@ const CreateRaffle = () => {
             name='awardImage'
             onChange={handleFileChange}
             accept='image/*'
-            className='w-full text-black'
+            className='w-full text-ink-900'
           />
         </div>
-        <p className='text-sm text-green-600'>
+        <p className='text-sm text-success-700'>
           {raffle.awardImage ? "Imagen cargada" : "Cargar imagen del premio"}
         </p>
         <button
           disabled={isLoading}
           type='submit'
-          className='w-full bg-blue-500 text-white py-2 px-4 rounded-card font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50'
+          className='w-full bg-brand-600 text-on-brand py-2 px-4 rounded-card font-semibold hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-300 disabled:opacity-50'
         >
           {isLoading ? "Creando..." : "Crear Rifa"}
         </button>

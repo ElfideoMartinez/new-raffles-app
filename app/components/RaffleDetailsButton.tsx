@@ -10,7 +10,7 @@ interface IRaffeDetailsButtonProps {
 /**
  * CTA into a raffle's detail page.
  *
- * Reworked 2026-10-20: previously declared `bg-blue-500` then overrode it with
+ * Reworked 2026-10-20: previously declared `bg-brand-600` then overrode it with
  * an inline dark-teal style override, so the primary action on every storefront card
  * rendered as dark teal and ignored the brand tokens. Now uses the shared
  * brand-cta gradient and matches the ticket buttons elsewhere.

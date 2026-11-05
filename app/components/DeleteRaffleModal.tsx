@@ -9,7 +9,7 @@ const DeleteRaffleModal = ({ idRaffle, isAvailable, onDelete }: { idRaffle: stri
       <button
       disabled={isAvailable}
         type="button"
-        className='bg-red-500 p-2 h-12 w-12 rounded-card flex items-center justify-center hover:bg-red-600'
+        className='bg-danger-500 p-2 h-12 w-12 rounded-card flex items-center justify-center hover:bg-danger-700'
         onClick={() => setIsOpen(true)}
         aria-label="Eliminar"
       >
@@ -22,18 +22,18 @@ const DeleteRaffleModal = ({ idRaffle, isAvailable, onDelete }: { idRaffle: stri
 
       {/* Modal */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} labelledBy="delete-raffle-title">
-        <div className="bg-white p-6 rounded-card shadow-lg w-80 text-center">
-          <h2 id="delete-raffle-title" className="text-xl font-bold mb-4 text-gray-950">¿Eliminar?</h2>
-          <p className="text-gray-600 mb-6">Esta acción no se puede deshacer.</p>
+        <div className="bg-surface p-6 rounded-card shadow-lg w-80 text-center">
+          <h2 id="delete-raffle-title" className="text-xl font-bold mb-4 text-ink-900">¿Eliminar?</h2>
+          <p className="text-ink-500 mb-6">Esta acción no se puede deshacer.</p>
           <div className="flex justify-center gap-4">
             <button 
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-card hover:bg-gray-400"
+              className="bg-ink-300 text-ink-700 px-4 py-2 rounded-card hover:bg-ink-300"
               onClick={() => setIsOpen(false)}
             >
               Cancelar
             </button>
             <button              
-              className="bg-red-500 text-white px-4 py-2 rounded-card hover:bg-red-600"
+              className="bg-danger-500 text-white px-4 py-2 rounded-card hover:bg-danger-700"
               onClick={() => {
                 onDelete(idRaffle);
                 setIsOpen(false);

@@ -88,7 +88,7 @@ const RafflePageServer = async ({ params }: { params: { id: string } }) => {
   if (raffleData.error) {
     return (
       <main className="mt-16 flex items-center justify-center">
-        <div className="max-w-md rounded-card border border-danger-500/20 bg-white p-8 text-center shadow-card">
+        <div className="max-w-md rounded-card border border-danger-500/20 bg-surface p-8 text-center shadow-card">
           <h1 className="text-lg font-bold text-ink-900">
             No se pudo cargar la rifa
           </h1>

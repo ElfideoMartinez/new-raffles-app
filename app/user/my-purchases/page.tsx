@@ -281,7 +281,7 @@ const MyPurchasesPage = () => {
         <h1 className="text-center mb-3 text-xl font-bold text-ink-900">Mis compras</h1>
 
         {!user && (
-          <div className="mb-4 bg-white rounded-card border border-ink-100 shadow-card p-4 text-center">
+          <div className="mb-4 bg-surface rounded-card border border-ink-100 shadow-card p-4 text-center">
             <p className="text-sm text-ink-700">
               No has iniciado sesión. Solo se muestran compras guardadas en este
               dispositivo;{" "}
@@ -302,7 +302,7 @@ const MyPurchasesPage = () => {
             {groups.map((group) => {
               const isOpen = openId === group.id;
               return (
-                <li key={group.id} className="bg-white rounded-card border border-ink-100 shadow-card p-4">
+                <li key={group.id} className="bg-surface rounded-card border border-ink-100 shadow-card p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm text-ink-700">

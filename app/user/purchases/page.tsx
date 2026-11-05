@@ -69,7 +69,7 @@ const PurchasesPage = () => {
             return (
             <li key={index} className="bg-slate-700 p-4 rounded-card">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-gray-300">📅 Compra realizada el: {formatDateTime(group.date)}</p>
+                <p className="text-sm text-ink-500">📅 Compra realizada el: {formatDateTime(group.date)}</p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -81,7 +81,7 @@ const PurchasesPage = () => {
                   </button>
                   <Link
                     href="/soporte"
-                    className="rounded-card bg-yellow-500 px-3 py-1.5 text-sm font-semibold text-gray-900"
+                    className="rounded-card bg-warning-500 px-3 py-1.5 text-sm font-semibold text-ink-900"
                   >
                     Reportar problema
                   </Link>
@@ -89,7 +89,7 @@ const PurchasesPage = () => {
               </div>
 
               {!isOpen && itemCount === 0 && (
-                <p className="mt-2 text-sm text-gray-400">Esta compra no tiene artículos registrados.</p>
+                <p className="mt-2 text-sm text-ink-500">Esta compra no tiene artículos registrados.</p>
               )}
 
               {isOpen && (

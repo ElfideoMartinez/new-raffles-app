@@ -35,7 +35,7 @@ const Cards = ({
   const isSoldOut = left !== null && left <= 0;
 
   return (
-    <article className="group flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-card border border-ink-100 bg-white shadow-card transition-shadow hover:shadow-card-hover">
+    <article className="group flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-card border border-ink-100 bg-surface shadow-card transition-shadow hover:shadow-card-hover">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-ink-100">
         {awardImage ? (
           <Image

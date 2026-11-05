@@ -355,17 +355,17 @@ const EditBetPage = () => {
   console.log("Rifa valida:", isValidBet);
 
   return (
-    <div className='max-w-lg mx-auto bg-white p-6 rounded-card shadow-lg mt-5'>
-      <h2 className='text-black text-2xl font-bold mb-6 text-center'>
+    <div className='max-w-lg mx-auto bg-surface p-6 rounded-card shadow-lg mt-5'>
+      <h2 className='text-ink-900 text-2xl font-bold mb-6 text-center'>
         Actualizar apuesta
       </h2>
       <form ref={formRef} onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label className='text-black block text-sm font-medium mb-1'>
+          <label className='text-ink-900 block text-sm font-medium mb-1'>
             Apuestas disponibles:
           </label>
           <select
-            className='w-full py-2 px-3 text-gray-950 bg-white border rounded-sm focus:border-blue-500'
+            className='w-full py-2 px-3 text-ink-900 bg-surface border rounded-sm focus:border-brand-500'
             value={idBet || "default"}
             disabled={isLoadingBet}
             onChange={(e) => handleChangeRaffle(e.target.value)}
@@ -379,7 +379,7 @@ const EditBetPage = () => {
           </select>
         </div>
         {loadError && (
-          <p className='text-sm text-red-700 bg-red-50 border border-red-300 rounded-card p-3'>
+          <p className='text-sm text-danger-700 bg-danger-50 border border-danger-500 rounded-card p-3'>
             {loadError}
           </p>
         )}
@@ -391,7 +391,7 @@ const EditBetPage = () => {
         ) : (
           <div>
             <div>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Titulo de la Apuesta:
               </label>
               <input
@@ -400,12 +400,12 @@ const EditBetPage = () => {
                 value={bet.title}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div className='mt-2'>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Descripcion de la apuesta:
               </label>
               <textarea
@@ -413,12 +413,12 @@ const EditBetPage = () => {
                 value={bet.description}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Precio por Ticket:
               </label>
               <input
@@ -429,12 +429,12 @@ const EditBetPage = () => {
                 required
                 step='0.01'
                 min='0'
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div className='mt-2'>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Fecha de Sorteo:
               </label>
               <input
@@ -443,11 +443,11 @@ const EditBetPage = () => {
                 value={bet.date}
                 onChange={handleChange}
                 required
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
             <div className='mt-2'>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Pozo inicial/actual:
               </label>
               <input
@@ -458,12 +458,12 @@ const EditBetPage = () => {
                 required
                 min={0}
                 step='0.01'
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div className='mt-2'>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Equipo A:
               </label>
               <input
@@ -472,12 +472,12 @@ const EditBetPage = () => {
                 value={asString(bet.teams[0])}
                 onChange={(e) => handleTeamChange(0, e.target.value)}
                 required
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div className='mt-2'>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Equipo B
               </label>
               <input
@@ -486,12 +486,12 @@ const EditBetPage = () => {
                 value={asString(bet.teams[1])}
                 onChange={(e) => handleTeamChange(1, e.target.value)}
                 required
-                className='w-full px-4 py-2 border rounded-sm text-gray-950 bg-white focus:outline-none focus:border-blue-500'
+                className='w-full px-4 py-2 border rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500'
               />
             </div>
 
             <div className='flex flex-col gap-4 py-4'>
-              <label className='flex items-center gap-2 text-gray-950'>
+              <label className='flex items-center gap-2 text-ink-900'>
                 <input
                   type='checkbox'
                   checked={bet.isFinished}
@@ -503,7 +503,7 @@ const EditBetPage = () => {
             </div>
 
             <div>
-              <label className='text-black block text-sm font-medium mb-1'>
+              <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Actualizar imagen de la apuesta:
               </label>
               <input
@@ -511,14 +511,14 @@ const EditBetPage = () => {
                 name='awardImage'
                 onChange={handleFileChange}
                 accept='image/*'
-                className='w-full text-black'
+                className='w-full text-ink-900'
               />
             </div>
-            <p className='text-sm text-green-600'>
+            <p className='text-sm text-success-700'>
               {bet.image ? "Imagen cargada" : "Cargar imagen de la apuesta"}
             </p>
             <div className='mt-3'>
-              <label className='text-black mb-1'>Imagen Actual</label>
+              <label className='text-ink-900 mb-1'>Imagen Actual</label>
               <img src={bet.image} alt='imagen actual de la apuesta' />
             </div>
           </div>
@@ -532,8 +532,8 @@ const EditBetPage = () => {
           <button
             disabled={isLoading || !isValidBet}
             type='submit'
-            className={`w-full bg-blue-500 text-white py-2 px-4 rounded-card font-semibold 
-              hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50
+            className={`w-full bg-brand-600 text-white py-2 px-4 rounded-card font-semibold 
+              hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-300 disabled:opacity-50
               `}
           >
             {isLoading ? "Actualizando..." : "Actualizar apuesta"}
