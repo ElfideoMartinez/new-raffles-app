@@ -13,7 +13,13 @@
   "stats": [],
   "facts": [],
   "previousFights": [],
-  "photo": null,
+  "photo": {
+    "file": "photo.png",
+    "source": "manual asset — CORTES_ACOSTA_WALDO_L_09-12.avif (cutout) added by Daniel 2026-11-05",
+    "source_file": "CORTES_ACOSTA_WALDO_L_09-12.avif",
+    "converted_note": "sips -> photo.png (460x700, transparent RGBA). Kept as photo.png so the gather cron (photo.jpg) never overwrites it.",
+    "license": "manual asset — rights not verified; do not use after event without clearance"
+  },
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
