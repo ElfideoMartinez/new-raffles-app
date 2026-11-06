@@ -85,9 +85,11 @@ const MainHeader = () => {
           </button>
 
           <Link href="/" className="flex min-w-0 items-center gap-2" aria-label="Rifas Mtz — inicio">
+            {/* Brand mark (2026-11-06): swapped the old /icon.jpg for Daniel's
+                dark logo. Left as a small rounded tile in the header tile. */}
             <Image
               className="h-10 w-10 rounded-pill ring-2 ring-white/40"
-              src="/icon.jpg"
+              src="/Logo_dark2.jpeg"
               alt=""
               width={40}
               height={40}
