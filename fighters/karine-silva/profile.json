@@ -20,22 +20,28 @@
     "Karine Silva de Almeida is a Brazilian professional mixed martial artist who competes in the women's Flyweight division of the Ultimate Fighting Championship (UFC). As of September 19, 2026, she is #14 in the Meta UFC women's flyweight rankings.."
   ],
   "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "date": "2026-11-07"
+    }
+  ],
   "photo": null,
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Karine_Silva",
       "note": "short factual summary",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Karine_Silva",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     }
   ],
   "_event": {

@@ -20,28 +20,28 @@
     " Virna Carole Andrade Jandiroba is a Brazilian mixed martial artist who currently competes in the women's Strawweight division of the Ultimate Fighting Championship (UFC). She is a former Invicta Fighting Championships (Invicta) Strawweight champion."
   ],
   "previousFights": [],
-  "photo": {
-    "file": "photo.png",
-    "source": "manual asset — JANDIROBA_VIRNA_L_04-04.avif (cutout) added by Daniel 2026-11-05",
-    "source_file": "JANDIROBA_VIRNA_L_04-04.avif",
-    "converted_note": "sips -> photo.png (460x700, transparent RGBA). Kept as photo.png so the gather cron (photo.jpg) never overwrites it.",
-    "license": "manual asset — rights not verified; do not use after event without clearance"
-  },
+  "cards": [
+    {
+      "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "date": "2026-11-07"
+    }
+  ],
+  "photo": null,
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Virna_Jandiroba",
       "note": "short factual summary",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Virna_Jandiroba",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     }
   ],
   "_event": {

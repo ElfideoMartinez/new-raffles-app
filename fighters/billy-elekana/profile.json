@@ -20,22 +20,28 @@
     "Billy Joseph Elekana is an American professional mixed martial artist. He currently competes in the Light Heavyweight division for the Ultimate Fighting Championship (UFC)."
   ],
   "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "date": "2026-11-07"
+    }
+  ],
   "photo": null,
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Billy_Elekana",
       "note": "short factual summary",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Billy_Elekana",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-11-04"
+      "checked": "2026-11-06"
     }
   ],
   "_event": {

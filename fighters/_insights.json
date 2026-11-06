@@ -1,0 +1,451 @@
+{
+  "generated_at": "2026-11-06T16:37:04.201Z",
+  "event": null,
+  "cards": [
+    "UFC 333: Volkanovski vs. Evloev",
+    "UFC Fight Night: Cortes Acosta vs. Walker"
+  ],
+  "fighterCount": 40,
+  "matchups": [
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Aaron Pico",
+        "Losene Keita"
+      ],
+      "division": "Featherweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "15-5",
+        "17-3"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Featherweight",
+        "Récord combinado: 15-5 · 17-3"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Abdul-Rakhman Yakhyaev",
+        "Nikita Krylov"
+      ],
+      "division": "Light Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "11-0",
+        "31-13"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Light Heavyweight",
+        "Récord combinado: 11-0 · 31-13"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Abus Magomedov",
+        "Cam Rowston"
+      ],
+      "division": "Middleweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "30-7-1",
+        "15-4"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Middleweight",
+        "Récord combinado: 30-7-1 · 15-4"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Alexander Volkanovski",
+        "Movsar Evloev"
+      ],
+      "division": "Featherweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "29-4",
+        "20-1"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Featherweight",
+        "Récord combinado: 29-4 · 20-1"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Alexander Volkov",
+        "Rizvan Kuniev"
+      ],
+      "division": "Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "41-11",
+        "14-4-1"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Heavyweight",
+        "Récord combinado: 41-11 · 14-4-1"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Asaf Chopurov",
+        "Colby Thicknesse"
+      ],
+      "division": "Bantamweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "11-1",
+        "10-1"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Bantamweight",
+        "Récord combinado: 11-1 · 10-1"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Azamat Murzakanov",
+        "Dominick Reyes"
+      ],
+      "division": "Light Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "16-2",
+        "17-5"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Light Heavyweight",
+        "Récord combinado: 16-2 · 17-5"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Grant Dawson",
+        "Nurullo Aliev"
+      ],
+      "division": "Lightweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "25-3-1",
+        "12-1"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Lightweight",
+        "Récord combinado: 25-3-1 · 12-1"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Lone'er Kavanagh",
+        "Ramazan Temirov"
+      ],
+      "division": "Flyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "11-2",
+        "20-4"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Flyweight",
+        "Récord combinado: 11-2 · 20-4"
+      ]
+    },
+    {
+      "event": "UFC 333: Volkanovski vs. Evloev",
+      "matchup": [
+        "Merab Dvalishvili",
+        "Petr Yan"
+      ],
+      "division": "Bantamweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "21-6",
+        "21-5"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Bantamweight",
+        "Récord combinado: 21-6 · 21-5"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Billy Elekana",
+        "Lucas Fernando"
+      ],
+      "division": "Light Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "10-2",
+        "14-3"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Light Heavyweight",
+        "Récord combinado: 10-2 · 14-3"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Davey Grant",
+        "Elijah Smith"
+      ],
+      "division": "Bantamweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "18-8",
+        "10-1"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Bantamweight",
+        "Récord combinado: 18-8 · 10-1"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Gabriel Lorenço",
+        "Thomas Petersen"
+      ],
+      "division": "Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "8-1",
+        "11-5"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Heavyweight",
+        "Récord combinado: 8-1 · 11-5"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Gabriella Fernandes",
+        "Karine Silva"
+      ],
+      "division": "W Flyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "11-4",
+        "19-7"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: W Flyweight",
+        "Récord combinado: 11-4 · 19-7"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Johnny Walker",
+        "Waldo Cortes Acosta"
+      ],
+      "division": "Heavyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "23-10",
+        "17-4"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Heavyweight",
+        "Récord combinado: 23-10 · 17-4"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Jose Delano",
+        "Murtazali Magomedov"
+      ],
+      "division": "Featherweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "17-3",
+        "11-0"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Featherweight",
+        "Récord combinado: 17-3 · 11-0"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Keiichiro Nakamura",
+        "Ollie Schmid"
+      ],
+      "division": "Featherweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "8-1",
+        "4-3"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Featherweight",
+        "Récord combinado: 8-1 · 4-3"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Marcos Degli",
+        "Mitch Raposo"
+      ],
+      "division": "Flyweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "15-3",
+        "11-3"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: Flyweight",
+        "Récord combinado: 15-3 · 11-3"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Nina Milošević",
+        "Priscila Cachoeira"
+      ],
+      "division": "W Bantamweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "9-1",
+        "13-9"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: W Bantamweight",
+        "Récord combinado: 9-1 · 13-9"
+      ]
+    },
+    {
+      "event": "UFC Fight Night: Cortes Acosta vs. Walker",
+      "matchup": [
+        "Tatiana Suarez",
+        "Virna Jandiroba"
+      ],
+      "division": "W Strawweight",
+      "headToHead": 0,
+      "priorFights": [],
+      "isFirstFight": true,
+      "sharedCards": 0,
+      "sharedEvents": [],
+      "records": [
+        "13-1",
+        "23-4"
+      ],
+      "notes": [
+        "Primera vez peleando entre sí",
+        "Ambos compiten en la misma división: W Strawweight",
+        "Récord combinado: 13-1 · 23-4"
+      ]
+    }
+  ]
+}

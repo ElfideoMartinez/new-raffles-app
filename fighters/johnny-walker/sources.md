@@ -1,16 +1,14 @@
 # Johnny Walker — sources
-Checked: 2026-11-04
+Checked: 2026-11-06
 ## Facts
-- https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107 — card, bout order, winner, division, country flag, record on card (checked 2026-11-04)
-- https://en.wikipedia.org/wiki/Johnny_Walker_(fighter) — short factual summary (checked 2026-11-04)
-- https://en.wikipedia.org/wiki/Johnny_Walker_(fighter) — infobox: birth date, record, nickname (checked 2026-11-04)
+- https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107 — card, bout order, winner, division, country flag, record on card (checked 2026-11-06)
+- https://en.wikipedia.org/wiki/Johnny_Walker_(fighter) — short factual summary (checked 2026-11-06)
+- https://en.wikipedia.org/wiki/Johnny_Walker_(fighter) — infobox: birth date, record, nickname (checked 2026-11-06)
+- https://commons.wikimedia.org/wiki/File:CoreyAnderson.jpg — photo, license CC BY 3.0 (Commons search) (checked 2026-11-06)
 ## Photo
-- `photo.png` (640×800, transparent cutout) — **manual asset** from
-  `Jony_walker_manually_added.webp`, added by Daniel 2026-11-05, converted via
-  `dwebp` (the .webp decodes to lossy PNG, 483 KB).
-- Kept as `photo.png` deliberately: the gather cron writes `photo.jpg` and could
-  overwrite a `.jpg`, so a distinct `.png` protects this manual asset.
-- ⚠️ Rights NOT verified (fan/net cutout). Confirm ownership/clearance before
-  using after Nov-07 event. The Commons match that misfired (Corey Anderson) was
-  removed 2026-11-04; this manual cutout replaces the initials fallback.
-- Sources (facts only):
+- File:CoreyAnderson.jpg
+- License: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0)
+- Artist: MMAnytt
+- Credit: YouTube: https://www.youtube.com/watch?v=akGTLNmH31Y – View/save archived versions on archive.org at 0:03 (cropped)
+- File page: https://commons.wikimedia.org/wiki/File:CoreyAnderson.jpg
+## Notes
