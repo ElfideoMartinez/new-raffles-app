@@ -20,7 +20,13 @@
     "Walker Johnny Silva Barra de Souza, known as Johnny Walker, is a Brazilian professional mixed martial artist. He currently competes in the Heavyweight division of the Ultimate Fighting Championship (UFC)."
   ],
   "previousFights": [],
-  "photo": null,
+  "photo": {
+    "file": "photo.png",
+    "source": "manual asset — Jony_walker_manually_added.webp (fan/net asset, transparent cutout) added by Daniel 2026-11-05",
+    "source_file": "Jony_walker_manually_added.webp",
+    "converted_note": "dwebp -> photo.png (640x800, transparent). Kept as photo.png (NOT photo.jpg) so the gather cron never overwrites it.",
+    "license": "manual asset — rights not verified; do not use after event without clearance"
+  },
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",
