@@ -1,6 +1,7 @@
 "use client";
 
 import { apiUrl, authedApiFetch } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import WithAuth from "@/app/components/WithAuth";
 import {
@@ -12,7 +13,6 @@ import {
 } from "firebase/storage";
 import { toast } from "nextjs-toast-notify";
 import { use, useEffect, useMemo, useRef, useState } from "react";
-import { FadeLoader } from "react-spinners";
 
 interface IBetData {
   id: string;
@@ -386,7 +386,7 @@ const EditBetPage = () => {
 
         {isLoadingBet ? (
           <div className='flex justify-center pt-2'>
-            <FadeLoader color="var(--color-ink-900)" />
+            <Spinner color="var(--color-ink-900)" />
           </div>
         ) : (
           <div>

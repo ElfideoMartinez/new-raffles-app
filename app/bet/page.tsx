@@ -1,8 +1,9 @@
 import { apiUrl } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ClipLoader } from "react-spinners";
+
 import { formatDate, formatPrice } from "@/app/utils/format";
 
 interface IBetData {
@@ -63,7 +64,7 @@ export default async function BetsPage() {
     return (
       <Suspense
         fallback={
-          <ClipLoader color="var(--color-brand-700)" size={50} className='mx-auto mt-20' />
+          <div className="flex justify-center mt-20"><Spinner /></div>
         }
       >
         <main className='min-h-screen p-4'>

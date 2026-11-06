@@ -1,11 +1,11 @@
 'use client'
 import { apiUrl, authedApiFetch } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { toast } from "nextjs-toast-notify";
 import { useEffect, useRef, useState } from "react";
-import { FadeLoader } from "react-spinners";
 
 interface IRaffleData{
   id: string,
@@ -269,7 +269,7 @@ const EditRaffle = () => {
             ))}
           </select>
         </div>
-        {isLoadingRaffle ? <div className="flex justify-center pt-2"><FadeLoader color="var(--color-ink-900)"/></div> : 
+        {isLoadingRaffle ? <div className="flex justify-center pt-2"><Spinner color="var(--color-ink-900)"/></div> : 
           <div>
             <label className='text-ink-900 block text-sm font-medium mb-1'>
                 Titulo de la Rifa:

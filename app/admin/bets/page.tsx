@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
+import Spinner from "@/app/components/Spinner";
 import Image from "next/image";
 import { toast } from "nextjs-toast-notify";
 import { useEffect, useState } from "react";
-import { FadeLoader } from "react-spinners";
+
 import { onValue, ref, set, update } from "firebase/database";
 import { realtimeDB } from "@/app/firebaseconfig";
 import { formatDate, formatPrice } from "@/app/utils/format";
@@ -757,7 +758,7 @@ export default function BetsPage() {
         </div>
         {isLoading ? (
           <div className='flex justify-center mt-20'>
-            <FadeLoader color="var(--color-brand-700)" />
+            <Spinner color="var(--color-brand-700)" />
           </div>
         ) : dataBet.length === 0 ? (
           <div className='text-center text-ink-500 mt-20'>

@@ -1,6 +1,7 @@
 import { authedApiFetch } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import React, { Suspense, useState } from "react";
-import { FadeLoader } from "react-spinners";
+
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
 import { toast } from "nextjs-toast-notify";
@@ -125,7 +126,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       {sale.payment_intent && <div>ID pago: {sale.payment_intent}</div>}
       {isLoading ? (
         <button className='bg-ink-300 text-white rounded-card p-2' disabled>
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </button>
       ) : (
         <div className="w-full flex flex-col gap-2 sm:flex-row mt-2">

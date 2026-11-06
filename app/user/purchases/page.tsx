@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { FadeLoader } from "react-spinners";
+import Spinner from "@/app/components/Spinner";
+
 import { formatDateTime } from "@/app/utils/format";
 import Link from "next/link";
 
@@ -51,7 +52,7 @@ const PurchasesPage = () => {
       <div className="relative mx-auto mt-4 w-full p-4">
         <h1 className="text-center mb-3 text-lg">Compras</h1>
         <div className="flex justify-center">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       </div>
     );

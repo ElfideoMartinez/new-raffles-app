@@ -3,12 +3,13 @@
 // salesBets docs, mirroring settleBet's maths. Extracted from page.tsx so the
 // Next.js Page module keeps only the default export.
 import { authedApiFetch } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import ApiErrorState, {
   safeMessage,
   type ErrorKind,
 } from "@/app/components/ApiErrorState";
 import { useEffect, useMemo, useState } from "react";
-import { FadeLoader } from "react-spinners";
+
 import { formatDate, formatPrice } from "@/app/utils/format";
 
 interface IBetsData {
@@ -310,7 +311,7 @@ export function SettlementReview({
         <ApiErrorState kind={error.kind} message={error.message} onRetry={loadSales} entityLabel="ventas de apuestas" />
       ) : sales === null ? (
         <div className="flex justify-center items-center w-full h-40">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       ) : (
         <>

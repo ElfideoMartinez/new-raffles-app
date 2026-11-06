@@ -1,5 +1,6 @@
 "use client";
 import { db } from "@/app/firebaseconfig";
+import Spinner from "@/app/components/Spinner";
 import withAuth from "@/app/components/WithAuth";
 import ApiErrorState, { type ErrorKind } from "@/app/components/ApiErrorState";
 import {
@@ -23,7 +24,6 @@ import { navigationItems, type PageKey } from "@/app/config/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FadeLoader } from "react-spinners";
 
 /**
  * Runtime editor for storefront copy + contact/payment details.
@@ -213,7 +213,7 @@ const ConfigPage = () => {
 
       {loading ? (
         <div className='flex justify-center items-center w-full h-64'>
-          <FadeLoader color='var(--color-brand-700)' />
+          <Spinner color='var(--color-brand-700)' />
         </div>
       ) : error ? (
         <ApiErrorState

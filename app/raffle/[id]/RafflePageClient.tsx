@@ -3,10 +3,11 @@
 "use client";
 
 import React, {useEffect, useState} from "react";
+import Spinner from "@/app/components/Spinner";
 import TicketButton from "@/app/components/TicketButton";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
-import { FadeLoader } from "react-spinners";
+
 import { toast } from "nextjs-toast-notify";
 import { formatPrice } from "@/app/utils/format";
 
@@ -62,7 +63,7 @@ const RafflePageClient = ({
     console.log('tickets desde pagina de rifa',tickets)
   },[tickets])
 
-  if (!isHydrated) return <div className="flex justify-center items-center mt-5"><FadeLoader color="var(--color-brand-700)"/></div>
+  if (!isHydrated) return <div className="flex justify-center items-center mt-5"><Spinner color="var(--color-brand-700)"/></div>
 
   const thereIsWinner = raffleData.ticketWinner != '' && raffleData.ticketWinner != '.';
   

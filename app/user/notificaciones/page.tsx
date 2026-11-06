@@ -17,8 +17,9 @@
  * FCM only to the caller's own registered token.
  */
 import { useCallback, useEffect, useState } from "react";
+import Spinner from "@/app/components/Spinner";
 import Link from "next/link";
-import { FadeLoader } from "react-spinners";
+
 import {
   doc,
   getDoc,
@@ -263,7 +264,7 @@ const MyNotificationsPage = () => {
       <div className="relative mx-auto mt-4 w-full max-w-3xl p-4">
         <h1 className="text-center mb-3 text-xl font-bold text-ink-900">Notificaciones</h1>
         <div className="flex justify-center h-40 items-center">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       </div>
     );

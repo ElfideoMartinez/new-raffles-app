@@ -10,8 +10,9 @@
 // maths still runs in settleBet; the take rate there is Remote Config's, the
 // preview uses the documented default (10%) and says so in the UI.
 import { onValue, ref } from "firebase/database";
+import Spinner from "@/app/components/Spinner";
 import { useEffect, useMemo, useState } from "react";
-import { FadeLoader } from "react-spinners";
+
 import { realtimeDB } from "@/app/firebaseconfig";
 import { formatDate, formatPrice } from "@/app/utils/format";
 import withAuth from "@/app/components/WithAuth";
@@ -69,7 +70,7 @@ export default function SettlementPage() {
       <h1 className="my-1 text-xl font-bold">Liquidación de apuestas</h1>
       {betsLoading ? (
         <div className="flex justify-center items-center w-full h-64">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       ) : betsError ? (
         <p role="alert" className="text-danger-700 text-sm my-4">

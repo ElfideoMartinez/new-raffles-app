@@ -4,10 +4,10 @@
 // grid) and every fix had to be applied twice. The pages now only supply the
 // endpoint, list key, labels, and the card renderer; behaviour is unchanged.
 import { authedApiFetch } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import ApiErrorState, { safeMessage, type ErrorKind } from "@/app/components/ApiErrorState";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FadeLoader } from "react-spinners";
 
 interface AdminSalesListPageProps<T> {
   heading: string;
@@ -84,7 +84,7 @@ function AdminSalesListPage<T extends { id: string }>({
       </div>
       {loading ? (
         <div className="flex justify-center items-center w-full h-64">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       ) : error ? (
         <ApiErrorState

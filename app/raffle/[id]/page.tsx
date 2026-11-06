@@ -1,9 +1,9 @@
 // app/raffle/[id]/RafflePageServer.tsx
 
 import { apiUrl } from "@/app/config/api";
+import Spinner from "@/app/components/Spinner";
 import React, { Suspense, createContext } from "react";
 import RafflePageClient from "./RafflePageClient";
-import { FadeLoader } from "react-spinners";
 
 interface IRaffleDataResponse {
   data: { number: number; sold: boolean; id: string }[];
@@ -107,7 +107,7 @@ const RafflePageServer = async ({ params }: { params: { id: string } }) => {
     <Suspense
       fallback={
         <div className='flex justify-center items-center mt-5'>
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       }
     >

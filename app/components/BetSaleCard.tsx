@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { FadeLoader } from "react-spinners";
+import Spinner from "@/app/components/Spinner";
+
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
 import { toast } from "nextjs-toast-notify";
@@ -171,7 +172,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
         >
           {/* Backlog item 8: labelled in-place progress instead of a bare
               spinner, so the button reads as busy rather than broken. */}
-          <FadeLoader color="var(--color-brand-700)" height={8} width={3} />
+          <Spinner color="var(--color-brand-700)" />
           <span>Procesando…</span>
         </button>
       ) : (

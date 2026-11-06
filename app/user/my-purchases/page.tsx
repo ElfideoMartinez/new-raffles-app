@@ -17,8 +17,9 @@
  * failure (401/403 are states, not "no compras").
  */
 import { useEffect, useState } from "react";
+import Spinner from "@/app/components/Spinner";
 import Link from "next/link";
-import { FadeLoader } from "react-spinners";
+
 import ApiErrorState from "../../components/ApiErrorState";
 import { safeMessage } from "../../components/ApiErrorState";
 import { userApiFetch, useClientAuth } from "../../components/clientAuth";
@@ -269,7 +270,7 @@ const MyPurchasesPage = () => {
       <div className="relative mx-auto mt-4 w-full max-w-3xl p-4">
         <h1 className="text-center mb-3 text-xl font-bold text-ink-900">Mis compras</h1>
         <div className="flex justify-center h-40 items-center">
-          <FadeLoader color="var(--color-brand-700)" />
+          <Spinner color="var(--color-brand-700)" />
         </div>
       </div>
     );
