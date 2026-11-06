@@ -29,6 +29,8 @@ export interface StorefrontConfig {
   contactPhones: string[];
   /** Intro line shown on /contact and after checkout. */
   contactIntro: string;
+  /** Instagram handle WITHOUT "@", e.g. "bet.mx.ufc". Empty = hide the line. */
+  instagram: string;
   /** Bank account number / CLABE shown on the transfer page. */
   bankAccount: string;
   /** Bank name, shown as a label next to the account when set. */
@@ -44,6 +46,7 @@ export const STOREFRONT_DEFAULTS: StorefrontConfig = {
   contactPhones: ["6391316226"],
   contactIntro:
     "Si tienes cualquier duda o necesitas más información, no dudes en ponerte en contacto con nosotros",
+  instagram: "bet.mx.ufc",
   bankAccount: "4152314135006792",
   bankName: "",
   bankHolder: "",
@@ -55,6 +58,7 @@ export interface StorefrontForm {
   contactEmail: string;
   contactPhonesText: string;
   contactIntro: string;
+  instagram: string;
   bankAccount: string;
   bankName: string;
   bankHolder: string;
@@ -75,6 +79,12 @@ export const STOREFRONT_FORM_FIELDS: {
     hint: "Un número por línea. Se muestran en /contact y en la confirmación de compra.",
   },
   { key: "contactIntro", label: "Texto de contacto", multiline: true },
+  {
+    key: "instagram",
+    label: "Instagram (handle, sin @)",
+    multiline: false,
+    hint: "Se muestra en /contact como enlace. Vacío = ocultar la línea.",
+  },
   {
     key: "bankAccount",
     label: "Cuenta bancaria (CLABE / número de cuenta)",
@@ -113,6 +123,11 @@ export function mergeStorefrontConfig(
   const intro = str(stored.contactIntro);
   if (intro) out.contactIntro = intro;
 
+  // Instagram is optional: an explicit empty string hides the line.
+  if (typeof stored.instagram === "string") {
+    out.instagram = stored.instagram.trim();
+  }
+
   const acct = str(stored.bankAccount);
   if (acct) out.bankAccount = acct;
 
@@ -138,6 +153,7 @@ export function toStorefrontForm(config: StorefrontConfig): StorefrontForm {
     contactEmail: config.contactEmail,
     contactPhonesText: config.contactPhones.join("\n"),
     contactIntro: config.contactIntro,
+    instagram: config.instagram,
     bankAccount: config.bankAccount,
     bankName: config.bankName,
     bankHolder: config.bankHolder,

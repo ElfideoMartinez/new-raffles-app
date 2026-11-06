@@ -146,6 +146,7 @@ const ConfigPage = () => {
         contactEmail: storeForm.contactEmail.trim(),
         contactPhones: phones,
         contactIntro: storeForm.contactIntro.trim(),
+        instagram: storeForm.instagram.trim(),
         bankAccount: storeForm.bankAccount.trim(),
         // Explicitly stored (possibly ""): empty means hide the line.
         bankName: storeForm.bankName.trim(),

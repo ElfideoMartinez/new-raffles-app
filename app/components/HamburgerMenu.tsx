@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   clientLogout,
   useClientAuth,
@@ -8,6 +9,7 @@ import {
 } from "@/app/components/clientAuth";
 import { navigationItems } from "@/app/config/navigation";
 import { useGeneralConfig } from "@/app/config/general";
+import SignOutConfirm from "./SignOutConfirm";
 import ThemeToggle from "./ThemeToggle";
 import type { User } from "firebase/auth";
 
@@ -26,6 +28,7 @@ export default function HamburgerMenu({
   hidden: boolean;
   onNavigate: () => void;
 }) {
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const { user, isAdmin } = useClientAuth();
   const { visiblePages } = useGeneralConfig();
   const router = useRouter();
@@ -41,12 +44,13 @@ export default function HamburgerMenu({
     }`;
 
   return (
-    <nav
-      id={id}
-      hidden={hidden}
-      aria-label="Navegación principal"
-      className="absolute left-2 right-2 top-16 z-50 rounded-card border border-ink-100 bg-surface p-2 text-sm shadow-card sm:left-4 sm:right-auto sm:w-72"
-    >
+    <>
+      <nav
+        id={id}
+        hidden={hidden}
+        aria-label="Navegación principal"
+        className="absolute left-2 right-2 top-16 z-50 rounded-card border border-ink-100 bg-surface p-2 text-sm shadow-card sm:left-4 sm:right-auto sm:w-72"
+      >
       <ul className="space-y-1">
         {visibleNav.map(({ href, label }) => (
           <li key={href}>
@@ -89,11 +93,7 @@ export default function HamburgerMenu({
             </p>
             <button
               type="button"
-              onClick={async () => {
-                await clientLogout();
-                onNavigate();
-                router.refresh();
-              }}
+              onClick={() => setConfirmSignOut(true)}
               className="flex min-h-11 w-full items-center rounded-sm px-4 py-2 text-left text-ink-900 transition-colors hover:bg-ink-100"
             >
               Cerrar sesión
@@ -109,6 +109,17 @@ export default function HamburgerMenu({
           </Link>
         )}
       </div>
-    </nav>
+      </nav>
+
+      <SignOutConfirm
+        open={confirmSignOut}
+        onCancel={() => setConfirmSignOut(false)}
+        onConfirm={() => {
+          setConfirmSignOut(false);
+          onNavigate();
+          void clientLogout().finally(() => router.refresh());
+        }}
+      />
+    </>
   );
 }

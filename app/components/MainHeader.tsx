@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useClientAuth, clientLogout } from "./clientAuth";
 import CartButton from "./CartButton";
+import SignOutConfirm from "./SignOutConfirm";
 import { navigationItems, isNavItemActive } from "@/app/config/navigation";
 import { useGeneralConfig } from "@/app/config/general";
 import HamburgerMenu from "./HamburgerMenu";
@@ -20,6 +21,7 @@ function accountDisplay(user: { displayName?: string | null; email?: string | nu
 
 const MainHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const { user, isAdmin } = useClientAuth();
   const { visiblePages } = useGeneralConfig();
   const router = useRouter();
@@ -141,11 +143,7 @@ const MainHeader = () => {
             {user ? (
               <button
                 type="button"
-                onClick={() => {
-                  void clientLogout();
-                  setMenuOpen(false);
-                  router.refresh();
-                }}
+                onClick={() => setConfirmSignOut(true)}
                 className="flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 text-sm font-medium text-on-brand/80 transition-colors hover:bg-white/10 hover:text-on-brand"
               >
                 <span className="truncate max-w-[140px] text-left text-ink-100">
@@ -174,6 +172,16 @@ const MainHeader = () => {
         id="main-navigation"
         hidden={!menuOpen}
         onNavigate={() => setMenuOpen(false)}
+      />
+
+      <SignOutConfirm
+        open={confirmSignOut}
+        onCancel={() => setConfirmSignOut(false)}
+        onConfirm={() => {
+          setConfirmSignOut(false);
+          setMenuOpen(false);
+          void clientLogout().finally(() => router.refresh());
+        }}
       />
     </div>
   );
