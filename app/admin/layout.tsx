@@ -13,7 +13,9 @@
 // noted in ufc-mission/backlog.md instead.
 import Link from "next/link";
 import ThemeToggle from "../components/ThemeToggle";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useClientAuth } from "../components/clientAuth";
 
 const NAV_SECTIONS: {
   title: string;
@@ -60,11 +62,35 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAdmin, loading } = useClientAuth();
 
+  // Every route in /admin except the login page "/admin" requires the admin
+  // claim. While auth resolves or when the signed-in account is not an admin,
+  // don't paint the shell (it would flash the nav + dashboard to a non-admin —
+  // the old "still let me through" bug). Redirect away instead.
+  useEffect(() => {
+    if (pathname === "/admin") return;
+    if (loading) return;
+    if (!isAdmin) {
+      router.replace("/");
+    }
+  }, [pathname, loading, isAdmin, router]);
+
+  // The login page at exactly "/admin" renders for everyone.
   if (pathname === "/admin") {
-    // Login page: no navigation yet, the visitor is not signed in.
     return <>{children}</>;
   }
+
+  if (loading) {
+    return (
+      <p role="status" className="p-6 text-center text-sm text-ink-500">
+        Cargando…
+      </p>
+    );
+  }
+
+  if (!isAdmin) return null;
 
   return (
     <>

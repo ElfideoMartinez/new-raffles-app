@@ -19,7 +19,7 @@ function accountDisplay(user: { displayName?: string | null; email?: string | nu
 
 const MainHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useClientAuth();
+  const { user, isAdmin } = useClientAuth();
   const router = useRouter();
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -115,6 +115,22 @@ const MainHeader = () => {
                 {label}
               </Link>
             ))}
+
+            {/* Admin (2026-11-06): a user carrying the admin claim reaches the
+                admin area from the same header — no separate login/account.
+                Uses isNavItemActive so it highlights while inside /admin. */}
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className={`flex items-center rounded-sm px-3 py-2 text-sm font-medium transition-colors sm:px-4 sm:py-2.5 ${
+                  isNavItemActive("/admin", pathname)
+                    ? "bg-white/20 font-bold text-on-brand"
+                    : "text-on-brand/80 hover:bg-white/10 hover:text-on-brand"
+                }`}
+              >
+                Admin
+              </Link>
+            )}
 
             {user ? (
               <button

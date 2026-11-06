@@ -25,7 +25,7 @@ export default function HamburgerMenu({
   hidden: boolean;
   onNavigate: () => void;
 }) {
-  const { user } = useClientAuth();
+  const { user, isAdmin } = useClientAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -56,6 +56,21 @@ export default function HamburgerMenu({
             </Link>
           </li>
         ))}
+
+        {/* Admin (2026-11-06): same account reaches the admin area; shown only
+            to users carrying the admin claim. */}
+        {isAdmin && (
+          <li>
+            <Link
+              href="/admin/dashboard"
+              onClick={onNavigate}
+              className={linkClass("/admin")}
+              aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+            >
+              Admin
+            </Link>
+          </li>
+        )}
       </ul>
 
       <div className="mt-2 border-t border-ink-100 pt-2">

@@ -4,25 +4,41 @@ import { useEffect, useState } from "react";
 import { db, auth } from "../firebaseconfig";
 import { getMessagingToken, onMessageListener } from "../firebaseMessaging";
 import { setDoc, doc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { useClientAuth } from "./clientAuth";
 
+/**
+ * Admin-only route guard (HOC).
+ *
+ * PREVIOUSLY this checked only "is a user signed in?" and passed anyone —
+ * including a normal storefront customer or a stale/failed login — through to
+ * the admin shell. The backend is claim-gated (assertAdmin rejects calls
+ * without `admin === true`), so no data leaked, but the admin UI + navigation
+ * still rendered and read as accessible. That was the "still let me through to
+ * the admin" bug.
+ *
+ * NOW this also requires the signed-in user to carry the `admin === true`
+ * custom claim. A signed-in non-admin is redirected to the storefront instead
+ * of seeing the admin UI. Every page wrapped here is admin-only.
+ */
 const withAuth = (Component: any) => {
   const WithAuth = (props: any) => {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
+    const { user, isAdmin, loading } = useClientAuth();
+    const [showLoading, setShowLoading] = useState(true);
 
     useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setAuthenticated(true);
-        } else {
-          router.replace("/admin"); // Redirect to login if not authenticated
-        }
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    }, [router]);
+      if (loading) return; // auth state not resolved yet
+      if (!user) {
+        // Not signed in at all → admin login page.
+        router.replace("/admin");
+      } else if (!isAdmin) {
+        // Signed in but the account lacks the admin claim → away.
+        router.replace("/");
+      } else {
+        setShowLoading(false);
+      }
+    }, [loading, user, isAdmin, router]);
+
     // Token registration (fixed 2026-10-25):
     //   1. The old code short-circuited on a localStorage token and never
     //      re-registered — refreshed FCM tokens were silently lost.
@@ -61,7 +77,6 @@ const withAuth = (Component: any) => {
           }
         } else {
           console.error("Notification permission denied.");
-          //request second time
           await Notification.requestPermission();
         }
       } catch (error) {
@@ -69,30 +84,27 @@ const withAuth = (Component: any) => {
       }
     };
     useEffect(() => {
-      // Register once a user exists; re-run on sign-in so the token lands
-      // under the right uid (auth state is already observed above).
-      if (authenticated) requestNoptificationPermission();
+      if (isAdmin) requestNoptificationPermission();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authenticated]);
+    }, [isAdmin]);
     useEffect(() => {
       console.log("Setting up message listener...");
       onMessageListener()
         .then((payload) => {
           console.log("Message received. ", payload);
-          // You can handle the payload here, e.g., show a notification
           new Notification(payload.title, {
             body: payload.body,
           });
         })
         .catch((err) => console.log("failed: ", err));
     }, []);
-    if (loading)
+    if (showLoading)
       return (
         <p role="status" className="p-6 text-center text-sm text-ink-500">
           Cargando…
         </p>
       );
-    if (!authenticated) return null;
+    if (!user || !isAdmin) return null;
 
     return <Component {...props} />;
   };

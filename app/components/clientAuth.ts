@@ -63,28 +63,52 @@ function readMockUser(): MockClientUser | null {
 }
 
 /** Signed-in client state. `null` means anonymous browsing. */
-export function useClientAuth(): { user: User | MockClientUser | null; loading: boolean } {
+export function useClientAuth(): {
+  user: User | MockClientUser | null;
+  /** True when the signed-in user carries the `admin === true` custom claim. */
+  isAdmin: boolean;
+  loading: boolean;
+} {
   const [user, setUser] = useState<User | MockClientUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Mock mode resolves immediately — Firebase auth state may never fire in
-    // a sandbox without network access to the auth backend.
+    // a sandbox without network access to the auth backend. Mock users never
+    // carry the admin claim.
     if (ENABLE_MOCK_AUTH) {
       const mock = readMockUser();
       if (mock) {
         setUser(mock);
+        setIsAdmin(false);
         setLoading(false);
       }
     }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser ?? readMockUser());
+      if (firebaseUser) {
+        // The admin claim lives on the decoded ID token, not the User object.
+        // getIdTokenResult() returns it and refreshes the token if stale; this
+        // is how the storefront learns the signed-in account is an admin so it
+        // can expose admin navigation without a separate login.
+        firebaseUser
+          .getIdTokenResult()
+          .then((tokenResult) => {
+            setIsAdmin(tokenResult.claims?.admin === true);
+          })
+          .catch(() => {
+            setIsAdmin(false);
+          });
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  return { user, loading };
+  return { user, isAdmin, loading };
 }
 
 export async function clientLogin(email: string, password: string): Promise<User> {
