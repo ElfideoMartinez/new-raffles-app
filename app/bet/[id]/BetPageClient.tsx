@@ -162,16 +162,6 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     return !Number.isFinite(p) || p <= 0;
   }, [realtimeBetData.pricePerTicket]);
 
-  // Finished bets are read-only history (WinnerBanner + the list card show the
-  // winner). New participation is pointless and Daniel wants the details page
-  // inaccessible for them — send anyone landing on a finished bet's URL back
-  // to the list. Direct-URL entry is blocked this way, too.
-  useEffect(() => {
-    if (realtimeBetData.isFinished) {
-      router.replace("/bet");
-    }
-  }, [realtimeBetData.isFinished, router]);
-
   // ---- Pari-mutuel ESTIMATE (DESIGN-AUDIT.md B2, Option A) ----
   // Same formula shape as the server's single source of truth
   // (functions/src/payout.ts): every ticket stakes pricePerTicket into one

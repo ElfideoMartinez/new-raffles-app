@@ -188,12 +188,15 @@ function BetCard({ bet }: { bet: IBetData }) {
 
         <div className='flex flex-col gap-2'>
           {bet.isFinished ? (
-            // Finished bets are read-only: the CTA is a non-navigable label so
-            // the card never links into the (blocked) details page. The winner
-            // is called out just below.
-            <span className='min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold bg-ink-100 text-ink-500'>
-              Apuesta Finalizada
-            </span>
+            // Finished = read-only history. The winner is shown via
+            // winnerLabel, and the deliberate path in is a "Ver ganador"
+            // button to the (read-only) details page.
+            <Link
+              href={`/bet/${bet.id}`}
+              className='min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold transition-colors duration-300 bg-ink-100 text-ink-700 hover:bg-ink-300'
+            >
+              Ver ganador
+            </Link>
           ) : (
             <Link
               href={`/bet/${bet.id}`}
