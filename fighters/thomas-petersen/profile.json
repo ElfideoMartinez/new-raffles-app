@@ -19,7 +19,13 @@
       "date": "2026-11-07"
     }
   ],
-  "photo": null,
+  "photo": {
+    "file": "photo.png",
+    "source_file": "PETERSEN_THOMAS_L_05-03.avif",
+    "source": "manual asset — full-body press image (UFC) added via other session 2026-11-06",
+    "converted_note": "converted to photo.png (transparent). Kept as photo.png so the gather cron (photo.jpg) never overwrites it.",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons; do not use after event without clearance"
+  },
   "sources": [
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261107",

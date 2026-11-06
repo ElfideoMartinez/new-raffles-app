@@ -8,3 +8,4 @@ Checked: 2026-11-06
 - Image URL: https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-01/NAKAMURA_KEIICHIRO_L_01-31.png?itok=-vL6J_TE
 - License: UFC official press image (© UFC) — reference copy only, not a CC/Commons photo
 ## Notes
+- WIRED: NAKAMURA_KEIICHIRO_L_01-31.avif -> photo.png (UFC official press image (© UFC) — reference copy only, not CC/Commons; do not use after event without clearance)

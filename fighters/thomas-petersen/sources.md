@@ -8,3 +8,4 @@ Checked: 2026-11-06
 - Image URL: https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-05/PETERSEN_THOMAS_L_05-03.png?itok=sYHO_Yst
 - License: UFC official press image (© UFC) — reference copy only, not a CC/Commons photo
 ## Notes
+- WIRED: PETERSEN_THOMAS_L_05-03.avif -> photo.png (UFC official press image (© UFC) — reference copy only, not CC/Commons; do not use after event without clearance)

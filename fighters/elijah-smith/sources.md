@@ -5,3 +5,4 @@ Checked: 2026-11-06
 ## Photo
 - No photo: no Commons/Wikipedia image passed the license policy (CC0/PD/CC BY*/CC BY-SA*) and the name-match rule. Initials fallback (ES).
 ## Notes
+- WIRED: SMITH_ELIJAH_L_03-14.avif -> photo.png (UFC official press image (© UFC) — reference copy only, not CC/Commons; do not use after event without clearance)
