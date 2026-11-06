@@ -13,7 +13,6 @@ const UserCartPage = () => {
   const tickets = useTicketStore((state) => state.getItemsFromCart());
   const userCartBets = useTicketStore((state) => state.getBetsFromCart());
   const removeBet = useTicketStore((state) => state.removeBetById);
-  console.log("Tickets", tickets);
   const totalRafflePrice = tickets.reduce(
     (total, raffle) => total + (raffle.raffleTotalPrice || 0),
     0
@@ -24,7 +23,6 @@ const UserCartPage = () => {
 
   const [isHydrated, setIsHydrated] = useState(false);
 
-  console.log("Total Raffle Price:", totalRafflePrice);
 
   // Group tickets by raffleId
   const groupedTickets = tickets.reduce((acc: any, ticket: any) => {
@@ -39,7 +37,6 @@ const UserCartPage = () => {
 
   // Convert the grouped tickets object back to an array
   const groupedTicketsArray = Object.values(groupedTickets);
-  console.log("Grouped Tickets", groupedTicketsArray);
 
   useEffect(() => {
     setIsHydrated(true);

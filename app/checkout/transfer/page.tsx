@@ -25,10 +25,8 @@ const CheckoutTransferPage = () => {
   const totalBetsPrice = bets.reduce(
     (total, bet) => total + (bet.totalPrice || 0), 0
   )
-  console.log('Info de las rifas',raffles);
   const allTickets = raffles.map((raffle) => raffle.ticketNumbers.sort((a,b) => a-b)).flat().toString();
   const ticketCount = raffles.map((raffle) => raffle.ticketNumbers.sort((a, b) => a - b)).flat().length;
-  //console.log("Num tickets", ticketCount);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -41,7 +39,6 @@ const CheckoutTransferPage = () => {
     const totalprice = totalRafflePrice+totalBetsPrice;
     setTotal(totalprice);
     setPaymenthConcept(() => Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join(""))
-    //console.log('No. tickets: ',allTickets.length)
   },[])
 
   // function to set the type of payment

@@ -76,7 +76,6 @@ const CreateRaffle = () => {
       awardImage: plainObject.awardImage as string,
     };
 
-    console.log("Objeto Plano",raffleData);
     try {
       await createNewRaffle(raffleData);
       resetForm();
@@ -108,7 +107,6 @@ const CreateRaffle = () => {
 
     // Upload the file
     const snapshot = await uploadBytes(storageRef, file);
-    console.log("Uploaded a blob or file!", snapshot);
 
     // Get and return the download URL
     const downloadURL = await getDownloadURL(storageRef);
@@ -135,7 +133,6 @@ const CreateRaffle = () => {
       );
     }
     const data = await res.json();
-    console.log(data);
 
     return data;
   };

@@ -109,7 +109,6 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
   };
 
   useEffect(() => {
-    //console.log(betSale.bets.map(bet => bet.betId));
   });
 
   const msg = `Gracias por tu compra 🤗. Tu transferencia ha sido recibida✅. Tus boletos de rifa ya estan 

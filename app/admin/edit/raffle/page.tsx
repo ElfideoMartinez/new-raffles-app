@@ -148,14 +148,11 @@ const EditRaffle = () => {
     if(newImage != null) {
       try {
         await deleteObject(storageRef);
-        console.log("Previous image deleted");
   
       } catch (error) {
-        console.log("Previous image not found, or error deleting it", error);
       }
   
       const snapshot = await uploadBytes(storageRef, file);
-      console.log("A new file has been uploaded!", snapshot);
   
       const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
@@ -191,7 +188,6 @@ const EditRaffle = () => {
         throw new Error("Failed to fetch raffle data");
       }
       const result = await responseData.json();
-      console.log(result);
       
       setRaffle((prevRaffle) => ({
         ...prevRaffle,
@@ -206,7 +202,6 @@ const EditRaffle = () => {
       }))
       setIsLoadingRaffle(false);
     }catch(e){
-      console.log(e);
     }
   }
 
@@ -223,7 +218,6 @@ const EditRaffle = () => {
         );
 
         if (!response.ok) {
-          console.log(response);
           throw new Error("Failed to fetch raffle data");
         }
 
@@ -235,7 +229,6 @@ const EditRaffle = () => {
         setRafflesData(raffles);
        
       } catch (e) {
-        console.log(e);   
       }
     };
     fetchRaffleData();
@@ -246,7 +239,6 @@ const EditRaffle = () => {
     formRef.current?.reset();
   }
   const isValidRaffle = idRaffle != 'default';
-  console.log('Rifa valida:',isValidRaffle)
   return(
     <div className='max-w-lg mx-auto bg-surface p-6 rounded-card shadow-lg mt-5'>
       <h2 className='text-ink-900 text-2xl font-bold mb-6 text-center'>

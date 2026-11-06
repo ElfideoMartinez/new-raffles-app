@@ -23,7 +23,6 @@ if (typeof window !== "undefined") {
 
 const getMessagingToken = async () => {
   if (typeof window === "undefined" || !messaging) {
-    console.log("Messaging not available on server side");
     return null;
   }
 
@@ -33,12 +32,8 @@ const getMessagingToken = async () => {
         "BC_nlAx1Fti-x-M1WRmWkdIVmwNV_PVYbcksLOUzaTww2ytV2GVDCepRlBk6kbT8oKXDRHOLJ07tc6m1KYA929A",
     });
     if (token) {
-      console.log("Token generated:", token);
       return token;
     } else {
-      console.log(
-        "No registration token available. Request permission to generate one."
-      );
       return null;
     }
   } catch (error) {
@@ -54,7 +49,6 @@ const onMessageListener = () => {
 
   return new Promise((resolve) => {
     onMessage(messaging, (payload) => {
-      console.log("Message received. ", payload);
       resolve(payload.notification);
     });
   });

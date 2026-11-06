@@ -28,20 +28,16 @@ export default function PlayPage() {
   const listenerRef = useRef<any>(null);
 
   useEffect(() => {
-    console.log("Component mounted, checking for existing ticket...");
     // Get ticket id from localStorage and listen to ticket data from Firebase
     const localTicketId = localStorage.getItem("ticketId");
     if (localTicketId) {
-      console.log("Found local ticket ID:", localTicketId);
       listenToTicket(localTicketId);
     } else {
-      console.log("No local ticket found, creating new ticket...");
       createNewTicket();
     }
 
     // Cleanup function to remove listener when component unmounts
     return () => {
-      console.log("Component unmounting, cleaning up listener...");
       if (listenerRef.current) {
         off(listenerRef.current);
         listenerRef.current = null;
@@ -59,7 +55,6 @@ export default function PlayPage() {
         ...ticket,
         status: "finnished",
       });
-      console.log("Ticket status updated to 'finnished' in Firebase.");
       clearLocalTicket();
     }
   }, [scratchedCardsCount, ticket]);
@@ -69,7 +64,6 @@ export default function PlayPage() {
   };
 
   const createNewTicket = async () => {
-    console.log("=== CREATING NEW TICKET ===");
     setIsLoading(true);
     setScratchedCardsCount(0);
     try {
@@ -84,23 +78,18 @@ export default function PlayPage() {
         }
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log("Response data:", result);
       const { data } = result;
 
-      console.log("New ticket created:", data);
       //clear any existing local ticket
       clearLocalTicket();
       // Save only the ticket id in localStorage
       localStorage.setItem("ticketId", data.id);
-      console.log("Saved ticket ID to localStorage:", data.id);
 
       setTicket(data);
       listenToTicket(data.id);
@@ -118,37 +107,25 @@ export default function PlayPage() {
   };
 
   const listenToTicket = (id: string) => {
-    console.log("=== SETTING UP LISTENER ===");
-    console.log("Ticket ID:", id);
-    console.log("Firebase DB instance:", realtimeDB);
 
     // Clean up any existing listener
     if (listenerRef.current) {
-      console.log("Cleaning up existing listener...");
       off(listenerRef.current);
     }
 
     const itemRef = ref(realtimeDB, `quickTickets/${id}`);
-    console.log("Firebase reference path:", `quickTickets/${id}`);
-    console.log("Firebase reference object:", itemRef);
 
     // Set up the new listener
     const unsubscribe = onValue(
       itemRef,
       (snapshot) => {
-        console.log("=== FIREBASE CALLBACK TRIGGERED ===");
-        console.log("Snapshot exists:", snapshot.exists());
-        console.log("Snapshot value:", snapshot.val());
-        console.log("Timestamp:", new Date().toISOString());
 
         if (snapshot.exists()) {
           const ticketData = snapshot.val();
-          console.log("Setting ticket data:", ticketData);
           setTicket(ticketData);
 
           // Only clear if expired, not if finished
           if (ticketData.status === "finnished") {
-            console.log("Ticket is finished, clearing local storage...");
             clearLocalTicket();
           }
         } else {
@@ -171,7 +148,6 @@ export default function PlayPage() {
 
     // Store the listener reference for cleanup
     listenerRef.current = itemRef;
-    console.log("Listener setup complete");
   };
 
   if (error && !ticket) {
@@ -243,7 +219,6 @@ export default function PlayPage() {
                     width={80}
                     height={80}
                     onComplete={() => {
-                      console.log(`Symbol ${i + 1} scratched!`);
                       setScratchedCardsCount((prev) => prev + 1);
                       navigator.vibrate(100);
                     }}

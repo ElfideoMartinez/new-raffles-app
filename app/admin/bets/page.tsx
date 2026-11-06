@@ -641,7 +641,6 @@ export default function BetsPage() {
               id: key,
               ...betsData[key],
             }));
-            console.log(betsArray);
             setDataBet(betsArray);
           } else {
             setDataBet([]);

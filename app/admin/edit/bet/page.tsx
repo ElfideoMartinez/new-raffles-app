@@ -81,7 +81,6 @@ const EditBetPage = () => {
         );
 
         if (!response.ok) {
-          console.log(response);
           throw new Error("Failed to fetch raffle data");
         }
 
@@ -185,13 +184,10 @@ const EditBetPage = () => {
     if (newImage != null) {
       try {
         await deleteObject(storageRef);
-        console.log("Previous image deleted");
       } catch (error) {
-        console.log("Previous image not found, or error deleting it", error);
       }
 
       const snapshot = await uploadBytes(storageRef, file);
-      console.log("A new file has been uploaded!", snapshot);
 
       const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
@@ -232,7 +228,6 @@ const EditBetPage = () => {
         throw new Error("Failed to fetch raffle data");
       }
       const result = await responseData.json();
-      console.log(result);
 
       const d = result?.betData ?? {};
       setBet((prevBet) => ({
@@ -352,7 +347,6 @@ const EditBetPage = () => {
   };
 
   const isValidBet = idBet != "default";
-  console.log("Rifa valida:", isValidBet);
 
   return (
     <div className='max-w-lg mx-auto bg-surface p-6 rounded-card shadow-lg mt-5'>

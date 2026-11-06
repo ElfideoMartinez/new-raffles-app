@@ -14,7 +14,6 @@ const CartButton = () => {
   const selectedTicketCount = useTicketStore((state) =>
     state.getItemsFromCart()
   );
-  console.log("selectedTicketCount", selectedTicketCount);
   //got through the cart elements and sum all the ticket numbers
   const totalTickets = selectedTicketCount.reduce(
     (acc, item) => acc + item.ticketNumbers.length,
@@ -23,7 +22,6 @@ const CartButton = () => {
   const totalTicketsBets = userCartBets.reduce(
     (acc, bet) => acc + (bet.ticketNumbers || 0), 0
   )
-  console.log("totalTickets", totalTickets+totalTicketsBets);
   
   if (!isHydrated){
     return (

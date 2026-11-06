@@ -65,10 +65,6 @@ const QuickTicketsActivePage = () => {
               Number(ticket.createdAt) >= startMs &&
               Number(ticket.createdAt) < endMs
           );
-          console.log(
-            `Tickets purchased today (${startOfToday.toDateString()}):`,
-            ticketsToday.length
-          );
 
           // 🔹 Count winners by category
           type WinnerCategory =
@@ -92,9 +88,7 @@ const QuickTicketsActivePage = () => {
             }
           });
 
-          console.log("Winner counts by category:", categoryCounts);
         } else {
-          console.log("No quick tickets found.");
         }
       },
       { onlyOnce: false }

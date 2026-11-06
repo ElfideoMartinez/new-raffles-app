@@ -50,18 +50,15 @@ const withAuth = (Component: any) => {
     const requestNoptificationPermission = async () => {
       try {
         const permission = await Notification.requestPermission();
-        console.log("Notification permission status:", permission);
         if (permission === "granted") {
           // Always ask FCM for the (possibly refreshed) token — no
           // localStorage short-circuit.
           const token = await getMessagingToken();
-          console.log("Notification token:", token);
           if (token) {
             localStorage.setItem("notificationToken", token);
             const user = auth.currentUser;
             if (!user) {
               // Anonymous (or not yet signed in): register on first login.
-              console.log("No signed-in user; notification token cached locally only.");
               return;
             }
             await setDoc(
@@ -88,15 +85,13 @@ const withAuth = (Component: any) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdmin]);
     useEffect(() => {
-      console.log("Setting up message listener...");
       onMessageListener()
         .then((payload) => {
-          console.log("Message received. ", payload);
           new Notification(payload.title, {
             body: payload.body,
           });
         })
-        .catch((err) => console.log("failed: ", err));
+        .catch(() => {});
     }, []);
     if (showLoading)
       return (

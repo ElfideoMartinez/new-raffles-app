@@ -225,7 +225,6 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       betRef,
       (snapshot) => {
         const data = snapshot.val();
-        console.log("Real-time bet data update:", data);
         if (data) {
           setRealtimeBetData(data);
           setLoading(false);
@@ -292,7 +291,6 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       totalPrice: totalPrice,
     });
 
-    console.log("Cart updated:", userCartBets());
     router.push("/user/cart");
   }, [
     betId,

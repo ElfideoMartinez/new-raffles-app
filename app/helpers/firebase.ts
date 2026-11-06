@@ -3,7 +3,6 @@ import { collection, addDoc } from "firebase/firestore";
 
 export const addNewSale = async (sale: any) => {
   try {
-    console.log("Adding sale", sale);
     const docRef = await addDoc(collection(db, "sales"), {
       ...sale,
       verified: true,
@@ -11,8 +10,6 @@ export const addNewSale = async (sale: any) => {
       total: sale.ticketNumbers.length * 25,
       sale_date: new Date().toDateString(),
     });
-    console.log("Document written with ID: ", docRef.id);
-    console.log("Sale added successfully");
   } catch (error) {
     console.error("Error adding sale", error);
   }

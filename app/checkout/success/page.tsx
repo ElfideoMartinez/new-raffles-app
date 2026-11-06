@@ -50,7 +50,6 @@ const SuccessPage = () => {
   const [ticketCount, setTicketCount] = useState(0);
   const [returnRoute, setReturnRoute] = useState(HOME_FALLBACK);
 
-  console.log("Tickets", ticketCount);
   useEffect(() => {
     // Ticket state is owned by the server: transfer sales are confirmed by an
     // admin. The client must not mark tickets sold.

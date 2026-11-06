@@ -10,7 +10,6 @@ const NotificationListener = () => {
         // Do something with the notification, e.g., show a toast
         alert(`Notification: ${notification.title} - ${notification.body}`);
       } catch (err) {
-        console.log("Failed to receive notification", err);
       }
     };
     listen();

@@ -47,7 +47,6 @@ const RafflePageClient = ({
 
   const addTicket = useTicketStore((state) => state.addTicket);
   const addTicketsToCart = useTicketStore((state) => state.addTicketsToCart);
-  //console.log(SelectedTickets);
 
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -61,7 +60,6 @@ const RafflePageClient = ({
   },[])
 
   useEffect(() => {
-    console.log('tickets desde pagina de rifa',tickets)
   },[tickets])
 
   if (!isHydrated) return <div className="flex justify-center items-center mt-5"><Spinner color="var(--color-brand-700)"/></div>

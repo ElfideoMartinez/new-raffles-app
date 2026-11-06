@@ -12,7 +12,6 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    console.log("data", data);
     const id = data.id;
     if (!id) {
       return new NextResponse(

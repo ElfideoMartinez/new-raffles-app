@@ -92,7 +92,6 @@ const CreateBet = () => {
       const storageRef = ref(storage, `betImages/${betTitle}_${Date.now()}`);
 
       const snapshot = await uploadBytes(storageRef, file);
-      console.log("Uploaded bet image!", snapshot);
 
       const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
@@ -104,7 +103,6 @@ const CreateBet = () => {
 
   const createNewBet = useCallback(async (betData: IBet) => {
     try {
-      console.log("Creating bet with data:", betData);
       const res = await authedApiFetch("createBet", {
           method: "POST",
           headers: {
@@ -119,7 +117,6 @@ const CreateBet = () => {
       }
 
       const data = await res.json();
-      console.log("Bet created successfully:", data);
       return data;
     } catch (error) {
       console.error("Error creating bet:", error);
@@ -178,7 +175,6 @@ const CreateBet = () => {
           totalBets: 0,
         };
 
-        console.log("Creating bet with data:", betData);
         await createNewBet(betData);
 
         //un comment this to clear form after submission
