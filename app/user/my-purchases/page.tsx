@@ -99,6 +99,47 @@ const OUTCOME_LABEL: Record<string, string> = {
   VOID: "Apuesta anulada (reembolso)",
 };
 
+/**
+ * Render a sale field safely — never "[object Object]".
+ * Handles the shapes real docs carry: numbers/strings pass through, arrays
+ * join with ", " (mapping object elements — e.g. tickets stored as
+ * {number: n} — to their number/id), and stray objects degrade to their
+ * number/id if present, else "".
+ */
+function toDisplayText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (Array.isArray(value)) {
+    const parts = value
+      .map((e) => toDisplayText(e))
+      .filter((s) => s.trim() !== "");
+    return parts.join(", ");
+  }
+  if (value && typeof value === "object") {
+    const rec = value as Record<string, unknown>;
+    for (const key of ["number", "ticketNumber", "id", "value"]) {
+      const v = rec[key];
+      if (v != null) return toDisplayText(v);
+    }
+    return "";
+  }
+  return "";
+}
+
+/** createdAt may serialize out of the Cloud Function as a Firestore Timestamp object. */
+function toDateText(value: unknown): string | null {
+  if (typeof value === "string" && value.trim() !== "") return value;
+  if (value && typeof value === "object") {
+    const rec = value as Record<string, unknown>;
+    const secs = rec._seconds ?? rec.seconds;
+    if (secs != null && typeof secs === "number") {
+      const d = new Date(secs * 1000);
+      return Number.isNaN(d.getTime()) ? null : d.toISOString();
+    }
+  }
+  return null;
+}
+
 function statusBadge(group: PurchaseGroup) {
   if (group.settled) {
     if (group.payoutStatus === "paid" || group.payoutStatus === "refund") {
@@ -141,18 +182,18 @@ function toGroups(server: ServerPurchase[], legacy: LegacyGroup[]): PurchaseGrou
     for (const r of sale.raffles ?? []) {
       items.push({
         key: `r-${sale.id}-${r.raffleId}`,
-        title: `🎟 Rifa: ${r.raffleName}`,
-        tickets: `Boletos: ${r.ticketNumbers.join(", ")}`,
-        amount: r.raffleTotalPrice,
+        title: `🎟 Rifa: ${toDisplayText(r.raffleName)}`,
+        tickets: `Boletos: ${toDisplayText(r.ticketNumbers)}`,
+        amount: Number(r.raffleTotalPrice) || 0,
       });
     }
     for (const b of sale.bets ?? []) {
       items.push({
         key: `b-${sale.id}-${b.betId}`,
-        title: `🎟 Apuesta: ${b.betName}`,
-        detail: `Equipo: ${b.team}`,
-        tickets: `Boletos: ${b.ticketNumbers}`,
-        amount: b.totalPrice,
+        title: `🎟 Apuesta: ${toDisplayText(b.betName)}`,
+        detail: `Equipo: ${toDisplayText(b.team)}`,
+        tickets: `Boletos: ${toDisplayText(b.ticketNumbers)}`,
+        amount: Number(b.totalPrice) || 0,
       });
     }
     const settlementEntries = Object.values(sale.settlements ?? {});
@@ -163,7 +204,7 @@ function toGroups(server: ServerPurchase[], legacy: LegacyGroup[]): PurchaseGrou
     const outcome = settlementEntries[0]?.result;
     return {
       id: sale.id,
-      date: sale.createdAt,
+      date: toDateText(sale.createdAt),
       legacy: false,
       total: sale.totalSalePrice ?? sale.totalBetsPrice ?? 0,
       verified: sale.verified,
@@ -180,23 +221,23 @@ function toGroups(server: ServerPurchase[], legacy: LegacyGroup[]): PurchaseGrou
     for (const r of group.raffles ?? []) {
       items.push({
         key: `lr-${index}-${r.raffleId}`,
-        title: `🎟 Rifa: ${r.raffleName}`,
-        tickets: `Boletos: ${r.ticketNumbers.join(", ")}`,
-        amount: r.raffleTotalPrice,
+        title: `🎟 Rifa: ${toDisplayText(r.raffleName)}`,
+        tickets: `Boletos: ${toDisplayText(r.ticketNumbers)}`,
+        amount: Number(r.raffleTotalPrice) || 0,
       });
     }
     for (const b of group.bets ?? []) {
       items.push({
         key: `lb-${index}-${b.betId}`,
-        title: `🎟 Apuesta: ${b.betName}`,
-        detail: `Equipo: ${b.team}`,
-        tickets: `Boletos: ${b.ticketNumbers}`,
-        amount: b.totalPrice,
+        title: `🎟 Apuesta: ${toDisplayText(b.betName)}`,
+        detail: `Equipo: ${toDisplayText(b.team)}`,
+        tickets: `Boletos: ${toDisplayText(b.ticketNumbers)}`,
+        amount: Number(b.totalPrice) || 0,
       });
     }
     return {
       id: `legacy-${index}`,
-      date: group.date,
+      date: toDateText(group.date),
       legacy: true,
       total: items.reduce((sum, item) => sum + item.amount, 0),
       verified: false,

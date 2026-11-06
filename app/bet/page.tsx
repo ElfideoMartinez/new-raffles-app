@@ -187,16 +187,21 @@ function BetCard({ bet }: { bet: IBetData }) {
         </div>
 
         <div className='flex flex-col gap-2'>
-          <Link
-            href={`/bet/${bet.id}`}
-            className={`min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold transition-colors duration-300 ${
-              bet.isFinished
-                ? "bg-ink-100 text-ink-500 cursor-not-allowed"
-                : "bg-brand-600 hover:bg-brand-700 text-on-brand"
-            }`}
-          >
-            {bet.isFinished ? "Apuesta Finalizada" : "Participar"}
-          </Link>
+          {bet.isFinished ? (
+            // Finished bets are read-only: the CTA is a non-navigable label so
+            // the card never links into the (blocked) details page. The winner
+            // is called out just below.
+            <span className='min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold bg-ink-100 text-ink-500'>
+              Apuesta Finalizada
+            </span>
+          ) : (
+            <Link
+              href={`/bet/${bet.id}`}
+              className='min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold transition-colors duration-300 bg-brand-600 hover:bg-brand-700 text-on-brand'
+            >
+              Participar
+            </Link>
+          )}
 
           {bet.isFinished && (
             <span className='text-center text-xs text-ink-500'>

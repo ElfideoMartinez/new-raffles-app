@@ -36,6 +36,11 @@ interface BetFormData {
   oddsTie?: string | undefined;
 }
 
+// Quick price options so a new bet starts with sensible values instead of 0.
+// (The pool is pari-mutuel — payout is computed at settlement — so these are
+// ticket-price options, not pre-set payout returns.)
+const PRICE_PRESETS = [20, 50, 100, 200, 500];
+
 const CreateBet = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [bet, setBet] = useState<BetFormData>({
@@ -289,6 +294,24 @@ const CreateBet = () => {
                     placeholder='0.00'
                     className='w-full pl-8 pr-4 py-3 border border-ink-300 rounded-sm text-ink-900 bg-surface focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all'
                   />
+                </div>
+                <div className='mt-2 flex flex-wrap gap-2'>
+                  {PRICE_PRESETS.map((p) => (
+                    <button
+                      key={p}
+                      type='button'
+                      onClick={() =>
+                        setBet((prev) => ({ ...prev, pricePerTicket: p }))
+                      }
+                      className={`rounded-pill px-3 py-1.5 text-sm font-semibold transition-colors ${
+                        Number(bet.pricePerTicket) === p
+                          ? "bg-brand-600 text-on-brand"
+                          : "bg-ink-100 text-ink-700 hover:bg-ink-300"
+                      }`}
+                    >
+                      ${p}
+                    </button>
+                  ))}
                 </div>
               </div>
 
