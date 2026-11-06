@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useClientAuth, clientLogout } from "./clientAuth";
 import CartButton from "./CartButton";
 import { navigationItems, isNavItemActive } from "@/app/config/navigation";
+import { useGeneralConfig } from "@/app/config/general";
 import HamburgerMenu from "./HamburgerMenu";
 import ThemeToggle from "./ThemeToggle";
 
@@ -20,10 +21,15 @@ function accountDisplay(user: { displayName?: string | null; email?: string | nu
 const MainHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAdmin } = useClientAuth();
+  const { visiblePages } = useGeneralConfig();
   const router = useRouter();
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Pages disabled in /admin config are hidden from navigation (direct URLs
+  // still work). Defaults to the full list when config is unavailable.
+  const visibleNav = navigationItems.filter((item) => visiblePages[item.key]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -102,7 +108,7 @@ const MainHeader = () => {
           className="border-t border-white/10 hidden sm:flex"
         >
           <div className="mx-auto flex max-w-7xl items-center gap-1 px-4">
-            {navigationItems.map(({ href, label }) => (
+            {visibleNav.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}

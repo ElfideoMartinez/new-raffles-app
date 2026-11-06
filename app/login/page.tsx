@@ -15,6 +15,7 @@ import {
   clientLogin,
   clientRegister,
 } from "../components/clientAuth";
+import { useGeneralConfig } from "../config/general";
 
 type Mode = "login" | "register";
 
@@ -31,7 +32,12 @@ export default function ClientLoginPage() {
 function ClientLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/";
+  const { defaultHome } = useGeneralConfig();
+  // After login go to the requested page, else the configured default home
+  // (falls back to /rifas). Root is a redirect, so never land on "/".
+  const next =
+    searchParams.get("next") ||
+    (defaultHome && defaultHome !== "/" ? defaultHome : "/rifas");
 
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");

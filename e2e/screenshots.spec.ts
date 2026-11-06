@@ -11,7 +11,7 @@ test.describe("audit change screenshots", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("storefront", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rifas");
     await page.waitForTimeout(1200);
     await page.screenshot({ path: `${OUT}/01-storefront-mobile.png`, fullPage: true });
   });

@@ -12,7 +12,7 @@ test.describe("storefront renders mock fixture data", () => {
   test("shows the active raffle with price, progress and tickets left", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/rifas");
 
     const active = page.locator("article", {
       has: page.getByRole("heading", { name: /Player A vs Player B/ }),
@@ -27,7 +27,7 @@ test.describe("storefront renders mock fixture data", () => {
   });
 
   test("sold-out raffle shows Agotada and offers no link", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rifas");
 
     const soldOut = page.locator("article", {
       has: page.getByRole("heading", { name: /Finished Example/ }),
@@ -39,7 +39,7 @@ test.describe("storefront renders mock fixture data", () => {
   });
 
   test("Ver Rifa navigates to the raffle detail page", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/rifas");
 
     const active = page.locator("article", {
       has: page.getByRole("heading", { name: /Player A vs Player B/ }),
@@ -57,7 +57,7 @@ test.describe("layout has no horizontal overflow", () => {
   for (const width of [320, 390]) {
     test(`no horizontal scroll at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
-      await page.goto("/");
+      await page.goto("/rifas");
       await expect(page.locator("article")).toHaveCount(2);
 
       const { viewport, scrollWidth } = await page.evaluate(() => ({

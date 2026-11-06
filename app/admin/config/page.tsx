@@ -14,6 +14,12 @@ import {
   toStorefrontForm,
   type StorefrontForm,
 } from "@/app/config/storefrontConfig";
+import {
+  GENERAL_DEFAULTS,
+  mergeGeneralConfig,
+  type GeneralConfig,
+} from "@/app/config/general";
+import { navigationItems, type PageKey } from "@/app/config/navigation";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -39,6 +45,7 @@ import { FadeLoader } from "react-spinners";
 const ConfigPage = () => {
   const [copyForm, setCopyForm] = useState<CheckoutSuccessConfig | null>(null);
   const [storeForm, setStoreForm] = useState<StorefrontForm | null>(null);
+  const [general, setGeneral] = useState<GeneralConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ kind: ErrorKind; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -48,23 +55,29 @@ const ConfigPage = () => {
 
   const copyRef = doc(db, "appConfig", "checkoutSuccess");
   const storeRef = doc(db, "appConfig", "storefront");
+  const generalRef = doc(db, "appConfig", "general");
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [copySnap, storeSnap] = await Promise.all([
+      const [copySnap, storeSnap, generalSnap] = await Promise.all([
         getDoc(copyRef),
         getDoc(storeRef),
+        getDoc(generalRef),
       ]);
       setCopyForm(mergeCheckoutConfig(copySnap.exists() ? copySnap.data() : null));
       setStoreForm(
         toStorefrontForm(mergeStorefrontConfig(storeSnap.exists() ? storeSnap.data() : null))
       );
+      setGeneral(
+        mergeGeneralConfig(generalSnap.exists() ? generalSnap.data() : null)
+      );
     } catch (err) {
       console.error("Could not load config:", err);
       setCopyForm(null);
       setStoreForm(null);
+      setGeneral(null);
       setError({
         kind: "forbidden",
         message: err instanceof Error ? err.message : "",
@@ -90,8 +103,24 @@ const ConfigPage = () => {
     setSaveError(null);
   };
 
+  const updateGeneralHome = (value: string) => {
+    setGeneral((prev) => (prev ? { ...prev, defaultHome: value } : prev));
+    setSavedAt(null);
+    setSaveError(null);
+  };
+
+  const togglePage = (key: PageKey, visible: boolean) => {
+    setGeneral((prev) =>
+      prev
+        ? { ...prev, visiblePages: { ...prev.visiblePages, [key]: visible } }
+        : prev
+    );
+    setSavedAt(null);
+    setSaveError(null);
+  };
+
   const save = async () => {
-    if (!copyForm || !storeForm) return;
+    if (!copyForm || !storeForm || !general) return;
     setSaving(true);
     setSaveError(null);
     setWarnings([]);
@@ -139,9 +168,25 @@ const ConfigPage = () => {
         );
       }
 
+      // ---- navigation: default home + page visibility ----
+      let defaultHome = general.defaultHome;
+      if (!/^\/[A-Za-z0-9/_-]*$/.test(defaultHome.trim()) || defaultHome.trim() === "/") {
+        defaultHome = GENERAL_DEFAULTS.defaultHome;
+        notices.push(
+          `La página de inicio no era válida: se usará "${GENERAL_DEFAULTS.defaultHome}".`
+        );
+      }
+      const generalPayload: Record<string, unknown> = {
+        defaultHome,
+        visiblePages: general.visiblePages,
+        updatedAt: serverTimestamp(),
+        updatedBy: "admin",
+      };
+
       await Promise.all([
         setDoc(copyRef, copyPayload, { merge: true }),
         setDoc(storeRef, storePayload, { merge: true }),
+        setDoc(generalRef, generalPayload, { merge: true }),
       ]);
 
       if (notices.length > 0) setWarnings(notices);
@@ -176,7 +221,7 @@ const ConfigPage = () => {
           onRetry={load}
           entityLabel='textos y datos'
         />
-      ) : copyForm && storeForm ? (
+      ) : copyForm && storeForm && general ? (
         <div className='w-full max-w-2xl flex flex-col gap-6'>
           {/* -------- contact + payment details -------- */}
           <section className='flex flex-col gap-4'>
@@ -203,6 +248,59 @@ const ConfigPage = () => {
                 )}
               </label>
             ))}
+          </section>
+
+          {/* -------- navigation: default home + visible pages -------- */}
+          <section className='flex flex-col gap-4'>
+            <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
+              Navegación e inicio
+            </h2>
+            <label className='flex flex-col gap-1'>
+              <span className='text-sm font-medium text-ink-700'>
+                Página de inicio (a donde lleva la raíz `/`)
+              </span>
+              <span className='text-xs text-ink-500'>
+                Tras iniciar sesión o entrar a la raíz, los usuarios aterrizan
+                aquí.
+              </span>
+              <select
+                value={general.defaultHome}
+                onChange={(e) => updateGeneralHome(e.target.value)}
+                className='w-full p-2 border border-ink-300 rounded-card text-sm text-ink-900 bg-surface'
+              >
+                {navigationItems.map((item) => (
+                  <option key={item.key} value={item.href}>
+                    {item.label} ({item.href})
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <p className='text-sm text-ink-500'>
+              Páginas visibles en la navegación. Ocultar una página solo quita
+              su enlace; la URL directa sigue funcionando.
+            </p>
+            <div className='flex flex-col gap-2'>
+              {navigationItems.map((item) => (
+                <label
+                  key={item.key}
+                  className='flex items-center gap-3 rounded-card border border-ink-200 p-2'
+                >
+                  <input
+                    type='checkbox'
+                    checked={general.visiblePages[item.key] ?? true}
+                    onChange={(e) => togglePage(item.key, e.target.checked)}
+                    className='h-4 w-4 accent-brand-600'
+                  />
+                  <span className='text-sm font-medium text-ink-900'>
+                    {item.label}
+                  </span>
+                  <span className='ml-auto text-xs text-ink-500'>
+                    {item.href}
+                  </span>
+                </label>
+              ))}
+            </div>
           </section>
 
           {/* -------- checkout thank-you copy -------- */}

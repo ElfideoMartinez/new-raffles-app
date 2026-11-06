@@ -7,6 +7,7 @@ import {
   type MockClientUser,
 } from "@/app/components/clientAuth";
 import { navigationItems } from "@/app/config/navigation";
+import { useGeneralConfig } from "@/app/config/general";
 import ThemeToggle from "./ThemeToggle";
 import type { User } from "firebase/auth";
 
@@ -26,8 +27,11 @@ export default function HamburgerMenu({
   onNavigate: () => void;
 }) {
   const { user, isAdmin } = useClientAuth();
+  const { visiblePages } = useGeneralConfig();
   const router = useRouter();
   const pathname = usePathname();
+
+  const visibleNav = navigationItems.filter((item) => visiblePages[item.key]);
 
   const linkClass = (href: string) =>
     `flex min-h-11 items-center rounded-sm px-4 py-2 transition-colors ${
@@ -44,7 +48,7 @@ export default function HamburgerMenu({
       className="absolute left-2 right-2 top-16 z-50 rounded-card border border-ink-100 bg-surface p-2 text-sm shadow-card sm:left-4 sm:right-auto sm:w-72"
     >
       <ul className="space-y-1">
-        {navigationItems.map(({ href, label }) => (
+        {visibleNav.map(({ href, label }) => (
           <li key={href}>
             <Link
               href={href}

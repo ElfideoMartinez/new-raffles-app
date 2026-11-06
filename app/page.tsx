@@ -1,74 +1,30 @@
-import { apiUrl } from "@/app/config/api";
-import Cards from "./components/Cards";
-import { Suspense } from "react";
-import { toRaffle, type AllRafflesResponse } from "./config/types";
+"use client";
+// Root page — a redirect to the configured default home.
+//
+// Before (2026-11-06): `/` was the raffles listing. Daniel wanted the root to
+// land wherever the admin decides, so the raffles listing moved to /rifas and
+// this page now forwards to appConfig/general.defaultHome (default /bet). The
+// configured value is read live via useGeneralConfig (starts on the default so
+// the redirect is immediate, then re-fires if a stored value differs).
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useGeneralConfig } from "@/app/config/general";
 
-export default async function Home() {
-  try {
-    const response = await fetch(
-      //`${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL}/getAllRaffles`,
-      apiUrl("getAllRaffles"),
-      {
-        cache: "no-store",
-      }
-    );
+export default function Home() {
+  const router = useRouter();
+  const { defaultHome } = useGeneralConfig();
 
-    if (!response.ok) {
-      console.error(response);
-      throw new Error(`Failed to fetch raffle data: ${response.statusText}`);
-    }
+  useEffect(() => {
+    // The resolved landing is always non-"/" (a configured home, or /rifas as
+    // the fallback), so this page can never redirect to itself.
+    const target =
+      defaultHome && defaultHome !== "/" ? defaultHome : "/rifas";
+    router.replace(target);
+  }, [defaultHome, router]);
 
-    const { result } = (await response.json()) as AllRafflesResponse;
-    const raffles = (Array.isArray(result) ? result : []).map(toRaffle);
-
-    return (
-      <Suspense fallback={<div>Cargando...</div>}>
-        <main className="mt-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">
-              Rifas activas
-            </h1>
-            <p className="mt-1 text-sm text-ink-500">
-              Elige una rifa y compra tus boletos en línea.
-            </p>
-          </div>
-          {raffles.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
-              {raffles.map((raffle) => (
-                <Cards key={raffle.id} {...raffle} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-card border border-ink-100 bg-surface p-10 text-center shadow-card">
-              <p className="text-lg font-semibold text-ink-900">
-                No hay rifas activas
-              </p>
-              <p className="mt-1 text-sm text-ink-500">
-                Vuelve pronto para ver las nuevas rifas.
-              </p>
-            </div>
-          )}
-        </main>
-      </Suspense>
-    );
-  } catch (error: unknown) {
-    console.error("Error rendering Home page:", error);
-    const message =
-      error instanceof Error ? error.message : "Error desconocido";
-    return (
-      <main className="mt-16 flex items-center justify-center">
-        <div className="max-w-md rounded-card border border-danger-500/20 bg-surface p-8 text-center shadow-card">
-          <h1 className="text-lg font-bold text-ink-900">
-            No se pudieron cargar las rifas
-          </h1>
-          <p className="mt-2 text-sm text-ink-500">
-            Intenta de nuevo en un momento.
-          </p>
-          <p className="mt-3 rounded-sm bg-danger-50 px-3 py-2 text-xs text-danger-700">
-            {message}
-          </p>
-        </div>
-      </main>
-    );
-  }
+  return (
+    <p role="status" className="p-6 text-center text-sm text-ink-500">
+      Cargando…
+    </p>
+  );
 }

@@ -1,0 +1,76 @@
+import { apiUrl } from "@/app/config/api";
+import Cards from "./../components/Cards";
+import { Suspense } from "react";
+import { toRaffle, type AllRafflesResponse } from "./../config/types";
+
+// The raffles listing. Moved from `/` to /rifas (2026-11-06): the root page
+// now redirects to the configured default home (appConfig/general.defaultHome,
+// default /bet), and this page keeps its own nav entry ("Rifas activas").
+export default async function Rifas() {
+  try {
+    const response = await fetch(
+      apiUrl("getAllRaffles"),
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      console.error(response);
+      throw new Error(`Failed to fetch raffle data: ${response.statusText}`);
+    }
+
+    const { result } = (await response.json()) as AllRafflesResponse;
+    const raffles = (Array.isArray(result) ? result : []).map(toRaffle);
+
+    return (
+      <Suspense fallback={<div>Cargando...</div>}>
+        <main className="mt-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">
+              Rifas activas
+            </h1>
+            <p className="mt-1 text-sm text-ink-500">
+              Elige una rifa y compra tus boletos en línea.
+            </p>
+          </div>
+          {raffles.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 [&>*]:min-w-0">
+              {raffles.map((raffle) => (
+                <Cards key={raffle.id} {...raffle} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-card border border-ink-100 bg-surface p-10 text-center shadow-card">
+              <p className="text-lg font-semibold text-ink-900">
+                No hay rifas activas
+              </p>
+              <p className="mt-1 text-sm text-ink-500">
+                Vuelve pronto para ver las nuevas rifas.
+              </p>
+            </div>
+          )}
+        </main>
+      </Suspense>
+    );
+  } catch (error: unknown) {
+    console.error("Error rendering Rifas page:", error);
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
+    return (
+      <main className="mt-16 flex items-center justify-center">
+        <div className="max-w-md rounded-card border border-danger-500/20 bg-surface p-8 text-center shadow-card">
+          <h1 className="text-lg font-bold text-ink-900">
+            No se pudieron cargar las rifas
+          </h1>
+          <p className="mt-2 text-sm text-ink-500">
+            Intenta de nuevo en un momento.
+          </p>
+          <p className="mt-3 rounded-sm bg-danger-50 px-3 py-2 text-xs text-danger-700">
+            {message}
+          </p>
+        </div>
+      </main>
+    );
+  }
+}
