@@ -1,6 +1,7 @@
 "use client";
 
 import { quickTicketUrl } from "@/app/config/api";
+import BackLink from "@/app/components/BackLink";
 import { useEffect, useState, useRef } from "react";
 import { onValue, ref, set, off } from "firebase/database";
 import { realtimeDB } from "../../firebaseconfig"; // Adjust the import path as needed
@@ -190,6 +191,7 @@ export default function PlayPage() {
 
   return (
     <main className='max-h-96 flex flex-col items-center justify-center text-center p-4 sm:p-0'>
+      <BackLink href="/rifas" label="Volver a las rifas" />
       <h1 className='text-2xl font-bold mb-2 mt-10'>🎟️ Rascadito Rapido</h1>
       {isLoading ? (
         <p className='text-ink-500'>Cargando tu boleto...</p>

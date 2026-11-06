@@ -1,4 +1,5 @@
 "use client";
+import BackLink from "@/app/components/BackLink";
 import useTicketStore from "@/app/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -393,16 +394,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
 
   return (
     <main className="-mx-4 flex min-h-screen flex-col items-center bg-ink-100 px-4 pb-[calc(13rem+env(safe-area-inset-bottom))] pt-4 text-ink-900 sm:mx-0 sm:rounded-card sm:px-6 sm:pb-36">
-      <a
-        href="/bet"
-        className="inline-flex items-center gap-2 rounded-pill bg-white/10 px-4 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-white/20 sm:mb-3"
-        aria-label="Volver a las apuestas"
-      >
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="m19 12-7 7-7-7" />
-        </svg>
-        Volver a Apuestas
-      </a>
+      <BackLink href="/bet" label="Volver a Apuestas" />
       {loading ? (
         <div role="status" aria-label="Cargando apuesta" className="flex h-96 items-center justify-center">
           <div className="h-12 w-12 animate-spin rounded-pill border-4 border-ink-200 border-b-brand-600" />

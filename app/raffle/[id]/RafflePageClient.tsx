@@ -4,6 +4,7 @@
 
 import React, {useEffect, useState} from "react";
 import Spinner from "@/app/components/Spinner";
+import BackLink from "@/app/components/BackLink";
 import TicketButton from "@/app/components/TicketButton";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
@@ -139,8 +140,11 @@ const RafflePageClient = ({
   }
 
   return (
-    
-    <div className='container mx-auto flex w-11/12 p-4 relative justify-center'>
+    <>
+      <div className="mx-auto flex w-11/12 pt-4">
+        <BackLink href="/rifas" label="Volver a las rifas" />
+      </div>
+      <div className='container mx-auto flex w-11/12 p-4 relative justify-center'>
       <div className="absolute left-0 top-10 z-10" >
         <button
           disabled={thereIsWinner} 
@@ -189,7 +193,8 @@ const RafflePageClient = ({
           rafflePrice={parseInt(raffleData.price)}
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
