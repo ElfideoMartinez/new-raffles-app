@@ -16,7 +16,9 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { savePhoto } from "./photo.mjs";
+import { ufcCutout, protectsManualCutout } from "./ufc-photo.mjs";
+import { boutResults } from "./results.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).filter((a) => a.startsWith("--")).map((a) => {
@@ -24,7 +26,12 @@ const args = Object.fromEntries(
     return [k, v === undefined ? true : v];
   })
 );
-const DATE = args.date || "2026-10-24";
+const DATE = args.date;
+if (typeof DATE !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(DATE) ||
+    !Number.isFinite(Date.parse(`${DATE}T00:00:00Z`)) ||
+    new Date(`${DATE}T00:00:00Z`).toISOString().slice(0, 10) !== DATE) {
+  throw new Error("Required --date=YYYY-MM-DD must be a valid calendar date");
+}
 const MAX = parseInt(args.max || "20", 10);
 // --any-license: download regardless of license (small production, Daniel's call
 // 2026-10-26). The license string is still recorded everywhere for later review.
@@ -100,28 +107,36 @@ async function espnCard(date) {
   if (!ev) throw new Error("No UFC event on that date");
   const fighters = new Map();
   const bouts = ev.competitions
-    .map((c, i) => ({
+    .slice()
+    .reverse() // main event first; order 0 = main, 1 = co-main (matches insights/backfill convention)
+    .map((c, i) => {
+      const results = boutResults(c);
+      return {
       order: i,
       division: c.type?.abbreviation || null,
-      athletes: c.competitors.map((x) => ({
+      date: c.date || ev.date || null,
+      athletes: c.competitors.map((x, index) => ({
         name: x.athlete.displayName,
-        winner: !!x.winner,
+        result: results[index],
         record: x.records?.[0]?.summary || null,
         country: x.athlete.flag?.alt || null,
         flagUrl: x.athlete.flag?.href || null,
       })),
-    }))
-    .reverse(); // main event first
+      };
+    });
   for (const b of bouts)
     for (const a of b.athletes) {
       if (!fighters.has(a.name))
         fighters.set(a.name, { name: a.name, bouts: [] });
       fighters.get(a.name).bouts.push({
+        order: b.order,
+        date: b.date || null,
         division: b.division,
-        opponent: b.athletes.find((x) => x !== a).name,
-        winner: a.winner,
-        result: a.winner ? "W" : "L",
+        opponent: b.athletes.find((x) => x !== a)?.name || null,
+        winner: a.result === "W" ? true : a.result === "L" ? false : null,
+        result: a.result,
         record: a.record,
+        country: a.country,
       });
     }
   return {
@@ -224,49 +239,21 @@ async function commonsCandidates(name) {
   return out;
 }
 
-function stripExif(buf) {
-  if (buf[0] !== 0xff || buf[1] !== 0xd8) throw new Error("not jpeg");
-  const out = [Buffer.from([0xff, 0xd8])];
-  let i = 2;
-  while (i < buf.length) {
-    if (buf[i] !== 0xff) throw new Error(`bad marker at ${i}`);
-    const m = buf[i + 1];
-    if (m === 0xd9) { out.push(Buffer.from([0xff, 0xd9])); break; }
-    if (m === 0xda) { out.push(buf.subarray(i)); break; } // scan data to end
-    const len = buf.readUInt16BE(i + 2);
-    const seg = buf.subarray(i, i + 2 + len);
-    // keep APP0 (JFIF) + coding/quant/huffman tables; drop other APPn (Exif/XMP/IPTC), COM
-    const keep = m === 0x01 || m === 0xe0 || (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) || m === 0xdb || m === 0xdc || m === 0xdd || m === 0xde || m === 0xdf || (m >= 0xd0 && m <= 0xd7);
-    if (keep) out.push(seg);
-    i += 2 + len;
-  }
-  return Buffer.concat(out);
-}
-
-function resizeViaSips(src) {
-  // resize to max-width 1200 and strip metadata
-  execFileSync("sips", ["--resampleWidth", "1200", "--setProperty", "format", "jpeg", src, "--out", src], { stdio: "pipe" });
-  try {
-    fs.writeFileSync(src, stripExif(fs.readFileSync(src)));
-  } catch (e) { console.log("  exif strip failed:", e.message); }
-}
-
 async function download(url, dest, tries = 4) {
   for (let i = 0; ; i++) {
     const wait = 1300 - (Date.now() - lastReq);
     if (wait > 0) await sleep(wait);
     lastReq = Date.now();
-    const res = await fetch(url, { headers: { "User-Agent": UA } });
-    if ((res.status === 429 || res.status === 503) && i < tries) {
-      console.log(`  download rate-limited (${res.status}); backing off…`);
-      await sleep(8000 * (i + 1));
-      continue;
+    try {
+      return await savePhoto(url, dest, { headers: { "User-Agent": UA } });
+    } catch (e) {
+      if ((e.status === 429 || e.status === 503) && i < tries) {
+        console.log(`  download rate-limited (${e.status}); backing off…`);
+        await sleep(8000 * (i + 1));
+        continue;
+      }
+      throw e;
     }
-    if (!res.ok) throw new Error(`HTTP ${res.status} downloading ${url}`);
-    const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.length > 3 * 1024 * 1024) throw new Error(`file too large: ${Math.round(buf.length / 1024)} KB`);
-    fs.writeFileSync(dest, buf);
-    return buf.length;
   }
 }
 
@@ -287,6 +274,14 @@ for (const f of card.fighters) {
   log("gathering…");
 
   const sources = [];
+  // Preserve any previously-gathered history for this fighter (across events) so
+  // insights.mjs can compute head-to-head / shared-card data over time.
+  let prev = null;
+  const prevFile = path.join(dir, "profile.json");
+  if (fs.existsSync(prevFile)) {
+    try { prev = JSON.parse(fs.readFileSync(prevFile, "utf8")); }
+    catch { prev = null; }
+  }
   const profile = {
     slug,
     name: f.name,
@@ -297,7 +292,8 @@ for (const f of card.fighters) {
     record: null,
     stats: [],
     facts: [],
-    previousFights: [],
+    previousFights: prev?.previousFights || [],
+    cards: prev?.cards || [],
     photo: null,
     sources: [],
     _event: { name: card.eventName, date: card.date, bouts: f.bouts },
@@ -310,9 +306,14 @@ for (const f of card.fighters) {
     if (m) profile.record = { wins: +m[1], losses: +m[2], draws: +m[3] };
   }
   for (const b of f.bouts) {
-    if (b.division) profile.previousFights.push({ event: card.eventName, opponent: b.opponent, result: b.winner ? "W" : "L", division: b.division });
+    if (b.division && b.result) {
+      const clash = profile.previousFights.some((x) => x.event === card.eventName && x.opponent === b.opponent);
+      if (!clash) profile.previousFights.push({ event: card.eventName, opponent: b.opponent, result: b.result, division: b.division });
+    }
   }
-  if (f.bouts.some((b) => b.winner)) profile.stats.push({ label: "Evento", value: "Ganó en " + card.eventName });
+  if (!profile.cards.some((c) => c.name === card.eventName))
+    profile.cards.push({ name: card.eventName, date: card.date });
+  if (f.bouts.some((b) => b.result === "W")) profile.stats.push({ label: "Evento", value: "Ganó en " + card.eventName });
   profile.division = profile.division?.replace(/([a-z])([A-Z])/g, "$1 $2");
 
   // 2) Wikipedia
@@ -338,19 +339,32 @@ for (const f of card.fighters) {
     } else log("no Wikipedia page found (summary 404 on all title variants)");
   } catch (e) { failures.push(`[${f.name}] wikipedia: ${e.message}`); log("wikipedia error:", e.message); }
 
-  // 3) Commons photo search (primary) — license-gated + name-matched
+  // 3a) UFC athlete page full-body cutout (PRIMARY — official, fighter-only, transparent PNG)
   let chosen = null;
   try {
-    const cands = await commonsCandidates(f.name);
+    const keepManual = protectsManualCutout(dir, prev?.photo);
+    const c = keepManual ? null : await ufcCutout(slug, dir);
+    if (keepManual) log("manual photo.png kept (not UFC-sourced)");
+    else if (c) {
+      chosen = { ...c, ok: true, matched: true, via: "ufc athlete page" };
+      sources.push({ url: c.filePage, note: "UFC athlete page: full-body press image (photo.png)", checked: CHECKED });
+      log(`photo OK (UFC athlete page): ${c.url}`);
+    } else log("no full-body image on UFC athlete page");
+  } catch (e) { failures.push(`[${f.name}] ufc-photo: ${e.message}`); log("ufc-photo error:", e.message); }
+
+  // 3b) Commons photo search — FALLBACK ONLY, opt-in (--commons-fallback). It produced
+  // off-topic images (group/event shots, namesakes), so it never runs by default.
+  try {
+    const cands = chosen || !args["commons-fallback"] ? [] : await commonsCandidates(f.name);
+
     for (const c of cands) {
       if (!c.ok) { rejections.push(`[${f.name}] REJECT ${c.title} — ${c.reason}`); log(`reject ${c.title}: ${c.reason}`); continue; }
       // download best candidate
       const tmp = path.join(dir, ".photo.tmp");
       try {
-        const size = await download(c.thumbUrl, tmp);
+        const result = await download(c.thumbUrl, tmp);
         fs.renameSync(tmp, path.join(dir, "photo.jpg"));
-        try { resizeViaSips(path.join(dir, "photo.jpg")); } catch (e) { log("sips resize failed:", e.message); }
-        chosen = { ...c, matched: true, bytes: size };
+        chosen = { ...c, matched: true, ...result };
         log(`photo OK: ${c.title} [${c.license}]`);
         break;
       } catch (e) {
@@ -360,7 +374,7 @@ for (const f of card.fighters) {
       }
     }
     // fallback: Wikipedia lead image (also license-check via Commons metadata of that file)
-    if (!chosen && winfo.pageImageName) {
+    if (!chosen && args["commons-fallback"] && winfo.pageImageName) {
       try {
         const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodeURIComponent(winfo.pageImageName)}&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1200&format=json&formatversion=2`;
         const d = await fetchJson(url);
@@ -377,20 +391,32 @@ for (const f of card.fighters) {
             const tmp = path.join(dir, ".photo.tmp");
             await download(ii.thumburl || ii.url, tmp);
             fs.renameSync(tmp, path.join(dir, "photo.jpg"));
-            try { resizeViaSips(path.join(dir, "photo.jpg")); } catch {}
             chosen = { title: p.title, url: ii.url, thumbUrl: ii.thumburl || ii.url, license, licenseUrl: meta.LicenseUrl?.value || "", artist: (meta.Artist?.value || "").replace(/<[^>]+>/g, "").trim(), credit: "", filePage: ii.descriptionurl, ok: true, matched: true, via: "wikipedia lead image" };
             log(`photo OK (wiki lead): ${p.title} [${license}]`);
           }
         }
       } catch (e) { log("wiki-lead photo check failed:", e.message); }
     }
-    if (!chosen) log("NO licensed photo — initials fallback");
+    if (!chosen) log("NO photo — initials fallback");
   } catch (e) { failures.push(`[${f.name}] commons: ${e.message}`); log("commons error:", e.message); }
 
-  if (chosen) {
+  if (chosen?.via === "ufc athlete page") {
+    profile.photo = {
+      file: "photo.png",
+      source_url: chosen.filePage,
+      download_url: chosen.url,
+      license: chosen.license,
+      license_url: null,
+      artist: null,
+      matched_name_score: 1,
+    };
+  } else if (!chosen && prev?.photo?.file === "photo.png" && protectsManualCutout(dir, prev.photo)) {
+    profile.photo = prev.photo; // keep a manual cutout's record across gathers
+  } else if (chosen) {
     profile.photo = {
       file: "photo.jpg",
       source_url: chosen.filePage || chosen.url,
+      download_url: chosen.thumbUrl || chosen.url,
       license: chosen.license,
       license_url: chosen.licenseUrl || null,
       artist: chosen.artist || null,
@@ -427,3 +453,4 @@ fs.writeFileSync(path.join(ROOT, "_gather-report.json"), JSON.stringify(report, 
 console.log(`\nDone. Profiles in ${ROOT}/. Rejections: ${rejections.length}, failures: ${failures.length}`);
 for (const r of rejections) console.log("  REJECT:", r);
 for (const x of failures) console.log("  FAIL:", x);
+if (failures.length > 0) process.exitCode = 1;
