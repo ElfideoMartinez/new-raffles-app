@@ -1,0 +1,34 @@
+{
+  "slug": "ufc-334-gane-vs.-hokit",
+  "generated_by": "scripts/instagram/generate.mjs",
+  "generated_at": "2026-11-11T18:16:57.228Z",
+  "input": "/Users/danielmartinez/Projects/new-raffles-app/instagram-pack/.automation/drafts/ufc-334-gane-vs.-hokit/input.json",
+  "brand": {
+    "name": "Rifas Mtz",
+    "handle": "@bet.mx.ufc"
+  },
+  "event": {
+    "kicker": "UFC 334 · ESTELAR",
+    "title": "UFC 334: Gane vs. Hokit"
+  },
+  "assets": [
+    {
+      "kind": "feed",
+      "file": "feed.jpg",
+      "dimensions": "1080x1350",
+      "bytes": 174789,
+      "under_8mb": true,
+      "format": "jpeg"
+    },
+    {
+      "kind": "story",
+      "file": "story.jpg",
+      "dimensions": "1080x1920",
+      "bytes": 178189,
+      "under_8mb": true,
+      "format": "jpeg"
+    }
+  ],
+  "antwork_media_rules": "jpg/jpeg <= 8MB; upload via add_media -> PUT URL -> curl",
+  "story_note": null
+}
