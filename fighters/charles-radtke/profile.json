@@ -1,0 +1,71 @@
+{
+  "slug": "charles-radtke",
+  "name": "Charles Radtke",
+  "nickname": null,
+  "initials": "CR",
+  "country": "USA",
+  "division": "Welterweight",
+  "record": {
+    "wins": 12,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [
+    "Charles Radtke born in 1964, is a studio furniture maker working in Cedarburg, Wisconsin. His focus is design, rarely if ever repeating an object."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/charles-radtke",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-04/RADTKE_CHARLES_L_04-11.png?itok=rRI5kMVe",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Charles_Radtke",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Charles_Radtke",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/charles-radtke",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 5,
+        "date": "2026-11-15T00:00Z",
+        "division": "Welterweight",
+        "opponent": "Stephen Thompson",
+        "winner": null,
+        "result": null,
+        "record": "12-5-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

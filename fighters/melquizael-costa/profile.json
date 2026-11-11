@@ -1,0 +1,81 @@
+{
+  "slug": "melquizael-costa",
+  "name": "Melquizael Costa",
+  "nickname": "The Dalmatian",
+  "initials": "MC",
+  "country": "Brazil",
+  "division": "Lightweight",
+  "record": {
+    "wins": 26,
+    "losses": 8,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1996-09-14"
+    }
+  ],
+  "facts": [
+    "Melquizael Costa da Conceição, sometimes known as Melk Costa, is a Brazilian professional mixed martial artist. A professional since 2014, he currently competes in the Featherweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/melquizael-costa",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-12/COSTA_MELQUIZAEL_L_12-13.png?itok=4B7irp2h",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Melquizael_Costa",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Melquizael_Costa",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Melquizael_Costa",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/melquizael-costa",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 9,
+        "date": "2026-11-14T22:00Z",
+        "division": "Lightweight",
+        "opponent": "Jared Gordon",
+        "winner": null,
+        "result": null,
+        "record": "26-8-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

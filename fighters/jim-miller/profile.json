@@ -1,0 +1,76 @@
+{
+  "slug": "jim-miller",
+  "name": "Jim Miller",
+  "nickname": null,
+  "initials": "JM",
+  "country": "USA",
+  "division": "Lightweight",
+  "record": {
+    "wins": 39,
+    "losses": 19,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1983-08-30"
+    }
+  ],
+  "facts": [
+    "James Andrew Miller is an American professional mixed martial artist. He currently competes in the Lightweight division of the Ultimate Fighting Championship (UFC), where he holds the UFC records for most bouts (47), most total wins (28), and most submission attempts (52) in the promotion's history."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/jim-miller",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-05/MILLER_JIM_L_05-09.png?itok=v9YKyo9m",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jim_Miller_(fighter)",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jim_Miller_(fighter)",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/jim-miller",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 7,
+        "date": "2026-11-15T00:00Z",
+        "division": "Lightweight",
+        "opponent": "Terrance McKinney",
+        "winner": null,
+        "result": null,
+        "record": "39-19-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

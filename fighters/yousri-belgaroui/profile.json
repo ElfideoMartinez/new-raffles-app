@@ -1,0 +1,76 @@
+{
+  "slug": "yousri-belgaroui",
+  "name": "Yousri Belgaroui",
+  "nickname": null,
+  "initials": "YB",
+  "country": "Netherlands",
+  "division": "Middleweight",
+  "record": {
+    "wins": 11,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1992-06-02"
+    }
+  ],
+  "facts": [
+    "Yousri Belgaroui is a Tunisian-Dutch kickboxer and mixed martial artist who currently competes in the Middleweight division of the Ultimate Fighting Championship (UFC). In kickboxing, he has competed in Glory, where he is a three-time Glory Middleweight Championship challenger.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/yousri-belgaroui",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-09/BELGAROUI_YOUSRI_L_09-12.png?itok=ZUzIronO",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Yousri_Belgaroui",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Yousri_Belgaroui",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/yousri-belgaroui",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 2,
+        "date": "2026-11-15T02:00Z",
+        "division": "Middleweight",
+        "opponent": "Caio Borralho",
+        "winner": null,
+        "result": null,
+        "record": "11-3-0",
+        "country": "Netherlands"
+      }
+    ]
+  }
+}

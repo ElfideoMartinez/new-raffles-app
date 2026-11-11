@@ -1,0 +1,76 @@
+{
+  "slug": "caio-borralho",
+  "name": "Caio Borralho",
+  "nickname": null,
+  "initials": "CB",
+  "country": "Brazil",
+  "division": "Middleweight",
+  "record": {
+    "wins": 18,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1993-01-16"
+    }
+  ],
+  "facts": [
+    "Caio Vinícius Silva Borralho is a Brazilian professional mixed martial artist who currently competes in the Middleweight division of the Ultimate Fighting Championship (UFC). As of June 20, 2026, he is #6 in the Meta UFC middleweight rankings.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/caio-borralho",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-03/BORRALHO_CAIO_L_03-07.png?itok=uKHF4K2U",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Caio_Borralho",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Caio_Borralho",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/caio-borralho",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 2,
+        "date": "2026-11-15T02:00Z",
+        "division": "Middleweight",
+        "opponent": "Yousri Belgaroui",
+        "winner": null,
+        "result": null,
+        "record": "18-2-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "slug": "ciryl-gane",
+  "name": "Ciryl Gane",
+  "nickname": "Bon Gamin (Good Kid)",
+  "initials": "CG",
+  "country": "France",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 14,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1990-04-12"
+    }
+  ],
+  "facts": [
+    "Ciryl Romain Gane is a French professional mixed martial artist, actor, and former Muay Thai fighter. He currently competes in the Heavyweight division of the Ultimate Fighting Championship (UFC), where he is the current UFC Heavyweight Champion and the first French champion in UFC history."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/ciryl-gane",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-06/GANE_CIRYL_L_BELT_01-22.png?itok=6Dy6iwAT",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/ciryl-gane",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 0,
+        "date": "2026-11-15T02:00Z",
+        "division": "Heavyweight",
+        "opponent": "Josh Hokit",
+        "winner": null,
+        "result": null,
+        "record": "14-2-0",
+        "country": "France"
+      }
+    ]
+  }
+}

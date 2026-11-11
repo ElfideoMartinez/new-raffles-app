@@ -1,0 +1,76 @@
+{
+  "slug": "terrance-mckinney",
+  "name": "Terrance McKinney",
+  "nickname": null,
+  "initials": "TM",
+  "country": "USA",
+  "division": "Lightweight",
+  "record": {
+    "wins": 18,
+    "losses": 9,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1994-09-15"
+    }
+  ],
+  "facts": [
+    "Terrance Kitarius McKinney is an American professional mixed martial artist who currently competes in the lightweight division of the Ultimate Fighting Championship (UFC). A professional since 2017, McKinney also competed for Legacy Fighting Alliance (LFA).."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/terrance-mckinney",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-03/MCKINNEY_TERRANCE_L_03-28.png?itok=xOcN-WHP",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Terrance_McKinney",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Terrance_McKinney",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/terrance-mckinney",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 7,
+        "date": "2026-11-15T00:00Z",
+        "division": "Lightweight",
+        "opponent": "Jim Miller",
+        "winner": null,
+        "result": null,
+        "record": "18-9-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

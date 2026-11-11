@@ -1,0 +1,59 @@
+{
+  "slug": "cesar-almeida",
+  "name": "Cesar Almeida",
+  "nickname": null,
+  "initials": "CA",
+  "country": "Brazil",
+  "division": "Middleweight",
+  "record": {
+    "wins": 7,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/cesar-almeida",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-12/ALMEIDA_CESAR_L_12-13.png?itok=-zsz4wrx",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/cesar-almeida",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 8,
+        "date": "2026-11-15T00:00Z",
+        "division": "Middleweight",
+        "opponent": "Donte Johnson",
+        "winner": null,
+        "result": null,
+        "record": "7-3-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

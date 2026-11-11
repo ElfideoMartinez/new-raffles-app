@@ -1,0 +1,76 @@
+{
+  "slug": "josh-hokit",
+  "name": "Josh Hokit",
+  "nickname": null,
+  "initials": "JH",
+  "country": "USA",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 10,
+    "losses": 0,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1997-11-12"
+    }
+  ],
+  "facts": [
+    "Joshua Seth Hokit is an American professional mixed martial artist who currently competes in the Heavyweight division of the Ultimate Fighting Championship (UFC). He formerly competed in Bellator MMA."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/josh-hokit",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-06/HOKIT_JOSH_L_06-14.png?itok=Es1_9BbW",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Josh_Hokit",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Josh_Hokit",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/josh-hokit",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 0,
+        "date": "2026-11-15T02:00Z",
+        "division": "Heavyweight",
+        "opponent": "Ciryl Gane",
+        "winner": null,
+        "result": null,
+        "record": "10-0-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

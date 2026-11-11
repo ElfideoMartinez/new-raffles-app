@@ -1,0 +1,76 @@
+{
+  "slug": "kayla-harrison",
+  "name": "Kayla Harrison",
+  "nickname": null,
+  "initials": "KH",
+  "country": "USA",
+  "division": "W Bantamweight",
+  "record": {
+    "wins": 19,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1990-07-02"
+    }
+  ],
+  "facts": [
+    "Kayla Jean Harrison is an American professional mixed martial artist and former judoka. She currently competes in the women's Bantamweight division of the Ultimate Fighting Championship (UFC), where she is the current UFC Women's Bantamweight Champion."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/kayla-harrison",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-06/HARRISON_KAYLA_L_BELTMOCK.png?itok=goxu4s1i",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Kayla_Harrison",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Kayla_Harrison",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/kayla-harrison",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 1,
+        "date": "2026-11-15T02:00Z",
+        "division": "W Bantamweight",
+        "opponent": "Amanda Nunes",
+        "winner": null,
+        "result": null,
+        "record": "19-1-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

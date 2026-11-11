@@ -1,0 +1,76 @@
+{
+  "slug": "bilal-hasan",
+  "name": "Bilal Hasan",
+  "nickname": null,
+  "initials": "BH",
+  "country": "Indonesia",
+  "division": "Flyweight",
+  "record": {
+    "wins": 10,
+    "losses": 0,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "2001-07-16"
+    }
+  ],
+  "facts": [
+    "Bilal Hasan is an American/Indonesian mixed martial artist. He currently competes in the flyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/bilal-hasan",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-08/HASAN_BILAL_L_08-29.png?itok=_m_VFo4D",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Bilal_Hasan",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Bilal_Hasan",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/bilal-hasan",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 4,
+        "date": "2026-11-15T02:00Z",
+        "division": "Flyweight",
+        "opponent": "Luis Gurule",
+        "winner": null,
+        "result": null,
+        "record": "10-0-0",
+        "country": "Indonesia"
+      }
+    ]
+  }
+}

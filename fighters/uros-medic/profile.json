@@ -1,0 +1,76 @@
+{
+  "slug": "uros-medic",
+  "name": "Uroš Medić",
+  "nickname": null,
+  "initials": "UM",
+  "country": "Serbia",
+  "division": "Welterweight",
+  "record": {
+    "wins": 14,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1993-04-25"
+    }
+  ],
+  "facts": [
+    "Uroš Medić is a Serbian mixed martial artist who competes in the Welterweight division of the Ultimate Fighting Championship. As of September 19, 2026, he is #9 in the Meta UFC welterweight rankings.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC 334: Gane vs. Hokit",
+      "date": "2026-11-14"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/uros-medic",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-07/MEDIC_UROS_L_08-01.png?itok=UUANmsOU",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Uro%C5%A1_Medi%C4%87",
+      "note": "short factual summary",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Uro%C5%A1_Medi%C4%87",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-11"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/uros-medic",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-11"
+    }
+  ],
+  "_event": {
+    "name": "UFC 334: Gane vs. Hokit",
+    "date": "2026-11-14",
+    "bouts": [
+      {
+        "order": 3,
+        "date": "2026-11-15T02:00Z",
+        "division": "Welterweight",
+        "opponent": "Kevin Holland",
+        "winner": null,
+        "result": null,
+        "record": "14-3-0",
+        "country": "Serbia"
+      }
+    ]
+  }
+}
