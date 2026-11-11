@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  Feed template — FIGHT WEEK poster — 1080x1350 (4:5).
+  Layout after the reference poster: dark photographic-style backdrop, stacked
+  gold headline, two fighter cutouts facing each other over a VS, event line and
+  broadcast line at the bottom. Fighter photos are embedded as data URIs by the
+  caller (triple-brace tokens); no external assets.
+-->
+<html lang="{{locale}}">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f5f0e8;
+    background:
+      radial-gradient(760px 620px at 50% 34%, rgba(255,179,71,.30), transparent 66%),
+      radial-gradient(900px 600px at 50% 0%, rgba(30,60,120,.55), transparent 70%),
+      linear-gradient(180deg, #071224 0%, #0b1020 45%, #050608 100%);
+    position: relative;
+    padding: 64px 60px 56px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .badge {
+    background: #ffb347; color: #111; font-weight: 800; letter-spacing: .14em;
+    font-size: 26px; text-transform: uppercase; padding: 12px 26px; border-radius: 6px;
+  }
+  .headline {
+    margin-top: 26px; text-align: center; text-transform: uppercase;
+    font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif; font-weight: 900;
+    font-size: 150px; line-height: .92; letter-spacing: -.02em;
+    background: linear-gradient(180deg, #ffe2a6 0%, #ffb347 55%, #c77a1d 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 6px 24px rgba(0,0,0,.45);
+  }
+  .matchup {
+    margin-top: 8px; width: 100%; flex: 1; position: relative;
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+  .fighter { width: 380px; height: 676px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .fighter .cut { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 18px 30px rgba(0,0,0,.55)); }
+  .fighter .nm {
+    margin-top: 14px; font-family: "Arial Black", Arial, sans-serif; font-weight: 900;
+    text-transform: uppercase; font-size: 46px; line-height: 1; text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .fighter .rec { margin-top: 8px; font-size: 24px; letter-spacing: .12em; color: #ffb347; font-weight: 700; text-transform: uppercase; }
+  .vs {
+    position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%);
+    font-family: "Arial Black", Arial, sans-serif; font-weight: 900; font-size: 120px; color: #fff;
+    text-shadow: 0 8px 26px rgba(0,0,0,.6); z-index: 2;
+  }
+  .vs::after { content: ""; display: block; height: 6px; margin-top: 8px; background: #ffb347; border-radius: 3px; }
+  .info {
+    margin-top: 22px; text-align: center; font-size: 34px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: #f5f0e8;
+  }
+  .info .sub { display: block; margin-top: 10px; font-size: 26px; font-weight: 600; color: #ffb347; letter-spacing: .08em; }
+  .foot {
+    margin-top: 16px; width: 100%; display: flex; justify-content: space-between; align-items: center;
+    font-size: 22px; color: rgba(245,240,232,.72); letter-spacing: .06em;
+  }
+  .foot .brand { font-weight: 800; color: #ffb347; }
+</style>
+</head>
+<body>
+  <div class="badge">{{event.kicker}}</div>
+  <div class="headline">{{headline}}</div>
+  <div class="matchup">
+    <div class="fighter">
+      <img class="cut" alt="{{left.name}}" src="{{{left.photoDataUri}}}">
+      <div class="nm">{{left.name}}</div>
+      <div class="rec">{{left.record}}</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="fighter">
+      <img class="cut" alt="{{right.name}}" src="{{{right.photoDataUri}}}">
+      <div class="nm">{{right.name}}</div>
+      <div class="rec">{{right.record}}</div>
+    </div>
+  </div>
+  <div class="info">
+    {{event.line}}
+    <span class="sub">{{event.broadcast}}</span>
+  </div>
+  <div class="foot">
+    <span class="brand">{{brand.handle}}</span>
+    <span>{{event.hashtag}}</span>
+  </div>
+</body>
+</html>
