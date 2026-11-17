@@ -23,7 +23,7 @@ function runGather(args = [], competitions = [], { commonsFailure = false } = {}
         return { ok: true, json: async () => (${JSON.stringify(fixture)}) };
       }
       if (url.startsWith('https://en.wikipedia.org/api/rest_v1/page/summary/')) return { ok: false, status: 404 };
-      if (url.startsWith('https://www.ufcespanol.com/athlete/')) return { ok: true, text: async () => '<html></html>' };
+      if (url.startsWith('https://www.ufcespanol.com/athlete/') || url.startsWith('https://www.ufc.com/athlete/')) return { ok: true, text: async () => '<html></html>' };
       if (url.startsWith('https://commons.wikimedia.org/w/api.php')) {
         if (${commonsFailure}) throw new Error('SYNTHETIC commons failure');
         return { ok: true, json: async () => ({ query: { pages: [] } }) };

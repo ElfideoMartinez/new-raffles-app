@@ -24,9 +24,21 @@ const onlySlugs = args.filter((a) => !a.startsWith("--"));
 const CHECKED = new Date().toISOString().slice(0, 10);
 const LICENSE = "UFC official press image (© UFC) — reference copy only, not CC/Commons";
 
+const UFC_HOSTS = new Set(["ufc.com", "www.ufc.com", "ufcespanol.com", "www.ufcespanol.com"]);
+
+function trustedUfcUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && UFC_HOSTS.has(url.hostname) && !url.username && !url.password && !url.port;
+  } catch { return false; }
+}
+
 export function extractFullBodyUrl(html) {
-  const m = html.match(/https:\/\/ufc\.com\/images\/styles\/athlete_bio_full_body\/[^"'\s<>)]+/);
-  return m ? m[0].replace(/&amp;/g, "&") : null;
+  const decoded = html.replace(/&(?:amp|#0*38|#x0*26);/gi, "&");
+  for (const candidate of decoded.match(/https:\/\/[^"'\s<>)]+/g) || []) {
+    if (trustedUfcUrl(candidate) && new URL(candidate).pathname.startsWith("/images/styles/athlete_bio_full_body/")) return candidate;
+  }
+  return null;
 }
 
 // A photo.png that is NOT UFC-sourced is a manual cutout (Daniel's): never overwrite it.
@@ -35,7 +47,7 @@ export function protectsManualCutout(dir, photo) {
 }
 
 export function isUfcSourced(photo) {
-  return !!photo && /ufc(espanol)?\.com|ufc\.com/.test(photo.source_url || photo.download_url || "");
+  return !!photo && trustedUfcUrl(photo.source_url || photo.download_url || "");
 }
 
 async function fetchText(url) {
@@ -72,11 +84,23 @@ function writeSourcesPhotoBlock(dir, slug, page, imgUrl) {
 // Fetch + validate + save the UFC full-body PNG to <dir>/photo.png.
 // Returns the photo record, or null when the athlete page has no full-body image.
 // Throws on network/validation errors; callers keep their existing photo then.
+async function findFullBody(slug) {
+  const errors = [];
+  for (const host of ["www.ufcespanol.com", "www.ufc.com"]) {
+    const page = `https://${host}/athlete/${slug}`;
+    try {
+      const imgUrl = extractFullBodyUrl(await fetchText(page));
+      if (imgUrl) return { page, imgUrl };
+    } catch (error) { errors.push(error.message); }
+  }
+  if (errors.length) throw new Error(errors.join("; "));
+  return null;
+}
+
 export async function ufcCutout(slug, dir) {
-  const page = `https://www.ufcespanol.com/athlete/${slug}`;
-  const html = await fetchText(page);
-  const imgUrl = extractFullBodyUrl(html);
-  if (!imgUrl) return null;
+  const found = await findFullBody(slug);
+  if (!found) return null;
+  const { page, imgUrl } = found;
   const buf = await fetchImage(imgUrl);
   const stage = path.join(dir, `.photo-ufc-${process.pid}.png`);
   fs.writeFileSync(stage, buf);
@@ -111,9 +135,8 @@ async function processFighter(slug) {
   }
   if (protectsManualCutout(dir, profile.photo)) return { slug, status: "manual-kept" };
   if (DRY) {
-    const html = await fetchText(`https://www.ufcespanol.com/athlete/${slug}`);
-    const imgUrl = extractFullBodyUrl(html);
-    return imgUrl ? { slug, status: "dry-run", imgUrl } : { slug, status: "no-full-body-on-page" };
+    const found = await findFullBody(slug);
+    return found ? { slug, status: "dry-run", imgUrl: found.imgUrl } : { slug, status: "no-full-body-on-page" };
   }
   const c = await ufcCutout(slug, dir);
   if (!c) return { slug, status: "no-full-body-on-page" };

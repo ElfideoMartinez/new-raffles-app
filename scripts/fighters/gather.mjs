@@ -16,8 +16,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { savePhoto } from "./photo.mjs";
-import { ufcCutout, protectsManualCutout } from "./ufc-photo.mjs";
+import { savePhoto, assertImageBytes, validateNativeDecode } from "./photo.mjs";
+import { ufcCutout, protectsManualCutout, isUfcSourced } from "./ufc-photo.mjs";
 import { boutResults } from "./results.mjs";
 
 const args = Object.fromEntries(
@@ -260,6 +260,7 @@ async function download(url, dest, tries = 4) {
 // ---------------- main ----------------
 const rejections = [];
 const failures = [];
+const photoCoverage = { profiles: 0, withPhoto: 0, png: 0, ufc: 0, retained: 0, initials: 0 };
 
 const card = await espnCard(DATE);
 console.log(`Event: ${card.eventName} (${card.date}) — ${card.fighters.length} fighters (cap ${MAX})`);
@@ -339,12 +340,29 @@ for (const f of card.fighters) {
     } else log("no Wikipedia page found (summary 404 on all title variants)");
   } catch (e) { failures.push(`[${f.name}] wikipedia: ${e.message}`); log("wikipedia error:", e.message); }
 
+  // Keep a usable local UFC image as the fallback before attempting any refresh.
+  let retainedUfc = false;
+  if (prev?.photo?.file === "photo.png" && isUfcSourced(prev.photo)) {
+    const saved = path.join(dir, "photo.png");
+    const decoded = path.join(dir, `.photo-retained-${process.pid}.png`);
+    try {
+      if (assertImageBytes(fs.readFileSync(saved)) !== "png") throw new Error("expected retained PNG");
+      validateNativeDecode(saved, decoded);
+      profile.photo = prev.photo;
+      retainedUfc = true;
+    } catch (e) { log("existing UFC photo unusable:", e.message); }
+    finally { fs.rmSync(decoded, { force: true }); }
+  }
+
   // 3a) UFC athlete page full-body cutout (PRIMARY — official, fighter-only, transparent PNG)
   let chosen = null;
   try {
     const keepManual = protectsManualCutout(dir, prev?.photo);
     const c = keepManual ? null : await ufcCutout(slug, dir);
-    if (keepManual) log("manual photo.png kept (not UFC-sourced)");
+    if (keepManual) {
+      profile.photo = prev?.photo?.file === "photo.png" ? prev.photo : { file: "photo.png", license: "Manual cutout; attribution not recorded" };
+      log("manual photo.png kept (not UFC-sourced)");
+    }
     else if (c) {
       chosen = { ...c, ok: true, matched: true, via: "ufc athlete page" };
       sources.push({ url: c.filePage, note: "UFC athlete page: full-body press image (photo.png)", checked: CHECKED });
@@ -355,7 +373,7 @@ for (const f of card.fighters) {
   // 3b) Commons photo search — FALLBACK ONLY, opt-in (--commons-fallback). It produced
   // off-topic images (group/event shots, namesakes), so it never runs by default.
   try {
-    const cands = chosen || !args["commons-fallback"] ? [] : await commonsCandidates(f.name);
+    const cands = chosen || profile.photo || !args["commons-fallback"] ? [] : await commonsCandidates(f.name);
 
     for (const c of cands) {
       if (!c.ok) { rejections.push(`[${f.name}] REJECT ${c.title} — ${c.reason}`); log(`reject ${c.title}: ${c.reason}`); continue; }
@@ -374,7 +392,7 @@ for (const f of card.fighters) {
       }
     }
     // fallback: Wikipedia lead image (also license-check via Commons metadata of that file)
-    if (!chosen && args["commons-fallback"] && winfo.pageImageName) {
+    if (!chosen && !profile.photo && args["commons-fallback"] && winfo.pageImageName) {
       try {
         const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodeURIComponent(winfo.pageImageName)}&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1200&format=json&formatversion=2`;
         const d = await fetchJson(url);
@@ -397,7 +415,7 @@ for (const f of card.fighters) {
         }
       } catch (e) { log("wiki-lead photo check failed:", e.message); }
     }
-    if (!chosen) log("NO photo — initials fallback");
+    if (!chosen && !profile.photo) log("NO photo — initials fallback");
   } catch (e) { failures.push(`[${f.name}] commons: ${e.message}`); log("commons error:", e.message); }
 
   if (chosen?.via === "ufc athlete page") {
@@ -425,6 +443,18 @@ for (const f of card.fighters) {
     sources.push({ url: chosen.filePage || chosen.url, note: `photo, license ${chosen.license}${chosen.via ? " (Wikipedia lead image)" : " (Commons search)"}`, checked: CHECKED });
   }
 
+  if (!chosen && retainedUfc) {
+    const oldSource = prev.sources?.find((s) => s.url === prev.photo.source_url);
+    sources.push(oldSource || { url: prev.photo.source_url, note: "Retained UFC full-body PNG; original check date unavailable" });
+    log("retained validated UFC photo.png (refresh unavailable)");
+  }
+  photoCoverage.profiles++;
+  if (profile.photo?.file && fs.existsSync(path.join(dir, profile.photo.file))) {
+    photoCoverage.withPhoto++;
+    if (profile.photo.file.endsWith(".png")) photoCoverage.png++;
+    if (isUfcSourced(profile.photo)) photoCoverage.ufc++;
+    if (!chosen) photoCoverage.retained++;
+  } else photoCoverage.initials++;
   profile.sources = sources;
   fs.writeFileSync(path.join(dir, "profile.json"), JSON.stringify(profile, null, 2) + "\n");
 
@@ -438,8 +468,10 @@ for (const f of card.fighters) {
     "",
     `## Photo`,
     chosen
-      ? `- ${chosen.title}\n- License: ${chosen.license}${chosen.relaxed ? " (RELAXED: accepted under --any-license; review before wide use)" : ` (${chosen.licenseUrl || "n/a"})`}\n- Artist: ${chosen.artist || "n/a"}\n- Credit: ${chosen.credit || "n/a"}\n- File page: ${chosen.filePage || chosen.url}`
-      : `- No photo: no Commons/Wikipedia image passed the license policy (CC0/PD/CC BY*/CC BY-SA*) and the name-match rule. Initials fallback (${profile.initials}).`,
+      ? `- File: ${profile.photo.file}\n- Image URL: ${profile.photo.download_url}\n- ${chosen.title}\n- License: ${chosen.license}${chosen.relaxed ? " (RELAXED: accepted under --any-license; review before wide use)" : ` (${chosen.licenseUrl || "n/a"})`}\n- Artist: ${chosen.artist || "n/a"}\n- Credit: ${chosen.credit || "n/a"}\n- File page: ${chosen.filePage || chosen.url}`
+      : profile.photo
+        ? `- File: ${profile.photo.file} (retained local image)\n- Source page: ${profile.photo.source_url || "not recorded"}\n- Image URL: ${profile.photo.download_url || "not recorded"}\n- License: ${profile.photo.license || "not recorded"}\n- Retained local image; no successful source refresh this run.`
+        : `- No usable photo: official UFC full-body image unavailable; ${args["commons-fallback"] ? "opt-in Commons/Wikipedia fallback found no accepted image" : "Commons/Wikipedia fallback not requested"}. Initials fallback (${profile.initials}).`,
     "",
     `## Notes`,
     failures.filter((x) => x.startsWith(`[${f.name}]`)).map((x) => "- FAIL: " + x.replace(/^\[[^\]]+\]\s*/, "")).join("\n"),
@@ -448,7 +480,7 @@ for (const f of card.fighters) {
 }
 
 // run report
-const report = { date: card.date, event: card.eventName, fighters: card.fighters.length, rejections, failures };
+const report = { date: card.date, event: card.eventName, fighters: card.fighters.length, generatedAt: new Date().toISOString(), photoCoverage, rejections, failures };
 fs.writeFileSync(path.join(ROOT, "_gather-report.json"), JSON.stringify(report, null, 2));
 console.log(`\nDone. Profiles in ${ROOT}/. Rejections: ${rejections.length}, failures: ${failures.length}`);
 for (const r of rejections) console.log("  REJECT:", r);

@@ -11,5 +11,10 @@ done
 bash -n scripts/fighters/cron.sh
 node --check scripts/fighters/insights.mjs
 node --check scripts/instagram/build-drafts.mjs
+node --check scripts/instagram/weekly-content.mjs
+node --test scripts/instagram/*.test.mjs scripts/fighters/*.test.mjs
+python3 scripts/fighters/weekly-gather.test.py
+python3 scripts/instagram/review-feed.test.py
+python3 scripts/instagram/prepare-week.test.py
 python3 scripts/fighters/cron-regression.test.py
 printf 'OK: required scripts/templates present; syntax and offline regression tests passed.\nNo content published, scheduled, or changed.\n'
