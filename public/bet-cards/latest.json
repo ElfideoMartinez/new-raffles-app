@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "event": "UFC Fight Night: Procházka vs. Stirling",
+  "eventDate": "2026-11-21",
+  "checkedAt": "2026-11-17T00:20:20.876044+00:00",
+  "matchups": [
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-0",
+      "order": 0,
+      "a": "Jiří Procházka",
+      "b": "Navajo Stirling",
+      "recordA": "32-6-1",
+      "recordB": "11-0",
+      "division": "Light Heavyweight",
+      "date": "2026-11-21T18:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-0.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-1",
+      "order": 1,
+      "a": "Aljamain Sterling",
+      "b": "Kevin Vallejos",
+      "recordA": "26-5",
+      "recordB": "18-1",
+      "division": "Featherweight",
+      "date": "2026-11-21T18:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-1.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-2",
+      "order": 2,
+      "a": "Brian Ortega",
+      "b": "Dan Hooker",
+      "recordA": "16-5",
+      "recordB": "24-15",
+      "division": "Lightweight",
+      "date": "2026-11-21T18:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-2.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-3",
+      "order": 3,
+      "a": "Asu Almabayev",
+      "b": "Kyoji Horiguchi",
+      "recordA": "24-3",
+      "recordB": "36-6",
+      "division": "Flyweight",
+      "date": "2026-11-21T18:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-3.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-4",
+      "order": 4,
+      "a": "Ikram Aliskerov",
+      "b": "Jared Cannonier",
+      "recordA": "18-2",
+      "recordB": "18-10",
+      "division": "Middleweight",
+      "date": "2026-11-21T18:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-4.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-5",
+      "order": 5,
+      "a": "Aleksandre Topuria",
+      "b": "Santiago Luna",
+      "recordA": "7-1",
+      "recordB": "8-1",
+      "division": "Bantamweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-5.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-6",
+      "order": 6,
+      "a": "Shamil Gaziev",
+      "b": "Tallison Teixeira",
+      "recordA": "15-3",
+      "recordB": "9-2",
+      "division": "Heavyweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-6.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-7",
+      "order": 7,
+      "a": "Alessandro Costa",
+      "b": "Amir Albazi",
+      "recordA": "17-5",
+      "recordB": "17-3",
+      "division": "Flyweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-7.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-8",
+      "order": 8,
+      "a": "Jake Matthews",
+      "b": "Tahir Abdullayev",
+      "recordA": "23-8",
+      "recordB": "20-3",
+      "division": "Welterweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-8.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-9",
+      "order": 9,
+      "a": "Dom Mar Fan",
+      "b": "Nikolas Motta",
+      "recordA": "9-3",
+      "recordB": "15-6",
+      "division": "Lightweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-9.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    },
+    {
+      "id": "ufc-fight-night-prochazka-vs-stirling-2026-11-21-10",
+      "order": 10,
+      "a": "Alik Lorenz",
+      "b": "Diyar Nurgozhay",
+      "recordA": "8-2",
+      "recordB": "12-2",
+      "division": "Light Heavyweight",
+      "date": "2026-11-21T15:00Z",
+      "image": "/bet-cards/images/ufc-fight-night-prochazka-vs-stirling-2026-11-21-10.jpg",
+      "photoReviewRequired": true,
+      "photoLicenses": [
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+        "UFC official press image (© UFC) — reference copy only, not CC/Commons"
+      ]
+    }
+  ]
+}

@@ -2596,6 +2596,30 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       return;
     }
 
+    // Bets created from the gathered card carry a stable sourceKey (the matchup
+    // id). Enforce uniqueness server-side so a double submit (or two admins)
+    // can never create duplicate bets for the same matchup, and persist it for
+    // future dedupe. The normal single-bet form sends no sourceKey -> null.
+    const sourceKey = data.sourceKey ? String(data.sourceKey).trim() : "";
+    if (sourceKey.length > 120) {
+      res.status(400).json({ status: 400, message: "sourceKey too long" });
+      return;
+    }
+    if (sourceKey) {
+      const exists = await db
+        .collection("bets")
+        .where("sourceKey", "==", sourceKey)
+        .limit(1)
+        .get();
+      if (!exists.empty) {
+        res.status(409).json({
+          status: 409,
+          message: `Ya existe una apuesta para este enfrentamiento (${sourceKey}).`,
+        });
+        return;
+      }
+    }
+
     // Generate unique bet ID
     const betId = `bet_${Date.now()}_${Math.random()
       .toString(36)
@@ -2619,7 +2643,12 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       // in the record so clients never read `undefined`, but never incremented
       // independently.
       totalBets: 0,
-      initialPool: 0,
+      // Persist the card picker's configured initial pool (the old code
+      // hardcoded 0, silently dropping the admin's pool value). Clamp sane.
+      initialPool: Number.isFinite(Number(data.initialPool))
+        ? Math.max(0, Number(data.initialPool))
+        : 0,
+      sourceKey: sourceKey || null,
       isFinished: false,
       createdAt: Date.now(),
     };
