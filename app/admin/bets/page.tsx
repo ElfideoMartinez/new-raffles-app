@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Spinner from "@/app/components/Spinner";
 import Image from "next/image";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { useEffect, useState } from "react";
 
 import { onValue, ref, set, update } from "firebase/database";
@@ -464,7 +464,7 @@ function AdminBetCard({
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        toast.info(`Link copiado al portapapeles!`, {
+        showToast.info(`Link copiado al portapapeles!`, {
           duration: 2000,
           progress: false,
           position: "top-right",
@@ -650,7 +650,7 @@ export default function BetsPage() {
         setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
-        toast.error("Error al cargar las apuestas", {
+        showToast.error("Error al cargar las apuestas", {
           duration: 2000,
           progress: false,
           position: "top-right",
@@ -681,7 +681,7 @@ export default function BetsPage() {
             : bet
         )
       );
-      toast.info("Apuesta actualizada correctamente", {
+      showToast.info("Apuesta actualizada correctamente", {
         duration: 2000,
         progress: false,
         position: "top-right",
@@ -690,7 +690,7 @@ export default function BetsPage() {
         sound: false,
       });
     } catch (error) {
-      toast.error("Error al actualizar la apuesta", {
+      showToast.error("Error al actualizar la apuesta", {
         duration: 2000,
         progress: false,
         position: "top-right",
@@ -715,7 +715,7 @@ export default function BetsPage() {
         bet.id === betId ? { ...bet, settled: true } : bet
       )
     );
-    toast.info("Apuesta liquidada correctamente", {
+    showToast.info("Apuesta liquidada correctamente", {
       duration: 2000,
       progress: false,
       position: "top-right",
@@ -729,7 +729,7 @@ export default function BetsPage() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        toast.info(`Link copiado al portapapeles!`, {
+        showToast.info(`Link copiado al portapapeles!`, {
           duration: 2000,
           progress: false,
           position: "top-right",

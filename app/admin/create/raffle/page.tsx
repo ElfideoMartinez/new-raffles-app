@@ -3,7 +3,7 @@ import { authedApiFetch } from "@/app/config/api";
 import withAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import Link from "next/link";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import React, { useRef, useState } from "react";
 
 interface IRaffle {
@@ -79,7 +79,7 @@ const CreateRaffle = () => {
     try {
       await createNewRaffle(raffleData);
       resetForm();
-      toast.success(`Rifa creada exitosamente`,{
+      showToast.success(`Rifa creada exitosamente`,{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -89,7 +89,7 @@ const CreateRaffle = () => {
       });
     } catch (error) {
       console.error("Error al crear la rifa:", error);
-      toast.error(`Error al crear la rifa. Inténtalo de nuevo.`,{
+      showToast.error(`Error al crear la rifa. Inténtalo de nuevo.`,{
         duration: 2000,
         progress: false,
         position: 'top-right',

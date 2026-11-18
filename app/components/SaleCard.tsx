@@ -4,7 +4,7 @@ import React, { Suspense, useState } from "react";
 
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { formatPrice } from "@/app/utils/format";
 
 
@@ -74,7 +74,7 @@ const SaleCard: React.FC<SaleCardProps> = ({
       );
     } catch (error) {
       // State is untouched: the card keeps showing what the server still has.
-      toast.error(`Error al completar la compra. Inténtalo de nuevo más tarde.`,{
+      showToast.error(`Error al completar la compra. Inténtalo de nuevo más tarde.`,{
         duration: 2000,
         progress: false,
         position: 'top-right',

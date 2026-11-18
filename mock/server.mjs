@@ -190,7 +190,8 @@ const routes = {
     const raffle = raffles.find((r) => r.id === id) || raffles[0];
     return { __raw: { raffleData: raffle, data: mockTickets(raffle) } };
   },
-  getAllBets: () => ({ bets }),
+  // Storefront expects the list as `result` (the array itself), matching the live function.
+  getAllBets: () => bets,
   getBetData: (body, url) => {
     const id = url.searchParams.get("id") || body?.id || "mock-bet-1";
     const bet = bets.find((b) => b.id === id) || bets[0];

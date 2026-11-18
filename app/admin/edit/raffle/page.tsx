@@ -4,7 +4,7 @@ import Spinner from "@/app/components/Spinner";
 import DeleteRaffleModal from "@/app/components/DeleteRaffleModal";
 import withAuth from "@/app/components/WithAuth";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { useEffect, useRef, useState } from "react";
 
 interface IRaffleData{
@@ -63,7 +63,7 @@ const EditRaffle = () => {
       }
     }catch(e){
       console.error(e);
-      toast.error(`Error al borrar la rifa. Inténtalo de nuevo.`,{
+      showToast.error(`Error al borrar la rifa. Inténtalo de nuevo.`,{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -73,7 +73,7 @@ const EditRaffle = () => {
       });
       return;
     }
-    toast.success(`Rifa borrada correctamente`,{
+    showToast.success(`Rifa borrada correctamente`,{
       duration: 2000,
       progress: false,
       position: 'top-right',
@@ -117,7 +117,7 @@ const EditRaffle = () => {
       cleanRaffle();
       setNewImage(null)
       resetForm();
-      toast.success(`Rifa actualizada correctamente`,{
+      showToast.success(`Rifa actualizada correctamente`,{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -128,7 +128,7 @@ const EditRaffle = () => {
       setUpdatedRafflesData((prev) => !prev);
     }catch(e){
       console.error("Error al actualizar la rifa:", e);
-      toast.error(`Error al actualizar la rifa. Inténtalo de nuevo.`,{
+      showToast.error(`Error al actualizar la rifa. Inténtalo de nuevo.`,{
         duration: 2000,
         progress: false,
         position: 'top-right',

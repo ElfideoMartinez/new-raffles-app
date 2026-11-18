@@ -11,7 +11,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { use, useEffect, useMemo, useRef, useState } from "react";
 
 interface IBetData {
@@ -153,7 +153,7 @@ const EditBetPage = () => {
       cleanBet();
       setNewImage(null);
       resetForm();
-      toast.success(`Apuesta actualizada correctamente`, {
+      showToast.success(`Apuesta actualizada correctamente`, {
         duration: 2000,
         progress: false,
         position: "top-right",
@@ -164,7 +164,7 @@ const EditBetPage = () => {
       setUpdatedBetsData((prev) => !prev);
     } catch (e) {
       console.error("Error al actualizar la apuesta:", e);
-      toast.error(`Error al actualizar la apuesta. Inténtalo de nuevo.`, {
+      showToast.error(`Error al actualizar la apuesta. Inténtalo de nuevo.`, {
         duration: 2000,
         progress: false,
         position: "top-right",
@@ -277,7 +277,7 @@ const EditBetPage = () => {
       }
     } catch (e) {
       console.error(e);
-      toast.error(`Error al borrar la apuesta. Inténtalo de nuevo.`, {
+      showToast.error(`Error al borrar la apuesta. Inténtalo de nuevo.`, {
         duration: 2000,
         progress: false,
         position: "top-right",
@@ -287,7 +287,7 @@ const EditBetPage = () => {
       });
       return;
     }
-    toast.success(`Apuesta borrada correctamente`, {
+    showToast.success(`Apuesta borrada correctamente`, {
       duration: 2000,
       progress: false,
       position: "top-right",

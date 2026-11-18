@@ -82,5 +82,23 @@ breakdown (name / manifest / severity counts) recovered from it is listed above.
 - Never `npm audit fix --force` on this repo without reviewing the breaking bumps.
 - Keep both lockfiles symmetric where a package appears in both.
 - Verify deploys still meet node 22 engines after upgrades.
-- This is a PREVIEW/handoff only — nothing in this doc has been changed/excluded; no
-  dependency was bumped or committed as part of writing it (worktree clean re: deps).
+
+## Session update — local remediation completed, pending ship
+
+Work completed on `main` in the local checkout (2026-11-18); commit/push/deploy status must be rechecked in the next session before assuming it shipped:
+
+- App dependencies: Next.js `15.5.29`, Firebase client `12.19.0`, Puppeteer Core `25.18.1`; root `engines.node` is `22`. Removed misplaced root `firebase-admin` and `firebase-functions` dependencies: source imports are not used by the Next app and Cloud Functions have their own package tree. Updated PostCSS and `@grpc/grpc-js` overrides and applied compatible Tailwind/ESLint transitive overrides.
+- Functions dependencies: Firebase Admin `13.10.0`, Firebase Functions `6.6.0`; removed unused `firebase-functions-test` (no usage/tests found). Functions `src/` was not changed. Functions lockfile pins Node 22; verify `functions/package.json` engine and deployed runtime before any function deployment.
+- Compatibility fixes required by the dependency update: Next 15 async dynamic-route `params` in `app/bet/[id]/page.tsx` and `app/raffle/[id]/page.tsx`; `nextjs-toast-notify` imports/calls changed to its `showToast` API across 11 app files; mock `getAllBets` now returns the array expected in `response.result`, fixing mobile/storefront E2E.
+- Verified: app `npm run typecheck`, `npm run lint -- --no-cache`, `npm run build`, E2E (`24 passed`); functions `npm run build`; `git diff --check`.
+- Last audits in this checkout: app full audit **18 high, 0 other** (development tooling); app `--omit=dev` **0**. Functions full and production audit **8 moderate, 0 high/critical**. Remaining app advisories mainly require compatible Tailwind 4 / ESLint-tooling upgrades; functions' suggested fix is the coordinated Firebase Admin 14 / Functions 7 major upgrade, not yet attempted as a source migration.
+- The root production Hosting deploy is scoped to `hosting:rifasmtz` (project `raffleapp-dbc1b`). Live URLs were HTTP 200 and `rifasmtz` was the configured production site when checked. `.env.local` contains dev-only origins for `NEXT_PUBLIC_FIREBASE_FUNCTIONS_BASE_URL` and `NEXT_PUBLIC_BASE_URL`; hide it for the entire Hosting deploy and restore with a shell `trap`, then scan deployed JS chunks for localhost/127.0.0.1/ports 3000–3001 before calling it shipped.
+- Do **not** deploy Functions as a blanket `--only functions`: production has additional functions absent from this checkout (including Stripe checkout/webhook functions). Functions source is unchanged; use only explicitly reviewed function names if a Functions deployment is later needed. Hosting/frameworks can update its own SSR function as part of a Hosting deploy.
+- GitHub Dependabot alerts could not be queried with the active token: API returned 403 due missing `admin:repo_hook` scope. Refresh with that scope only if fresh Dependabot totals are needed.
+
+### Next-session checklist
+
+1. Check `git status`, branch, `git log`, and verify whether this work was committed/pushed/deployed after this handoff was written. Do not duplicate commits or deploys.
+2. If still pending, review/stage only the explicitly intended dependency-upgrade files, listed in the session diff; include this handoff, commit on `main`, push, then verify `origin/main` and the commit SHA.
+3. If deployment remains pending, use Firebase Hosting only: hide `.env.local` for the whole deploy with guaranteed restoration, deploy `firebase deploy --only hosting:rifasmtz --project raffleapp-dbc1b` in foreground, verify `https://rifasmtz.web.app` and key routes, and scan live JS assets for dev-origin tokens. Do not run a blanket Functions deploy.
+4. Resume remaining audit work: inspect exact npm audit paths and safe patched versions for the 18 app high findings, with special care around Tailwind 4 and ESLint config compatibility. For Functions, plan and test the Admin 14 / Functions 7 / test tooling migration separately before a named production deploy. Re-audit both trees after each completed migration.

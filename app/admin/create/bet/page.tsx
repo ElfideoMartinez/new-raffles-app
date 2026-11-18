@@ -2,7 +2,7 @@
 import { authedApiFetch } from "@/app/config/api";
 import WithAuth from "@/app/components/WithAuth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { useMemo, useRef, useState, useCallback } from "react";
 
 interface IBet {
@@ -148,7 +148,7 @@ const CreateBet = () => {
       e.preventDefault();
 
       if (!bet.image) {
-        toast.error("Por favor selecciona una imagen para la apuesta", {
+        showToast.error("Por favor selecciona una imagen para la apuesta", {
           duration: 2000,
           progress: false,
           position: "top-right",
@@ -184,7 +184,7 @@ const CreateBet = () => {
 
         //un comment this to clear form after submission
         // resetForm();
-        toast.success("Apuesta creada exitosamente", {
+        showToast.success("Apuesta creada exitosamente", {
           duration: 2000,
           progress: false,
           position: "top-right",
@@ -194,7 +194,7 @@ const CreateBet = () => {
         });
       } catch (error) {
         console.error("Error in form submission:", error);
-        toast.error("Error al crear la apuesta. Inténtalo de nuevo.", {
+        showToast.error("Error al crear la apuesta. Inténtalo de nuevo.", {
           duration: 2000,
           progress: false,
           position: "top-right",

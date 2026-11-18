@@ -9,7 +9,7 @@ import TicketButton from "@/app/components/TicketButton";
 import AddToCartButton from "@/app/components/AddToCartButton";
 import useTicketStore from "@/app/store";
 
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { formatPrice } from "@/app/utils/format";
 
 interface IticketNumber {
@@ -70,7 +70,7 @@ const RafflePageClient = ({
     const availableTickets = raffleData.data.filter(ticket => !ticket.sold);
 
     if (availableTickets.length === 0) {
-      toast.warning('Ya no hay boletos disponibles',{
+      showToast.warning('Ya no hay boletos disponibles',{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -116,7 +116,7 @@ const RafflePageClient = ({
     
     if (validTicketFound && ticketRandom !== null) {
       addTicket(ticketRandom, raffleId);
-      toast.success(`¡Listo! Tu número es ${ticketRandom}, mucha suerte 🍀😉`,{
+      showToast.success(`¡Listo! Tu número es ${ticketRandom}, mucha suerte 🍀😉`,{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -126,7 +126,7 @@ const RafflePageClient = ({
       });
       //addTicketsToCart(raffleId, parseInt(raffleData.price), raffleData.raffleName);
     } else {
-      toast.warning('No hay mas boletos por escoger',{
+      showToast.warning('No hay mas boletos por escoger',{
         duration: 2000,
         progress: false,
         position: 'top-right',

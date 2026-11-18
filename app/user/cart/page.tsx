@@ -4,7 +4,7 @@ import useTicketStore from "@/app/store";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { formatPrice } from "@/app/utils/format";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 
 const UserCartPage = () => {
   // Remember where the buyer came from so /checkout/success can send them back
@@ -41,7 +41,7 @@ const UserCartPage = () => {
   useEffect(() => {
     setIsHydrated(true);
     if(totalRafflePrice!=0) {
-      toast.info('Para eliminar boletos individualmente has click o tap',{
+      showToast.info('Para eliminar boletos individualmente has click o tap',{
         duration: 2000,
         progress: true,
         position: 'top-right',
@@ -82,7 +82,7 @@ const UserCartPage = () => {
                         className='p-2 rounded-card bg-success-500 flex justify-center hover:cursor-pointer hover:bg-danger-500'
                         onClick={() => {
                         useTicketStore.getState().removeTicketFromCart(ticket.raffleId, number);
-                        toast.success('Boleto borrado',{
+                        showToast.success('Boleto borrado',{
                           duration: 800,
                           transition: 'popUp',
                           progress: false,

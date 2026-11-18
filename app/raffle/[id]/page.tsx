@@ -82,8 +82,9 @@ function failedRaffleData(error: string): IRaffleDataResponse {
   };
 }
 
-const RafflePageServer = async ({ params }: { params: { id: string } }) => {
-  const raffleData = await fetchRaffleData(params.id);
+const RafflePageServer = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const raffleData = await fetchRaffleData(id);
 
   if (raffleData.error) {
     return (
@@ -111,7 +112,7 @@ const RafflePageServer = async ({ params }: { params: { id: string } }) => {
         </div>
       }
     >
-      <RafflePageClient raffleData={raffleData} raffleId={params.id} />
+      <RafflePageClient raffleData={raffleData} raffleId={id} />
     </Suspense>
   );
 };

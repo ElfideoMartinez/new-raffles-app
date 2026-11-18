@@ -3,7 +3,7 @@ import Spinner from "@/app/components/Spinner";
 
 import ImageWithModal from "./ImageModal";
 import Link from "next/link";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 import { formatPrice } from "@/app/utils/format";
 import { authedApiFetch } from "@/app/config/api";
 
@@ -92,7 +92,7 @@ const SaleCard: React.FC<BetSaleCardProps> = ({
           ? "No se pudo rechazar el pago. Inténtalo de nuevo."
           : "No se pudo confirmar el pago. Inténtalo de nuevo."
       );
-      toast.error(
+      showToast.error(
         `Error al completar la compra. Inténtalo de nuevo más tarde.`,
         {
           duration: 2000,

@@ -6,7 +6,7 @@ import { auth, storage } from "@/app/firebaseconfig";
 import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRouter } from "next/navigation";
-import { toast } from "nextjs-toast-notify";
+import { showToast } from "nextjs-toast-notify";
 
 const CheckoutTransferPage = () => {
   const router = useRouter();
@@ -48,7 +48,7 @@ const CheckoutTransferPage = () => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        toast.info(`${text} copiado al portapapeles!`,{
+        showToast.info(`${text} copiado al portapapeles!`,{
           duration: 2000,
           progress: false,
           position: 'top-right',
@@ -84,7 +84,7 @@ const CheckoutTransferPage = () => {
     const validExtension = ["jpg", "jpeg", "png", "heic", "heif", "webp", "jfif"];
 
     if (!fileExtension || !validExtension.includes(fileExtension)){
-      toast.warning(`El archivo seleccionado no es valido`,{
+      showToast.warning(`El archivo seleccionado no es valido`,{
         duration: 2000,
         progress: false,
         position: 'top-right',
@@ -293,7 +293,7 @@ const CheckoutTransferPage = () => {
                 error instanceof Error && error.message
                   ? error.message
                   : "Inténtalo de nuevo más tarde.";
-              toast.error(`No pudimos registrar tu compra. ${detail}`,{
+              showToast.error(`No pudimos registrar tu compra. ${detail}`,{
                 duration: 2000,
                 progress: false,
                 position: 'top-right',
@@ -304,7 +304,7 @@ const CheckoutTransferPage = () => {
               setIsLoading(false);
             }
           } else {
-            toast.warning(`Por favor, ingresa un número de teléfono válido de 10 dígitos`,{
+            showToast.warning(`Por favor, ingresa un número de teléfono válido de 10 dígitos`,{
               duration: 2000,
               progress: false,
               position: 'top-right',
