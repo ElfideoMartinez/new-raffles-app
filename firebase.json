@@ -10,7 +10,8 @@
         "**/dist/**",
         "**.local",
         "*.local"
-      ]
+      ],
+      "predeploy": ["node scripts/assert-main-deploy.mjs"]
     },
     {
       "target": "rifasmtz",
@@ -22,7 +23,8 @@
         "**/dist/**",
         "**.local",
         "*.local"
-      ]
+      ],
+      "predeploy": ["node scripts/assert-main-deploy.mjs"]
     }
   ],
   "emulators": {

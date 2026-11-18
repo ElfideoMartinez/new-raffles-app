@@ -185,11 +185,27 @@ test('existing scheduled post with media objects reconciles without a write',asy
   assert.equal(r.error,undefined);assert.equal(api.calls.length,before+1);
 });
 
-test('source file changes flag review even when rendered artwork is unchanged',async t=>{
+test('provenance check timestamps do not mark an already-scheduled post changed',async t=>{
   const {root,manifest}=fixture(t),api=mockApi();
-  fs.writeFileSync(path.join(root,'source.json'),'old record');manifest.provenance=[{file:'source.json'}];
+  const source=path.join(root,'source.json');
+  fs.writeFileSync(source,JSON.stringify({record:'24-3-0',sources:[{url:'https://example.test/fact',checked:'2026-11-17'}]}));
+  manifest.provenance=[{file:'source.json',record:'24-3-0',sources:[{url:'https://example.test/fact',checked:'2026-11-17'}]}];
+  const [first]=await scheduler.scheduleManifest(manifest,{root,transport:api.transport,now:()=>NOW});
+  assert.equal(first.state,'scheduled');
+  const writes=api.calls.filter(c=>c.method!=='GET').length;
+  fs.writeFileSync(source,JSON.stringify({record:'24-3-0',sources:[{url:'https://example.test/fact',checked:'2026-11-18'}]}));
+  manifest.provenance=[{file:'source.json',record:'24-3-0',sources:[{url:'https://example.test/fact',checked:'2026-11-18'}]}];
+  const [r]=await scheduler.scheduleManifest(manifest,{root,transport:api.transport,now:()=>NOW});
+  assert.equal(r.state,'scheduled');assert.equal(r.needsReview,false);
+  assert.equal(api.calls.filter(c=>c.method!=='GET').length,writes);
+});
+test('factual source changes still require review when rendered artwork is unchanged',async t=>{
+  const {root,manifest}=fixture(t),api=mockApi();
+  const source=path.join(root,'source.json');
+  fs.writeFileSync(source,JSON.stringify({record:'24-3-0'}));manifest.provenance=[{file:'source.json',record:'24-3-0'}];
   await scheduler.scheduleManifest(manifest,{root,transport:api.transport,now:()=>NOW});
-  fs.writeFileSync(path.join(root,'source.json'),'revised record');
+  fs.writeFileSync(source,JSON.stringify({record:'25-3-0'}));
+  manifest.provenance=[{file:'source.json',record:'25-3-0'}];
   const [r]=await scheduler.scheduleManifest(manifest,{root,transport:api.transport,now:()=>NOW});
   assert.equal(r.needsReview,true);assert.ok(r.observedFingerprint);
 });

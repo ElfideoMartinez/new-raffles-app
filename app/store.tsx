@@ -17,6 +17,7 @@ interface IUserCartBets {
   ticketNumbers: number;
   totalPrice: number;
   clientReturns?: number;
+  image?: string;
 }
 
 interface ITikets {
@@ -76,6 +77,7 @@ interface TicketState {
     letterTeam: string;
     ticketNumbers: number;
     totalPrice: number;
+    image?: string;
   }>;
   updateBet: (newBet: IUserCartBets) => void;
   getBetsFromCart: () => Array<{
@@ -85,6 +87,7 @@ interface TicketState {
     letterTeam: string;
     ticketNumbers: number;
     totalPrice: number;
+    image?: string;
   }>;
   removeBetById: (betId: string) => void;
   clearCartBets: () => void;

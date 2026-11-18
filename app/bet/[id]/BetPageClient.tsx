@@ -289,6 +289,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       letterTeam: selectedLetterTeam,
       ticketNumbers: totalTickets,
       totalPrice: totalPrice,
+      image: realtimeBetData.image || undefined,
     });
 
     router.push("/user/cart");
@@ -300,6 +301,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     totalTickets,
     totalPrice,
     updateBet,
+    realtimeBetData.image,
     userCartBets,
     priceUnusable,
     router,

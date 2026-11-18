@@ -19,6 +19,7 @@
 import { useEffect, useState } from "react";
 import Spinner from "@/app/components/Spinner";
 import Link from "next/link";
+import BackLink from "@/app/components/BackLink";
 
 import ApiErrorState from "../../components/ApiErrorState";
 import { safeMessage } from "../../components/ApiErrorState";
@@ -309,6 +310,7 @@ const MyPurchasesPage = () => {
   if (authLoading || loading) {
     return (
       <div className="relative mx-auto mt-4 w-full max-w-3xl p-4">
+        <BackLink href="/bet" label="Volver a apuestas" />
         <h1 className="text-center mb-3 text-xl font-bold text-ink-900">Mis compras</h1>
         <div className="flex justify-center h-40 items-center">
           <Spinner color="var(--color-brand-700)" />
@@ -320,6 +322,7 @@ const MyPurchasesPage = () => {
   return (
     <div className="flex flex-col w-full items-center px-4">
       <div className="w-full max-w-3xl my-6">
+        <BackLink href="/bet" label="Volver a apuestas" />
         <h1 className="text-center mb-3 text-xl font-bold text-ink-900">Mis compras</h1>
 
         {!user && (

@@ -747,10 +747,16 @@ export default function BetsPage() {
         <h2 className='text-3xl font-bold text-ink-900 text-center mb-8'>
           Administrar Apuestas
         </h2>
-        <div className='flex justify-center mb-4'>
+        <div className="mb-6 flex flex-wrap justify-center gap-3">
           <Link
-            href={`${process.env.NEXT_PUBLIC_BASE_URL}/admin/create/bet`}
-            className='focus-ring px-4 py-2 bg-brand-600 hover:bg-brand-700 text-on-brand rounded-sm font-semibold transition-colors duration-300'
+            href="/admin/create-from-card"
+            className="focus-ring rounded-card border border-brand-600 px-4 py-2 font-semibold text-brand-700 hover:bg-brand-50"
+          >
+            Crear desde cartelera
+          </Link>
+          <Link
+            href="/admin/create/bet"
+            className="focus-ring rounded-card border border-brand-600 px-4 py-2 font-semibold text-brand-700 hover:bg-brand-50"
           >
             + Crear Nueva Apuesta
           </Link>

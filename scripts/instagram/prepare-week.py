@@ -24,7 +24,8 @@ def eligible_dates(now):
 def run_json(node,script,*args):
     result=subprocess.run([node,script,*args],cwd=ROOT,capture_output=True,text=True)
     if result.returncode:
-        raise RuntimeError(f'{script} failed: '+result.stderr[-2500:])
+        detail=(result.stderr+'\\n'+result.stdout).strip()
+        raise RuntimeError(f'{script} failed: {detail[-2500:]}')
     return json.loads(result.stdout)
 
 def main():
