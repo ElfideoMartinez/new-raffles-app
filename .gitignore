@@ -58,3 +58,11 @@ firebase-debug.*.log
 
 # generated UI screenshots (local artifacts)
 /screenshots/
+
+# Instagram content-pipeline build output (regenerated each run; not source)
+/instagram-pack/.automation/
+/instagram-pack/out/
+/instagram-pack/posting-cards/
+
+# python bytecode caches
+**/__pycache__/
