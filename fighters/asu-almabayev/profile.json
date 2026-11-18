@@ -1,0 +1,81 @@
+{
+  "slug": "asu-almabayev",
+  "name": "Asu Almabayev",
+  "nickname": "Zulfikar",
+  "initials": "AA",
+  "country": "Kazakhstan",
+  "division": "Flyweight",
+  "record": {
+    "wins": 24,
+    "losses": 3,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1994-01-25"
+    }
+  ],
+  "facts": [
+    "Asu Abaiuly Almabayev is a Kazakh professional mixed martial artist. He currently competes in the Flyweight division of the Ultimate Fighting Championship (UFC)."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/asu-almabayev",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-06/ALMABAYEV_ASU_L_06-27.png?itok=Y0SjNrdV",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Asu_Almabayev",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Asu_Almabayev",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Asu_Almabayev",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/asu-almabayev",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 3,
+        "date": "2026-11-21T18:00Z",
+        "division": "Flyweight",
+        "opponent": "Kyoji Horiguchi",
+        "winner": null,
+        "result": null,
+        "record": "24-3-0",
+        "country": "Kazakhstan"
+      }
+    ]
+  }
+}

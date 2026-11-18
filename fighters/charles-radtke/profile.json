@@ -34,22 +34,22 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Charles_Radtke",
       "note": "short factual summary",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Charles_Radtke",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://www.ufcespanol.com/athlete/charles-radtke",
       "note": "UFC athlete page: full-body press image (photo.png)",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     }
   ],
   "_event": {

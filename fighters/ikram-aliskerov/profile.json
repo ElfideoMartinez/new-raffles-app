@@ -1,0 +1,76 @@
+{
+  "slug": "ikram-aliskerov",
+  "name": "Ikram Aliskerov",
+  "nickname": null,
+  "initials": "IA",
+  "country": "Russia",
+  "division": "Middleweight",
+  "record": {
+    "wins": 18,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1992-12-07"
+    }
+  ],
+  "facts": [
+    "Ikram Sabirovich Aliskerov is a Russian professional mixed martial artist and former combat sambo competitor who currently competes in the middleweight division of the Ultimate Fighting Championship (UFC). As of October 24, 2026, he is #11 in the Meta UFC middleweight rankings.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/ikram-aliskerov",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-06/ALISKEROV_IKRAM_L_06-27.png?itok=3ij01m2a",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ikram_Aliskerov",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ikram_Aliskerov",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/ikram-aliskerov",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 4,
+        "date": "2026-11-21T18:00Z",
+        "division": "Middleweight",
+        "opponent": "Jared Cannonier",
+        "winner": null,
+        "result": null,
+        "record": "18-2-0",
+        "country": "Russia"
+      }
+    ]
+  }
+}

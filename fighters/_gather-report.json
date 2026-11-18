@@ -1,7 +1,16 @@
 {
-  "date": "2026-11-14",
-  "event": "UFC 334: Gane vs. Hokit",
-  "fighters": 20,
+  "date": "2026-11-21",
+  "event": "UFC Fight Night: Procházka vs. Stirling",
+  "fighters": 22,
+  "generatedAt": "2026-11-17T00:20:20.796Z",
+  "photoCoverage": {
+    "profiles": 22,
+    "withPhoto": 22,
+    "png": 22,
+    "ufc": 22,
+    "retained": 0,
+    "initials": 0
+  },
   "rejections": [],
   "failures": []
 }

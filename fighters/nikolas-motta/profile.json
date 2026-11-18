@@ -1,0 +1,76 @@
+{
+  "slug": "nikolas-motta",
+  "name": "Nikolas Motta",
+  "nickname": null,
+  "initials": "NM",
+  "country": "USA",
+  "division": "Lightweight",
+  "record": {
+    "wins": 15,
+    "losses": 6,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1993-02-08"
+    }
+  ],
+  "facts": [
+    "Nikolas Motta is a Brazilian mixed martial artist. He currently competes in the lightweight division of the Ultimate Fighting Championship (UFC).."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/nikolas-motta",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2024-01/MOTTA_NIKOLAS_L_01-13.png?itok=j7dTiOfC",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nikolas_Motta",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Nikolas_Motta",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/nikolas-motta",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 9,
+        "date": "2026-11-21T15:00Z",
+        "division": "Lightweight",
+        "opponent": "Dom Mar Fan",
+        "winner": null,
+        "result": null,
+        "record": "15-6-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

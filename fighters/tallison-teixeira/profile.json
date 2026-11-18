@@ -1,0 +1,81 @@
+{
+  "slug": "tallison-teixeira",
+  "name": "Tallison Teixeira",
+  "nickname": "Xicão",
+  "initials": "TT",
+  "country": "Brazil",
+  "division": "Heavyweight",
+  "record": {
+    "wins": 9,
+    "losses": 2,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1999-12-07"
+    }
+  ],
+  "facts": [
+    "Tallison Teixeira Silva is a Brazilian mixed martial artist who currently competes in the Heavyweight division of the Ultimate Fighting Championship (UFC). A professional since 2021, Teixeira earned his UFC contract on Dana White's Contender Series, winning by first round KO.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/tallison-teixeira",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-07/TEIXEIRA_TALLISON_R_07-12.png?itok=vtmFVu5M",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Tallison_Teixeira",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Tallison_Teixeira",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Tallison_Teixeira",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/tallison-teixeira",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 6,
+        "date": "2026-11-21T15:00Z",
+        "division": "Heavyweight",
+        "opponent": "Shamil Gaziev",
+        "winner": null,
+        "result": null,
+        "record": "9-2-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

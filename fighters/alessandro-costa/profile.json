@@ -1,0 +1,71 @@
+{
+  "slug": "alessandro-costa",
+  "name": "Alessandro Costa",
+  "nickname": null,
+  "initials": "AC",
+  "country": "Brazil",
+  "division": "Flyweight",
+  "record": {
+    "wins": 17,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [],
+  "facts": [
+    "Alessandro Costa was an Italian politician from Carrara who served on the Chamber of Deputies from 2 July 1987 to 22 April 1992. He was affiliated with the Italian Communist Party and the Democratic Party of the Left.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/alessandro-costa",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-07/COSTA_ALESSANDRO_L_07-11.png?itok=okElYxK7",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Alessandro_Costa",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Alessandro_Costa",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/alessandro-costa",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 7,
+        "date": "2026-11-21T15:00Z",
+        "division": "Flyweight",
+        "opponent": "Amir Albazi",
+        "winner": null,
+        "result": null,
+        "record": "17-5-0",
+        "country": "Brazil"
+      }
+    ]
+  }
+}

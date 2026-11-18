@@ -4,7 +4,7 @@
   "nickname": null,
   "initials": "DJ",
   "country": "USA",
-  "division": "Middleweight",
+  "division": "Catch Weight",
   "record": {
     "wins": 9,
     "losses": 0,
@@ -22,7 +22,7 @@
   "photo": {
     "file": "photo.png",
     "source_url": "https://www.ufcespanol.com/athlete/donte-johnson",
-    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-08/JOHNSON_DONTE_L_08-15.png?itok=kCrdzqZd",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-11/JOHNSON_DONTE_L_11-14.png?itok=SmYZF8xz",
     "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
     "license_url": null,
     "artist": null,
@@ -32,12 +32,12 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://www.ufcespanol.com/athlete/donte-johnson",
       "note": "UFC athlete page: full-body press image (photo.png)",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     }
   ],
   "_event": {
@@ -47,7 +47,7 @@
       {
         "order": 8,
         "date": "2026-11-15T00:00Z",
-        "division": "Middleweight",
+        "division": "Catch Weight",
         "opponent": "Cesar Almeida",
         "winner": null,
         "result": null,

@@ -1,0 +1,76 @@
+{
+  "slug": "santiago-luna",
+  "name": "Santiago Luna",
+  "nickname": null,
+  "initials": "SL",
+  "country": "Mexico",
+  "division": "Bantamweight",
+  "record": {
+    "wins": 8,
+    "losses": 1,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1962-11-29"
+    }
+  ],
+  "facts": [
+    "Santiago Luna Torres is a Spanish professional golfer.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/santiago-luna",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-02/LUNA_SANTIAGO_L_02-28.png?itok=zdTFJx55",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Santiago_Luna",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Santiago_Luna",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/santiago-luna",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 5,
+        "date": "2026-11-21T15:00Z",
+        "division": "Bantamweight",
+        "opponent": "Aleksandre Topuria",
+        "winner": null,
+        "result": null,
+        "record": "8-1-0",
+        "country": "Mexico"
+      }
+    ]
+  }
+}

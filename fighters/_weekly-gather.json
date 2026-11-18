@@ -1,0 +1,121 @@
+{
+  "checkedAt": "2026-11-17T00:20:20.876044+00:00",
+  "event": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+  "eventDate": "2026-11-21T15:00Z",
+  "queryDate": "2026-11-21",
+  "fighters": [
+    {
+      "name": "Asu Almabayev",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/asu-almabayev"
+    },
+    {
+      "name": "Dan Hooker",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/dan-hooker"
+    },
+    {
+      "name": "Kyoji Horiguchi",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/kyoji-horiguchi"
+    },
+    {
+      "name": "Ji\u0159\u00ed Proch\u00e1zka",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/jiri-prochazka"
+    },
+    {
+      "name": "Aleksandre Topuria",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/aleksandre-topuria"
+    },
+    {
+      "name": "Amir Albazi",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/amir-albazi"
+    },
+    {
+      "name": "Jared Cannonier",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/jared-cannonier"
+    },
+    {
+      "name": "Tallison Teixeira",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/tallison-teixeira"
+    },
+    {
+      "name": "Kevin Vallejos",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/kevin-vallejos"
+    },
+    {
+      "name": "Brian Ortega",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/brian-ortega"
+    },
+    {
+      "name": "Ikram Aliskerov",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/ikram-aliskerov"
+    },
+    {
+      "name": "Jake Matthews",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/jake-matthews"
+    },
+    {
+      "name": "Santiago Luna",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/santiago-luna"
+    },
+    {
+      "name": "Diyar Nurgozhay",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/diyar-nurgozhay"
+    },
+    {
+      "name": "Aljamain Sterling",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/aljamain-sterling"
+    },
+    {
+      "name": "Alessandro Costa",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/alessandro-costa"
+    },
+    {
+      "name": "Tahir Abdullayev",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/tahir-abdullayev"
+    },
+    {
+      "name": "Shamil Gaziev",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/shamil-gaziev"
+    },
+    {
+      "name": "Dom Mar Fan",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/dom-mar-fan"
+    },
+    {
+      "name": "Nikolas Motta",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/nikolas-motta"
+    },
+    {
+      "name": "Alik Lorenz",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/alik-lorenz"
+    },
+    {
+      "name": "Navajo Stirling",
+      "photo": true,
+      "source": "https://www.ufcespanol.com/athlete/navajo-stirling"
+    }
+  ],
+  "failures": [],
+  "partial": false,
+  "publishing": "approval-required"
+}

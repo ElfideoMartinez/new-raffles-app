@@ -29,7 +29,7 @@
   "photo": {
     "file": "photo.png",
     "source_url": "https://www.ufcespanol.com/athlete/ciryl-gane",
-    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-06/GANE_CIRYL_L_BELT_01-22.png?itok=6Dy6iwAT",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-11/GANE_CIRYL_L_BELT_11-14.png?itok=W_sp62gO",
     "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
     "license_url": null,
     "artist": null,
@@ -39,27 +39,27 @@
     {
       "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261114",
       "note": "card, bout order, winner, division, country flag, record on card",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
       "note": "short factual summary",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
       "note": "nickname (wikibox)",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://en.wikipedia.org/wiki/Ciryl_Gane",
       "note": "infobox: birth date, record, nickname",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     },
     {
       "url": "https://www.ufcespanol.com/athlete/ciryl-gane",
       "note": "UFC athlete page: full-body press image (photo.png)",
-      "checked": "2026-11-11"
+      "checked": "2026-11-13"
     }
   ],
   "_event": {

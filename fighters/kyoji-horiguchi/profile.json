@@ -1,0 +1,81 @@
+{
+  "slug": "kyoji-horiguchi",
+  "name": "Kyoji Horiguchi",
+  "nickname": "Karate Kid",
+  "initials": "KH",
+  "country": "Japan",
+  "division": "Flyweight",
+  "record": {
+    "wins": 36,
+    "losses": 6,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1990-10-12"
+    }
+  ],
+  "facts": [
+    "Kyoji Horiguchi  is a Japanese mixed martial artist currently competing in the flyweight division of the Ultimate Fighting Championship. He formerly competed in the Flyweight and Bantamweight divisions of Rizin FF, where he was the inaugural Flyweight Champion and the inaugural and two-time Bantamweight Champion."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/kyoji-horiguchi",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-11/HORIGUCHI_KYOJI_R_11-22.png?itok=Dn6SxnwP",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Kyoji_Horiguchi",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Kyoji_Horiguchi",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Kyoji_Horiguchi",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/kyoji-horiguchi",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 3,
+        "date": "2026-11-21T18:00Z",
+        "division": "Flyweight",
+        "opponent": "Asu Almabayev",
+        "winner": null,
+        "result": null,
+        "record": "36-6-0",
+        "country": "Japan"
+      }
+    ]
+  }
+}

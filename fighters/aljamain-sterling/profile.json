@@ -1,0 +1,76 @@
+{
+  "slug": "aljamain-sterling",
+  "name": "Aljamain Sterling",
+  "nickname": null,
+  "initials": "AS",
+  "country": "USA",
+  "division": "Featherweight",
+  "record": {
+    "wins": 26,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1989-07-31"
+    }
+  ],
+  "facts": [
+    "Aljamain Antoine Sterling is an American professional mixed martial artist. He currently competes in the Featherweight division of the Ultimate Fighting Championship (UFC), where he is a former UFC Bantamweight Champion."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/aljamain-sterling",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2026-04/STERLING_ALJAMAIN_L_04-25.png?itok=lJPFybAO",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Aljamain_Sterling",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Aljamain_Sterling",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/aljamain-sterling",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 1,
+        "date": "2026-11-21T18:00Z",
+        "division": "Featherweight",
+        "opponent": "Kevin Vallejos",
+        "winner": null,
+        "result": null,
+        "record": "26-5-0",
+        "country": "USA"
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "slug": "brian-ortega",
+  "name": "Brian Ortega",
+  "nickname": "T-City",
+  "initials": "BO",
+  "country": "USA",
+  "division": "Lightweight",
+  "record": {
+    "wins": 16,
+    "losses": 5,
+    "draws": 0
+  },
+  "stats": [
+    {
+      "label": "Nac.",
+      "value": "1991-02-21"
+    }
+  ],
+  "facts": [
+    "Brian Martin Ortega is an American professional mixed martial artist who currently competes in the Featherweight division of the Ultimate Fighting Championship (UFC). A professional since 2010, Ortega has also competed in the RFA, where he was the Featherweight Champion.."
+  ],
+  "previousFights": [],
+  "cards": [
+    {
+      "name": "UFC Fight Night: Procházka vs. Stirling",
+      "date": "2026-11-21"
+    }
+  ],
+  "photo": {
+    "file": "photo.png",
+    "source_url": "https://www.ufcespanol.com/athlete/brian-ortega",
+    "download_url": "https://ufc.com/images/styles/athlete_bio_full_body/s3/2025-08/ORTEGA_BRIAN_L_08-23.png?itok=OQf_S2Es",
+    "license": "UFC official press image (© UFC) — reference copy only, not CC/Commons",
+    "license_url": null,
+    "artist": null,
+    "matched_name_score": 1
+  },
+  "sources": [
+    {
+      "url": "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard?dates=20261121",
+      "note": "card, bout order, winner, division, country flag, record on card",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Brian_Ortega",
+      "note": "short factual summary",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Brian_Ortega",
+      "note": "nickname (wikibox)",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Brian_Ortega",
+      "note": "infobox: birth date, record, nickname",
+      "checked": "2026-11-17"
+    },
+    {
+      "url": "https://www.ufcespanol.com/athlete/brian-ortega",
+      "note": "UFC athlete page: full-body press image (photo.png)",
+      "checked": "2026-11-17"
+    }
+  ],
+  "_event": {
+    "name": "UFC Fight Night: Procházka vs. Stirling",
+    "date": "2026-11-21",
+    "bouts": [
+      {
+        "order": 2,
+        "date": "2026-11-21T18:00Z",
+        "division": "Lightweight",
+        "opponent": "Dan Hooker",
+        "winner": null,
+        "result": null,
+        "record": "16-5-0",
+        "country": "USA"
+      }
+    ]
+  }
+}
