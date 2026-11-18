@@ -42,7 +42,7 @@ export function buildWeeklyReport({profiles=[],gather,date=localDate(),event,roo
   const days=[],items=[];
   for(let index=0;index<7;index++){
     const date=addDays(monday,index),slots=daySlots(date),plan=buildPlan({profiles:relevant,date,event:selected,root});
-    const preparationTime=index===5?'07:00':'12:15';
+    const preparationTime=index===5?'Vie (fin de semana off)':'12:15';
     const day={date,name:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][index],preparationTime,items:[]};
     const entries=[...plan.stories.map((s,i)=>({source:s,kind:'story',topic:slots.stories[i].topic})),...(slots.feed?[{source:plan.feed,kind:'feed',topic:slots.feed.id}]:[])];
     if(date===carousel.date)entries.push({source:carousel,kind:'feed',topic:carousel.slot});
