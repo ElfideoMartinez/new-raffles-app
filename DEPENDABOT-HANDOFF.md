@@ -83,7 +83,7 @@ breakdown (name / manifest / severity counts) recovered from it is listed above.
 - Keep both lockfiles symmetric where a package appears in both.
 - Verify deploys still meet node 22 engines after upgrades.
 
-## Session update — local remediation completed, pending ship
+## Session update — remediation committed/pushed; Hosting deploy pending
 
 Work completed on `main` in the local checkout (2026-11-18); commit/push/deploy status must be rechecked in the next session before assuming it shipped:
 
