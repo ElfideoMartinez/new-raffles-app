@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { formatDate, formatPrice } from "@/app/utils/format";
+import { isBetClosed } from "@/app/utils/betStatus";
 
 interface IBetData {
   id: string;
@@ -102,6 +103,8 @@ export default async function BetsPage() {
 }
 
 function BetCard({ bet }: { bet: IBetData }) {
+  const closed = isBetClosed(bet);
+  const outcome = winnerLabel(bet);
   const totalBets = bet.betsTeamA + bet.betsTeamB + (bet.tieBets || 0);
   const teamAPercentage =
     totalBets > 0 ? ((bet.betsTeamA / totalBets) * 100).toFixed(1) : "0";
@@ -187,15 +190,12 @@ function BetCard({ bet }: { bet: IBetData }) {
         </div>
 
         <div className='flex flex-col gap-2'>
-          {bet.isFinished ? (
-            // Finished = read-only history. The winner is shown via
-            // winnerLabel, and the deliberate path in is a "Ver ganador"
-            // button to the (read-only) details page.
+          {closed ? (
             <Link
               href={`/bet/${bet.id}`}
               className='min-h-11 w-full text-center py-2.5 px-4 rounded-card font-semibold transition-colors duration-300 bg-ink-100 text-ink-700 hover:bg-ink-300'
             >
-              Ver ganador
+              {outcome ? "Ver resultado" : "Ver detalles"}
             </Link>
           ) : (
             <Link
@@ -206,11 +206,9 @@ function BetCard({ bet }: { bet: IBetData }) {
             </Link>
           )}
 
-          {bet.isFinished && (
+          {closed && (
             <span className='text-center text-xs text-ink-500'>
-              {winnerLabel(bet)
-                ? winnerLabel(bet)
-                : "Esta apuesta ha terminado"}
+              {outcome ?? "Esta apuesta ha terminado"}
             </span>
           )}
         </div>

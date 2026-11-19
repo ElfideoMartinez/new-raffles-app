@@ -6,7 +6,7 @@
 import { authedApiFetch } from "@/app/config/api";
 import Spinner from "@/app/components/Spinner";
 import ApiErrorState, { safeMessage, type ErrorKind } from "@/app/components/ApiErrorState";
-import Link from "next/link";
+import BackLink from "@/app/components/BackLink";
 import { useEffect, useState } from "react";
 
 interface AdminSalesListPageProps<T> {
@@ -64,17 +64,17 @@ function AdminSalesListPage<T extends { id: string }>({
 
   return (
     <div className='flex flex-col w-full items-center'>
-      <h1 className="my-1">{heading}</h1>
-      <div className='flex space-x-4 mb-4' role="tablist">
+      <h1 className="mb-4 text-2xl font-bold text-ink-900">{heading}</h1>
+      <div className="mb-4 flex flex-wrap justify-center gap-2" role="group" aria-label="Filtrar por estado">
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            role="tab"
-            aria-selected={activeTab === tab.key}
-            className={`p-2 border-b-2 ${
+            type="button"
+            aria-pressed={activeTab === tab.key}
+            className={`focus-ring min-h-11 rounded-sm px-3 text-sm font-semibold ${
               activeTab === tab.key
-                ? "bg-brand-600 text-on-brand border-brand-700"
-                : "bg-ink-300 text-ink-500 border-transparent"
+                ? "bg-brand-100 text-on-brand"
+                : "bg-ink-100 text-ink-700 hover:text-ink-900"
             }`}
             onClick={() => setActiveTab(tab.key)}
           >
@@ -93,6 +93,8 @@ function AdminSalesListPage<T extends { id: string }>({
           onRetry={fetchData}
           entityLabel={entityLabel}
         />
+      ) : visible.length === 0 ? (
+        <p role="status" className="w-full rounded-card border border-ink-100 bg-surface p-5 text-center text-sm text-ink-700">No hay registros con este estado.</p>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full'>
           {visible.map((item) =>
@@ -100,9 +102,7 @@ function AdminSalesListPage<T extends { id: string }>({
           )}
         </div>
       )}
-      <Link href='../' className='p-2 bg-brand-600 border-white border-2 mt-4 mb-1 '>
-        Volver al inicio
-      </Link>
+      <div className="mt-4"><BackLink href="/admin/dashboard" label="Volver al resumen" /></div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
   children,
   isWinner = false,
 }) => (
-  <div className='bg-surface text-ink-900 p-4 rounded-card mb-4 shadow flex justify-between items-center'>
+  <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-ink-100 bg-surface p-4 text-ink-900 shadow-card">
     <div>
       <div>
         <span className='text-3xl text-center ml-auto text-success-700 font-extrabold tracking-widest'>
@@ -23,12 +23,12 @@ const TicketCard: React.FC<TicketCardProps> = ({
         </span>
       </div>
       <div className='text-sm text-ink-500'>
-        <strong>Created:</strong> {createdAt}
+        <strong>Creado:</strong> {createdAt}
       </div>
       <div className='text-sm'>
-        <strong>Symbols:</strong> {symbols?.join(", ")}
+        <strong>Símbolos:</strong> {symbols?.join(", ")}
         {isWinner && (
-          <span className='text-success-700 ml-2 font-bold'>Winner</span>
+          <span className='text-success-700 ml-2 font-bold'>Ganador</span>
         )}
       </div>
     </div>

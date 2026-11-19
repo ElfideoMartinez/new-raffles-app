@@ -4,7 +4,8 @@ import useTicketStore from "@/app/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { realtimeDB } from "@/app/firebaseconfig";
-import { ref, onValue, off } from "firebase/database";
+import { ref, onValue } from "firebase/database";
+import { isBetClosed } from "@/app/utils/betStatus";
 
 interface BetRealtimeData {
   oddsTie: any;
@@ -100,8 +101,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   const userCartBets = useTicketStore((state) => state.getBetsFromCart);
   const userTicketsBets = useTicketStore((state) => state.getTicketInfoByBetId);
 
-  // Loading state
-  const [loading, setLoading] = useState(true);
+  const [loadStatus, setLoadStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
 
   // Real-time bet data state
   const [realtimeBetData, setRealtimeBetData] = useState<BetRealtimeData>({
@@ -125,6 +125,8 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     title: "",
     oddsTie: "",
   });
+
+  const closed = isBetClosed(realtimeBetData);
 
   // User selection state
   const [ticketsTeamA, setTicketsTeamA] = useState(0);
@@ -218,33 +220,36 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
 
   // Real-time database listener
   useEffect(() => {
-    if (!betId) return;
+    if (!betId) {
+      setLoadStatus("missing");
+      return;
+    }
 
+    setLoadStatus("loading");
     const betRef = ref(realtimeDB, `bets/${betId}`);
-    const unsubscribe = onValue(
+    return onValue(
       betRef,
       (snapshot) => {
         const data = snapshot.val();
         if (data) {
           setRealtimeBetData(data);
-          setLoading(false);
+          setLoadStatus("ready");
+        } else {
+          setLoadStatus("missing");
         }
       },
       (error) => {
         console.error("Error listening to bet updates:", error);
-        setLoading(false);
+        setLoadStatus("error");
       }
     );
 
-    // Cleanup function
-    return () => {
-      off(betRef, "value", unsubscribe);
-    };
   }, [betId]);
 
   // Optimized ticket update function
   const updateTickets = useCallback(
     (team: "A" | "B" | "C", action: number) => {
+      if (closed) return;
       // Reset other teams when selecting a new one
       if (action > 0) {
         if (team !== "A") setTicketsTeamA(0);
@@ -276,11 +281,11 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
           break;
       }
     },
-    [realtimeBetData.teams]
+    [closed, realtimeBetData.teams]
   );
 
   const addToCart = useCallback(() => {
-    if (totalTickets === 0 || priceUnusable) return;
+    if (closed || totalTickets === 0 || priceUnusable) return;
 
     updateBet({
       betId: betId as string,
@@ -295,6 +300,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     router.push("/user/cart");
   }, [
     betId,
+    closed,
     realtimeBetData.title,
     selectedTeam,
     selectedLetterTeam,
@@ -364,7 +370,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             type="button"
             className="h-11 w-11 rounded-pill bg-surface text-2xl font-bold text-ink-900 hover:bg-ink-100 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Quitar un boleto de ${teamName}`}
-            disabled={tickets === 0}
+            disabled={closed || tickets === 0}
             onClick={() => updateTickets(teamKey, -1)}
           >
             −
@@ -383,11 +389,13 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
           </button>
         </div>
 
-        <p className="mt-3 rounded-sm bg-warning-500 px-3 py-2 text-center text-sm font-semibold text-success-700">
-          Cada boleto cuesta ${realtimeBetData.pricePerTicket}. Si gana {teamName},
-          recibirías aproximadamente ${estimatedPayout.toFixed(2)}.
-          <span className="block text-xs font-normal">Estimación; puede cambiar antes del cierre.</span>
-        </p>
+        {!closed && (
+          <p className="mt-3 rounded-sm bg-warning-500 px-3 py-2 text-center text-sm font-semibold text-success-700">
+            Cada boleto cuesta ${realtimeBetData.pricePerTicket}. Si gana {teamName},
+            recibirías aproximadamente ${estimatedPayout.toFixed(2)}.
+            <span className="block text-xs font-normal">Estimación; puede cambiar antes del cierre.</span>
+          </p>
+        )}
       </section>
     );
   };
@@ -395,9 +403,18 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   return (
     <main className="-mx-4 flex min-h-screen flex-col items-center bg-ink-100 px-4 pb-[calc(13rem+env(safe-area-inset-bottom))] pt-4 text-ink-900 sm:mx-0 sm:rounded-card sm:px-6 sm:pb-36">
       <BackLink href="/bet" label="Volver a Apuestas" />
-      {loading ? (
+      {loadStatus === "loading" ? (
         <div role="status" aria-label="Cargando apuesta" className="flex h-96 items-center justify-center">
           <div className="h-12 w-12 animate-spin rounded-pill border-4 border-ink-200 border-b-brand-600" />
+        </div>
+      ) : loadStatus !== "ready" ? (
+        <div className="w-full max-w-md rounded-card border border-ink-100 bg-surface p-6 text-center shadow-card">
+          <h1 className="text-lg font-bold">
+            {loadStatus === "missing" ? "No encontramos esta apuesta" : "No se pudo cargar la apuesta"}
+          </h1>
+          <p className="mt-2 text-sm text-ink-500">
+            {loadStatus === "missing" ? "Vuelve a la lista para ver otras apuestas." : "Intenta de nuevo en un momento."}
+          </p>
         </div>
       ) : (
         <>
@@ -416,7 +433,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
 
           <div className="mb-5 w-full max-w-4xl text-center">
             <p className="mb-1 text-sm font-bold uppercase tracking-wide text-brand-700">
-              {realtimeBetData.isFinished ? "Apuesta finalizada" : "Elige un resultado"}
+              {closed ? "Apuesta finalizada" : "Elige un resultado"}
             </p>
             <h1 className="text-balance text-2xl font-extrabold tracking-tight sm:text-3xl">
               {realtimeBetData.title}
@@ -424,9 +441,11 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             <p className="mt-2 text-base font-semibold text-ink-700 sm:text-lg">
               {realtimeBetData.description}
             </p>
-            <p className="mt-2 text-sm text-ink-500">
-              Elige un equipo y agrega boletos. El pago potencial es estimado.
-            </p>
+            {!closed && (
+              <p className="mt-2 text-sm text-ink-500">
+                Elige un equipo y agrega boletos. El pago potencial es estimado.
+              </p>
+            )}
             <div className="mx-auto mt-4 inline-flex min-h-11 items-center rounded-pill border border-brand-100 bg-surface px-5 text-sm font-semibold text-ink-900 shadow-sm">
               Precio por boleto: ${realtimeBetData.pricePerTicket}
             </div>
@@ -435,7 +454,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
           {/* Team Selection Cards */}
           <div
             className={`grid w-full max-w-5xl grid-cols-1 items-stretch justify-center gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 ${
-              realtimeBetData.isFinished ? "pointer-events-none opacity-40" : ""
+              closed ? "opacity-40" : ""
             }`}
           >
             {/* Team A */}
@@ -446,7 +465,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               emoji='⚪'
               tickets={ticketsTeamA}
               stakeShare={stakeSharePercent("A")}
-              disabled={realtimeBetData.isFinished || ticketsTeamB > 0 || tieTickets > 0}
+              disabled={closed || ticketsTeamB > 0 || tieTickets > 0}
             />
 
             {/* Tie */}
@@ -457,7 +476,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               emoji=''
               tickets={tieTickets}
               stakeShare={stakeSharePercent("C")}
-              disabled={realtimeBetData.isFinished || ticketsTeamA > 0 || ticketsTeamB > 0}
+              disabled={closed || ticketsTeamA > 0 || ticketsTeamB > 0}
             />
 
             {/* Team B */}
@@ -468,15 +487,16 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               emoji='🔴'
               tickets={ticketsTeamB}
               stakeShare={stakeSharePercent("B")}
-              disabled={realtimeBetData.isFinished || ticketsTeamA > 0 || tieTickets > 0}
+              disabled={closed || ticketsTeamA > 0 || tieTickets > 0}
             />
           </div>
 
-          <p className="mx-auto mt-4 max-w-3xl text-center text-sm text-ink-500">
+          <p hidden={closed} className="mx-auto mt-4 max-w-3xl text-center text-sm text-ink-500">
             Las ganancias estimadas pueden cambiar según las apuestas que se reciban antes del cierre.
           </p>
 
           <section
+            hidden={closed}
             aria-label="Resumen de apuesta"
             className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-100 bg-white/95 px-4 pt-3 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur supports-[backdrop-filter]:bg-white/90 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
           >
@@ -502,7 +522,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               <button
                 type="button"
                 className="min-h-12 w-full shrink-0 rounded-pill bg-warning-500 px-6 py-3 text-base font-bold text-brand-700 shadow-sm transition hover:bg-warning-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:text-lg"
-                disabled={totalTickets === 0 || priceUnusable}
+                disabled={closed || totalTickets === 0 || priceUnusable}
                 onClick={addToCart}
               >
                 Agregar al carrito
