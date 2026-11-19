@@ -5,7 +5,7 @@ import * as admin from "firebase-admin";
 import { getDatabase } from "firebase-admin/database";
 import { getRemoteConfig } from "firebase-admin/remote-config";
 import type express from "express";
-import { buildNotificationPayload, tokensByUser } from "./notifications";
+import { buildNotificationPayload } from "./notifications";
 import {
   DEFAULT_TAKE_RATE,
   distributableCents,
@@ -241,7 +241,7 @@ export const sendPurchaseNotifications = functions.https.onRequest(
           body: "Hay una compra nueva. Revisa los detalles en el panel de administración.",
           destination: "adminSales",
           imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
+            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8ab-4918-b6ab-2ff2209ad761",
         }),
       });
       await summarizeAndPruneMulticast("sendPurchaseNotifications", fcmTokens, response);
@@ -332,6 +332,60 @@ export const createQuickTicket = functions.https.onRequest(async (req, res) => {
       message: "Error creating quick ticket",
       error: error || "Unknown error",
     });
+  }
+});
+
+// ADMIN ONLY: change one field of an existing quick ticket, atomically.
+export const updateQuickTicketStatus = functions.https.onRequest(async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
+  if (req.method !== "POST") {
+    res.set("Allow", "POST, OPTIONS");
+    res.status(405).json({ status: 405, message: "Method Not Allowed" });
+    return;
+  }
+
+  const body = req.body;
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    res.status(400).json({ status: 400, message: "Invalid quick-ticket update" });
+    return;
+  }
+  const { ticketId, action, claimed } = body;
+  const keys = Object.keys(body);
+  if (typeof ticketId !== "string" || !/^ticket_\d{13}_[a-z0-9]{1,6}$/.test(ticketId) ||
+    !(action === "activate" && keys.length === 2 ||
+      action === "setClaimed" && typeof claimed === "boolean" && keys.length === 3 && keys.includes("claimed"))) {
+    res.status(400).json({ status: 400, message: "Invalid quick-ticket update" });
+    return;
+  }
+
+  try {
+    const result = await rtdb.ref(`quickTickets/${ticketId}`).transaction((ticket) => {
+      // On a cold client, null may just be the local cache. Propose a no-op
+      // against null so Firebase retries against server data if the ticket exists.
+      if (ticket === null) return null;
+      if (typeof ticket !== "object" || Array.isArray(ticket)) return undefined;
+      if (action === "activate" && ticket.status === "pending") {
+        return { ...ticket, status: "active" };
+      }
+      if (action === "setClaimed" && ticket.status === "finnished" && ticket.isWinner === true) {
+        return { ...ticket, claimed };
+      }
+      return undefined;
+    }, undefined, false);
+
+    if (!result.snapshot.exists()) {
+      res.status(404).json({ status: 404, message: "Quick ticket not found" });
+    } else if (!result.committed) {
+      res.status(409).json({ status: 409, message: "Quick ticket is not in a compatible state" });
+    } else if (action === "activate") {
+      res.status(200).json({ ok: true, status: "active" });
+    } else {
+      res.status(200).json({ ok: true, claimed });
+    }
+  } catch (err) {
+    console.error("Error updating quick ticket:", err);
+    res.status(500).json({ status: 500, message: "Error updating quick ticket" });
   }
 });
 
@@ -806,6 +860,108 @@ export const getSales = functions.https.onRequest(async (req, res) => {
   }
 });
 
+const DASHBOARD_SALES_LIMIT = 500;
+
+function dashboardDate(value: unknown): number | null {
+  const ms = typeof value === "object" && value !== null && "toMillis" in value && typeof value.toMillis === "function"
+    ? value.toMillis()
+    : value;
+  return typeof ms === "number" && Number.isFinite(ms) && ms > 0 && ms <= 8.64e15 ? Math.trunc(ms) : null;
+}
+
+function dashboardAmountCents(raw: unknown): number | null {
+  const amount = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
+  const cents = toCents(amount);
+  return amount >= 0 && Number.isSafeInteger(cents) ? cents : null;
+}
+
+async function dashboardSalesTotals(
+  collection: "sales" | "salesBets",
+  amountField: "totalRafflePrice" | "totalBetsPrice"
+) {
+  // Firestore excludes legacy rows without createdAt. They cannot be ranked
+  // chronologically; limited describes this timestamped window, not all sales.
+  const { docs } = await db.collection(collection)
+    .orderBy("createdAt", "desc")
+    .select("verified", amountField, "createdAt")
+    .limit(DASHBOARD_SALES_LIMIT + 1)
+    .get();
+
+  let confirmed = 0;
+  let pending = 0;
+  let cents = 0;
+  for (const doc of docs.slice(0, DASHBOARD_SALES_LIMIT)) {
+    const row = doc.data();
+    // The verification flag is the only discriminator; rejection also writes false.
+    if (row.verified !== true) {
+      pending++;
+      continue;
+    }
+    confirmed++;
+    // Only the category subtotal: totalSalePrice can include both categories.
+    cents += dashboardAmountCents(row[amountField]) ?? 0;
+  }
+  const row = docs[0]?.data();
+  const latestCents = dashboardAmountCents(row?.[amountField]);
+  const latest = row ? {
+    createdAt: dashboardDate(row.createdAt),
+    status: row.verified === true ? "verified" : "unverified",
+    amount: latestCents === null ? null : latestCents / 100,
+  } : null;
+  return { confirmed, pending, amount: cents / 100, limited: docs.length > DASHBOARD_SALES_LIMIT, latest };
+}
+
+async function dashboardQuickTotals() {
+  // Ticket keys are ticket_<13-digit epoch millis>_<suffix>. Key ordering
+  // gives creation order for these IDs and is indexed without a rules change.
+  const snapshot = await rtdb.ref("quickTickets").orderByKey()
+    .limitToLast(DASHBOARD_SALES_LIMIT + 1).once("value");
+  const rows: { status: unknown; createdAt: unknown }[] = [];
+  // RTDB forEach preserves ascending query order; snapshot.val() need not.
+  snapshot.forEach((child) => {
+    const row = child.val();
+    rows.push({ status: row?.status, createdAt: row?.createdAt });
+  });
+
+  let confirmed = 0;
+  let pending = 0;
+  for (const { status } of rows.slice(-DASHBOARD_SALES_LIMIT)) {
+    // "Confirmed" means activated or played, not paid. No revenue is recorded.
+    if (status === "active" || status === "finnished") confirmed++;
+    else if (status === "pending") pending++;
+  }
+  const row = rows[rows.length - 1];
+  const status = row?.status;
+  const latest = row ? {
+    createdAt: dashboardDate(row.createdAt),
+    status: status === "active" || status === "finnished" || status === "pending" ? status : "unknown",
+  } : null;
+  return { confirmed, pending, limited: rows.length > DASHBOARD_SALES_LIMIT, latest };
+}
+
+// ADMIN ONLY: aggregates plus a minimal latest-activity summary; no buyer or ticket credentials.
+export const getDashboardSales = functions.https.onRequest(async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  if (await rejectUnlessAdmin(req, res, "GET, OPTIONS")) return;
+  if (req.method !== "GET") {
+    res.set("Allow", "GET, OPTIONS");
+    res.status(405).json({ status: 405, message: "Method Not Allowed" });
+    return;
+  }
+
+  try {
+    const [raffles, bets, quick] = await Promise.all([
+      dashboardSalesTotals("sales", "totalRafflePrice"),
+      dashboardSalesTotals("salesBets", "totalBetsPrice"),
+      dashboardQuickTotals(),
+    ]);
+    res.status(200).json({ raffles, bets, quick });
+  } catch (err) {
+    console.error("Error fetching dashboard sales:", err);
+    res.status(500).json({ status: 500, message: "Error fetching dashboard sales" });
+  }
+});
+
 // ADMIN ONLY: mutates data. Requires an admin ID token.
 export const rejectSale = functions.https.onRequest(async (req, res) => {
   if (await rejectUnlessAdmin(req, res, "GET, POST, OPTIONS")) return;
@@ -1112,7 +1268,7 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
           body: "Hay una compra nueva. Revisa los detalles en el panel de administración.",
           destination: "adminSales",
           imageUrl:
-            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
+            "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8ab-4918-b6ab-2ff2209ad761",
         }),
       });
       await summarizeAndPruneMulticast("createSale", fcmTokens, response);
@@ -2216,9 +2372,8 @@ function outcomeName(
  *
  * Best effort: a notification failure never fails or rolls back settlement.
  * Channels, mirroring the app's existing infrastructure:
- *  - FCM push to the enabled tokens owned by each sale's userId. Private
- *    settlement details are never broadcast to the full device roster.
- *    Anonymous or unregistered sales still receive their in-app notification.
+ *  - FCM push to the registered tokens owned by each sale's userId, respecting
+ *    per-device opt-out; anonymous sales still get their in-app record only.
  *  - One in-app record per sale in the Firestore `notifications` collection,
  *    which is also the idempotency ledger: doc id `${betId}__${saleId}`.
  *    Re-settlement cannot duplicate sends because settleBet returns early on
@@ -2244,12 +2399,18 @@ async function notifyBetSettlement(
     const matchup = `${teams.a ?? "A"} vs ${teams.b ?? "B"}`;
     const notificationPath = `/bet/${encodeURIComponent(betId)}`;
 
+    const notificationTokensByUser = new Map<string, string[]>();
     const tokensSnapshot = await db.collection("notificationTokens").get();
-    const tokenRows: { userId: string; token: unknown; enabled?: unknown }[] = [];
     tokensSnapshot.forEach((doc) => {
-      tokenRows.push({ userId: doc.id, token: doc.get("token"), enabled: doc.get("enabled") });
+      const token = doc.get("token");
+      // Settlement text contains private payout/outcome details. Never send it
+      // to the whole device roster; only the account that owns the sale.
+      if (typeof token === "string" && token && doc.get("enabled") !== false) {
+        const tokens = notificationTokensByUser.get(doc.id) ?? [];
+        tokens.push(token);
+        notificationTokensByUser.set(doc.id, tokens);
+      }
     });
-    const userTokens = tokensByUser(tokenRows);
 
     for (const sale of sales) {
       const notifRef = db.doc(`notifications/${betId}__${sale.saleId}`);
@@ -2296,7 +2457,7 @@ async function notifyBetSettlement(
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      const saleTokens = sale.userId ? userTokens.get(sale.userId) ?? [] : [];
+      const saleTokens = sale.userId ? notificationTokensByUser.get(sale.userId) ?? [] : [];
       if (saleTokens.length > 0) {
         const response = await admin.messaging().sendEachForMulticast({
           tokens: saleTokens,
@@ -2306,7 +2467,12 @@ async function notifyBetSettlement(
             destination: "myPurchases",
             path: notificationPath,
           }),
-          data: { betId, saleId: sale.saleId, type: notifType, url: notificationPath },
+          data: {
+            betId,
+            saleId: sale.saleId,
+            type: notifType,
+            url: notificationPath,
+          },
         });
         await summarizeAndPruneMulticast("settlement", saleTokens, response);
       }

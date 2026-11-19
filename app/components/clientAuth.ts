@@ -85,27 +85,22 @@ export function useClientAuth(): {
         setLoading(false);
       }
     }
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    let revision = 0;
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      const current = ++revision;
+      setLoading(true);
+      setIsAdmin(false);
       setUser(firebaseUser ?? readMockUser());
-      if (firebaseUser) {
-        // The admin claim lives on the decoded ID token, not the User object.
-        // getIdTokenResult() returns it and refreshes the token if stale; this
-        // is how the storefront learns the signed-in account is an admin so it
-        // can expose admin navigation without a separate login.
-        firebaseUser
-          .getIdTokenResult()
-          .then((tokenResult) => {
-            setIsAdmin(tokenResult.claims?.admin === true);
-          })
-          .catch(() => {
-            setIsAdmin(false);
-          });
-      } else {
-        setIsAdmin(false);
-      }
+      // A protected layout must not redirect until the claim has resolved.
+      const token = await firebaseUser?.getIdTokenResult().catch(() => null);
+      if (current !== revision) return;
+      setIsAdmin(token?.claims.admin === true);
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      revision++;
+      unsubscribe();
+    };
   }, []);
 
   return { user, isAdmin, loading };

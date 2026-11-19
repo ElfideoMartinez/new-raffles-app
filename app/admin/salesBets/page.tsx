@@ -10,7 +10,7 @@ type Bets = Parameters<typeof BetSaleCard>[0]["betSale"];
 
 const BetsPage = () => (
   <AdminSalesListPage<Bets>
-    heading="Apuestas"
+    heading="Ventas de apuestas"
     fetchKey="getSalesBets"
     listKey="betSales"
     entityLabel="apuestas"

@@ -198,6 +198,13 @@ const routes = {
     return { __raw: { betData: bet, data: mockTickets(bet) } };
   },
   getSalesBets: () => ({ betSales: salesBets }),
+  getDashboardSales: () => ({
+    __raw: {
+      raffles: { confirmed: 3, pending: 2, amount: 500, limited: false, latest: { status: "verified", amount: 150, createdAt: 1795093200000 } },
+      bets: { confirmed: 4, pending: 1, amount: 650, limited: false, latest: { status: "unverified", amount: 200, createdAt: 1795094700000 } },
+      quick: { confirmed: 2, pending: 1, limited: false, latest: { status: "pending", createdAt: 1795095600000 } },
+    },
+  }),
   // Mirror of the real settleBet response shape (functions/src/index.ts). The
   // admin settlement page only shows this after the explicit confirm button.
   settleBet: (body) => {
@@ -333,6 +340,10 @@ const server = createServer(async (req, res) => {
 
   const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
   const name = url.pathname.replace(/^\/+/, "").split("/").pop();
+  if (name === "getDashboardSales" && req.method !== "GET") {
+    res.setHeader("Allow", "GET, OPTIONS");
+    return json(res, 405, { status: 405, message: "Method Not Allowed" });
+  }
 
   let body = {};
   if (req.method === "POST") {
@@ -364,6 +375,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`[mock] raffle mock listening on http://127.0.0.1:${PORT}`);
-  console.log(`[mock] functions base: http://127.0.0.1:${PORT}/raffleapp-dbc1b/us-central1`);
+  const { port } = server.address();
+  console.log(`[mock] raffle mock listening on http://127.0.0.1:${port}`);
+  console.log(`[mock] functions base: http://127.0.0.1:${port}/raffleapp-dbc1b/us-central1`);
 });

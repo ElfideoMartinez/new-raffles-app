@@ -124,7 +124,7 @@ const UserCartPage = () => {
               ) : (
                 <div aria-hidden="true" className="flex h-20 w-20 shrink-0 items-center justify-center rounded-sm bg-ink-100 text-ink-500">Sin imagen</div>
               )}
-              <div className="min-w-0">
+              <div className="min-w-0 break-words">
                 <p className="font-semibold">Apuesta: {bet.betName}</p>
                 <p>Equipo: {bet.team}</p>
                 <p>Boletos: {bet.ticketNumbers}</p>
