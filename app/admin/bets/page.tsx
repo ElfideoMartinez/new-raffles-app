@@ -579,7 +579,7 @@ function AdminBetCard({
         <div className='space-y-2'>
           <Link
             target='_blank'
-            href={`${process.env.NEXT_PUBLIC_BASE_URL}/bet/${bet.id}`}
+            href={`/bet/${bet.id}`}
             className='block w-full text-center py-2 px-4 bg-brand-600 hover:bg-brand-700 text-on-brand rounded-sm font-semibold transition-colors duration-300'
           >
             Ver Apuesta

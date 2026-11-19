@@ -10,7 +10,7 @@ type Sale = Parameters<typeof SaleCard>[0]["sale"];
 
 const SalesPage = () => (
   <AdminSalesListPage<Sale>
-    heading="Ventas"
+    heading="Ventas de rifas"
     fetchKey="getSales"
     listKey="sales"
     entityLabel="ventas"
