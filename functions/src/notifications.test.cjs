@@ -14,7 +14,7 @@ test("builds a purchase notification with safe copy and admin destination", () =
     },
     webpush: {
       notification: { data: { url: "/admin/sales" } },
-      fcmOptions: { link: "https://raffleapp-dbc1b.web.app/admin/sales" },
+      fcmOptions: { link: "https://rifasmtz.web.app/admin/sales" },
     },
   });
 });
@@ -45,7 +45,7 @@ test("includes optional image and a specific same-origin destination", () => {
   assert.equal(payload.notification.imageUrl, "https://example.test/logo.png");
   assert.equal(payload.webpush.notification.icon, "https://example.test/logo.png");
   assert.equal(payload.webpush.notification.data.url, "/bet/bet-123");
-  assert.equal(payload.webpush.fcmOptions.link, "https://raffleapp-dbc1b.web.app/bet/bet-123");
+  assert.equal(payload.webpush.fcmOptions.link, "https://rifasmtz.web.app/bet/bet-123");
 });
 
 test("rejects unsafe notification paths", () => {

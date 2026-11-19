@@ -16,7 +16,7 @@ export interface NotificationPayload {
   };
 }
 
-const SITE_ORIGIN = "https://raffleapp-dbc1b.web.app";
+const SITE_ORIGIN = "https://rifasmtz.web.app";
 const DESTINATIONS: Record<NotificationDestination, string> = {
   adminSales: "/admin/sales",
   myPurchases: "/user/my-purchases",
