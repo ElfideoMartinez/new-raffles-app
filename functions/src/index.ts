@@ -5,6 +5,7 @@ import * as admin from "firebase-admin";
 import { getDatabase } from "firebase-admin/database";
 import { getRemoteConfig } from "firebase-admin/remote-config";
 import type express from "express";
+import { buildNotificationPayload, tokensByUser } from "./notifications";
 import {
   DEFAULT_TAKE_RATE,
   distributableCents,
@@ -232,24 +233,16 @@ export const sendPurchaseNotifications = functions.https.onRequest(
         return;
       }
 
-      // Create a message to send
-      const message = {
-        notification: {
-          title: "Nueva compra por recibida",
-          body: `Nueva compra por transferencia favor de confirmar ASAP`,
-        },
-        token: fcmTokens,
-      };
-
       // Send the message using Firebase Cloud Messaging
       const response = await admin.messaging().sendEachForMulticast({
         tokens: fcmTokens,
-        notification: {
-          title: message.notification.title,
-          body: message.notification.body,
+        ...buildNotificationPayload({
+          title: "Nueva compra pendiente de confirmación",
+          body: "Hay una compra nueva. Revisa los detalles en el panel de administración.",
+          destination: "adminSales",
           imageUrl:
             "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
-        },
+        }),
       });
       await summarizeAndPruneMulticast("sendPurchaseNotifications", fcmTokens, response);
 
@@ -1111,28 +1104,16 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
         return;
       }
 
-      // Create a message to send
-      const message = {
-        notification: {
-          title: `Nueva compra por recibida ${
-            raffles.length > 0 ? "de rifa" : "de apuestas"
-          }`,
-          body: `Nueva compra por ${
-            raffles.length > 0 ? totalRafflePrice : totalBetsPrice
-          } transferencia favor de confirmar ASAP`,
-        },
-        token: fcmTokens,
-      };
-
       // Send the message using Firebase Cloud Messaging
       const response = await admin.messaging().sendEachForMulticast({
         tokens: fcmTokens,
-        notification: {
-          title: message.notification.title,
-          body: message.notification.body,
+        ...buildNotificationPayload({
+          title: "Nueva compra pendiente de confirmación",
+          body: "Hay una compra nueva. Revisa los detalles en el panel de administración.",
+          destination: "adminSales",
           imageUrl:
             "https://firebasestorage.googleapis.com/v0/b/raffleapp-dbc1b.appspot.com/o/icon.jpg?alt=media&token=3f65205e-c8aa-4918-b6ab-2ff2209ad761",
-        },
+        }),
       });
       await summarizeAndPruneMulticast("createSale", fcmTokens, response);
     } catch (error) {
@@ -1568,10 +1549,11 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
         if (tokens.length > 0) {
           const response = await admin.messaging().sendEachForMulticast({
             tokens,
-            notification: {
+            ...buildNotificationPayload({
               title: "Nueva compra por transferencia",
-              body: `Nueva compra por $${totalSalePrice} (${ticketCount} boletos) de ${name}. Favor de confirmar ASAP.`,
-            },
+              body: `Nueva compra por $${totalSalePrice} (${ticketCount} boletos). Pendiente de confirmación.`,
+              destination: "adminSales",
+            }),
           });
           await summarizeAndPruneMulticast("transferSale", tokens, response);
         }
@@ -2234,9 +2216,9 @@ function outcomeName(
  *
  * Best effort: a notification failure never fails or rolls back settlement.
  * Channels, mirroring the app's existing infrastructure:
- *  - FCM push to every registered token in `notificationTokens` (same
- *    broadcast channel as `sendPurchaseNotifications`; tokens are device-level
- *    in this app, not per-buyer).
+ *  - FCM push to the enabled tokens owned by each sale's userId. Private
+ *    settlement details are never broadcast to the full device roster.
+ *    Anonymous or unregistered sales still receive their in-app notification.
  *  - One in-app record per sale in the Firestore `notifications` collection,
  *    which is also the idempotency ledger: doc id `${betId}__${saleId}`.
  *    Re-settlement cannot duplicate sends because settleBet returns early on
@@ -2260,15 +2242,14 @@ async function notifyBetSettlement(
     const winnerName = outcomeName(outcome, teams);
     const perTicket = (perTicketCents / 100).toFixed(2);
     const matchup = `${teams.a ?? "A"} vs ${teams.b ?? "B"}`;
+    const notificationPath = `/bet/${encodeURIComponent(betId)}`;
 
     const tokensSnapshot = await db.collection("notificationTokens").get();
-    const tokens: string[] = [];
+    const tokenRows: { userId: string; token: unknown; enabled?: unknown }[] = [];
     tokensSnapshot.forEach((doc) => {
-      const token = doc.get("token");
-      // Respect the per-device opt-out (Notificaciones page, 2026-10-25).
-      if (typeof token === "string" && token && doc.get("enabled") !== false)
-        tokens.push(token);
+      tokenRows.push({ userId: doc.id, token: doc.get("token"), enabled: doc.get("enabled") });
     });
+    const userTokens = tokensByUser(tokenRows);
 
     for (const sale of sales) {
       const notifRef = db.doc(`notifications/${betId}__${sale.saleId}`);
@@ -2315,13 +2296,19 @@ async function notifyBetSettlement(
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      if (tokens.length > 0) {
+      const saleTokens = sale.userId ? userTokens.get(sale.userId) ?? [] : [];
+      if (saleTokens.length > 0) {
         const response = await admin.messaging().sendEachForMulticast({
-          tokens,
-          notification: { title: pushTitle, body },
-          data: { betId, saleId: sale.saleId, type: notifType },
+          tokens: saleTokens,
+          ...buildNotificationPayload({
+            title: pushTitle,
+            body,
+            destination: "myPurchases",
+            path: notificationPath,
+          }),
+          data: { betId, saleId: sale.saleId, type: notifType, url: notificationPath },
         });
-        await summarizeAndPruneMulticast("settlement", tokens, response);
+        await summarizeAndPruneMulticast("settlement", saleTokens, response);
       }
     }
   } catch (err) {
