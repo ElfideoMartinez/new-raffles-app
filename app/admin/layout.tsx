@@ -42,6 +42,7 @@ const NAV_SECTIONS: {
     links: [
       { href: "/admin/bets", label: "Administrar apuestas" },
       { href: "/admin/create/bet", label: "Crear apuesta" },
+      { href: "/admin/create-from-card", label: "Crear desde cartelera" },
       { href: "/admin/edit/bet", label: "Editar apuesta" },
       { href: "/admin/create/raffle", label: "Crear rifa" },
       { href: "/admin/edit/raffle", label: "Editar rifa" },

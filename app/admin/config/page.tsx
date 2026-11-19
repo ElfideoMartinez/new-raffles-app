@@ -225,7 +225,7 @@ const ConfigPage = () => {
       ) : copyForm && storeForm && general ? (
         <div className='w-full max-w-2xl flex flex-col gap-6'>
           {/* -------- contact + payment details -------- */}
-          <section className='flex flex-col gap-4'>
+          <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-surface p-5 shadow-card">
             <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
               Contacto y pago
             </h2>
@@ -252,7 +252,7 @@ const ConfigPage = () => {
           </section>
 
           {/* -------- navigation: default home + visible pages -------- */}
-          <section className='flex flex-col gap-4'>
+          <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-surface p-5 shadow-card">
             <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
               Navegación e inicio
             </h2>
@@ -305,7 +305,7 @@ const ConfigPage = () => {
           </section>
 
           {/* -------- checkout thank-you copy -------- */}
-          <section className='flex flex-col gap-4'>
+          <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-surface p-5 shadow-card">
             <h2 className='text-lg font-semibold border-b border-ink-300 pb-1'>
               Textos de confirmación de compra
             </h2>
@@ -355,10 +355,9 @@ const ConfigPage = () => {
               type='button'
               onClick={save}
               disabled={saving}
-              className={`p-2 rounded-card text-white ${
-                saving ? "bg-ink-300 cursor-not-allowed" : ""
+              className={`p-2 rounded-card font-semibold text-on-brand ${
+                saving ? "bg-ink-300 cursor-not-allowed" : "bg-brand-700 hover:bg-brand-600"
               }`}
-              style={saving ? undefined : { backgroundColor: "var(--color-brand-700)" }}
             >
               {saving ? "Guardando…" : "Guardar cambios"}
             </button>

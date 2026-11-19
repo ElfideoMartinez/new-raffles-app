@@ -43,10 +43,27 @@ export function normalizeManifest(manifest, {root=ROOT}={}) {
     const provenance=(feed.provenance ?? plan.provenance ?? []).map(source=>{
       const file=typeof source==='string'?source:source.file;
       const resolved=file?path.resolve(root,file):null;
-      return {...(typeof source==='string'?{file:source}:source),fileSha256:resolved&&fs.existsSync(resolved)?hash(fs.readFileSync(resolved)):null};
+      const fileFacts=resolved&&fs.existsSync(resolved)?(()=>{
+        const bytes=fs.readFileSync(resolved);
+        let semanticFileSha256;
+        try {semanticFileSha256=hash(canonicalJson(stableSourceFacts(JSON.parse(bytes.toString('utf8')))));}
+        catch {semanticFileSha256=hash(bytes);}
+        return {fileSha256:hash(bytes),semanticFileSha256};
+      })():{fileSha256:null,semanticFileSha256:null};
+      return {...(typeof source==='string'?{file:source}:source),...fileFacts};
     });
     return {id:feed.id,scheduledAt,caption,mediaPaths,media,provenance};
   });
+}
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value && typeof value==='object') return `{${Object.keys(value).sort().map(key=>`${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
+  return JSON.stringify(value);
+}
+function stableSourceFacts(value) {
+  if (Array.isArray(value)) return value.map(stableSourceFacts);
+  if (value && typeof value==='object') return Object.fromEntries(Object.keys(value).filter(key=>!['fileSha256','semanticFileSha256','checked','checkedAt','lastChecked','verifiedAt','updatedAt','generatedAt'].includes(key)).sort().map(key=>[key,stableSourceFacts(value[key])]));
+  return value;
 }
 function saveReceipt(file, receipt) {
   fs.mkdirSync(path.dirname(file),{recursive:true});
@@ -74,14 +91,20 @@ export async function scheduleManifest(manifest, {root=ROOT,receiptDir=path.join
     for (const feed of feeds) {
       const receiptPath=path.join(receiptDir,hash(feed.id)+'.json');
       let r=fs.existsSync(receiptPath)?JSON.parse(fs.readFileSync(receiptPath,'utf8')):null;
-      const fingerprint=hash(JSON.stringify({id:feed.id,accountId:ACCOUNT,workspaceId:WORKSPACE,caption:feed.caption,scheduledAt:feed.scheduledAt,media:feed.media.map(m=>m.sha256),provenance:feed.provenance}));
+      const fingerprint=hash(canonicalJson(stableSourceFacts({id:feed.id,accountId:ACCOUNT,workspaceId:WORKSPACE,caption:feed.caption,scheduledAt:feed.scheduledAt,media:feed.media.map(m=>m.sha256),provenance:feed.provenance})));
       const persist=()=>{if (!dryRun) saveReceipt(receiptPath,r);};
       try {
         if (r?.id && r.id!==feed.id) throw new Error('Receipt slot mismatch');
         if (r?.canceledAt || r?.state==='canceled') {results.push({...r,receiptPath});continue;}
         if (r?.fingerprint && r.fingerprint!==fingerprint) {
-          r.needsReview=true;r.reviewReason='Source, caption, schedule or artwork changed; existing post was NOT replaced';r.observedFingerprint=fingerprint;persist();
-          if (!r.postId) {results.push({...r,receiptPath});continue;}
+          const priorSemantic=hash(canonicalJson(stableSourceFacts({id:r.id,accountId:r.accountId,workspaceId:r.workspaceId,caption:r.caption,scheduledAt:r.sourceScheduledAt,media:(r.media??[]).map(m=>m.sha256),provenance:r.provenance??[]})));
+          const sourceUnchanged=Boolean(r.postId && priorSemantic===fingerprint);
+          if (sourceUnchanged) {
+            r.fingerprint=fingerprint;r.provenance=feed.provenance;r.needsReview=false;delete r.reviewReason;delete r.observedFingerprint;persist();
+          } else {
+            r.needsReview=true;r.reviewReason='Source, caption, schedule or artwork changed; existing post was NOT replaced';r.observedFingerprint=fingerprint;persist();
+            if (!r.postId) {results.push({...r,receiptPath});continue;}
+          }
         }
         if (dryRun) {
           let window;

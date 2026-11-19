@@ -10,7 +10,8 @@
         "**/dist/**",
         "**.local",
         "*.local"
-      ]
+      ],
+      "predeploy": ["node scripts/assert-main-deploy.mjs"]
     },
     {
       "target": "rifasmtz",
@@ -22,7 +23,8 @@
         "**/dist/**",
         "**.local",
         "*.local"
-      ]
+      ],
+      "predeploy": ["node scripts/assert-main-deploy.mjs"]
     }
   ],
   "emulators": {
@@ -49,7 +51,7 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+      "predeploy": ["node scripts/assert-main-deploy.mjs", "npm --prefix \"$RESOURCE_DIR\" run build"]
     }
   ],
   "firestore": {
