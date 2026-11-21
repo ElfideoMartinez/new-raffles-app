@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UFC Two-Way Winner Lab</title>
+<style>
+:root{color-scheme:dark;--ink:#f4ede2;--muted:#cbbbab;--gold:#ffb347;--line:#594838;--paper:#12100e;--panel:#241f19}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Avenir Next,Avenir,sans-serif}main{max-width:980px;margin:auto;padding:clamp(14px,3vw,30px)}h1,h2,h3,p,dl,dd{margin:0}h1{font-size:clamp(27px,4.8vw,45px);line-height:1.08;letter-spacing:-.05em;margin:5px 0 8px}h2{font-size:20px;letter-spacing:-.025em}h3{font-size:17px}.label,legend{font:700 12px/1.4 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--gold)}header{border-bottom:1px solid var(--line);padding-bottom:15px}.muted,dt{color:var(--muted)}.small{font-size:14px}.choices{display:flex;flex-wrap:wrap;gap:7px}.controls{display:flex;gap:14px 22px;flex-wrap:wrap;margin:18px 0}fieldset{border:0;margin:0;padding:0;min-width:0}legend{margin-bottom:6px;padding:0}button,select{border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink);font:inherit;min-height:44px;padding:6px 10px}button{cursor:pointer}button[aria-pressed=true]{color:var(--paper);background:var(--gold);border-color:var(--gold);font-weight:700}:focus-visible{outline:2px solid var(--gold);outline-offset:3px}.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;background:var(--panel)}article{padding:14px clamp(10px,2vw,20px)}article+article{border-left:1px solid var(--line)}article header{min-height:90px;padding-bottom:9px}.result{font-size:clamp(21px,3.4vw,32px);font-weight:750;line-height:1.1;letter-spacing:-.04em;margin:12px 0 2px}.result,dd{font-variant-numeric:tabular-nums}dl{font-size:14px}dl>div{display:flex;justify-content:space-between;gap:5px;padding:7px 0;border-bottom:1px solid var(--line)}dd{text-align:right}footer{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}.steps{margin:9px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:0;list-style:none;gap:8px}.steps button{width:100%;height:100%;text-align:left;padding:7px 10px}.steps strong{display:block}.flow-panel{margin-top:8px;padding:9px 0;min-height:60px}.flow-panel p+p{margin-top:4px}details{margin-top:10px;font-size:14px;color:var(--muted)}summary{cursor:pointer;min-height:44px;align-content:center}a{color:var(--gold)}[hidden]{display:none!important}@media(max-width:500px){article header{min-height:114px}dl>div{flex-wrap:wrap}dd{text-align:left}.steps{grid-template-columns:1fr}.steps strong,.steps span{display:inline}.steps span{margin-left:.5em}}
+</style></head><body><main>
+<header><p class="label">New Raffles / UFC rules lab</p><h1>Two-way winner: base vs. method extra</h1><p class="muted">Same base pool. The optional second ticket has its own stake and payout.</p></header>
+<div class="controls"><fieldset><legend>Result to simulate</legend><div class="choices" id="results"><button data-result="draw" aria-pressed="true">Official draw</button><button data-result="tko" aria-pressed="false">A by TKO</button><button data-result="decision" aria-pressed="false">A by decision</button><button data-result="submission" aria-pressed="false">B by submission</button><button data-result="nc" aria-pressed="false">No contest</button></div></fieldset>
+<fieldset><legend><label for="pick">Your optional method pick</label></legend><select id="pick"><option value="tko">Fighter A · KO/TKO</option><option value="submission">Fighter A · Submission</option><option value="decision">Fighter A · Decision</option></select></fieldset></div>
+<section aria-label="Ticket comparison" aria-live="polite" class="compare" id="comparison"></section>
+<footer id="flow"><h2>What happens after a draw?</h2><p class="small muted">Proposed flow. Select a step to preview the customer or admin message.</p><ol class="steps" id="steps"><li><button data-step="review" aria-pressed="true"><strong>01 · Admin review</strong><span>Confirm result</span></button></li><li><button data-step="pending" aria-pressed="false"><strong>02 · Purchase history</strong><span>Refund pending</span></button></li><li><button data-step="sent" aria-pressed="false"><strong>03 · Receipt</strong><span>Refund confirmed</span></button></li></ol><div class="flow-panel" id="flow-panel" aria-live="polite"></div></footer>
+<details><summary>Example pool sizes and fee</summary><p>Only verified stakes count. The base uses 70 A / 30 B tickets at MXN $50. The extra uses 30 / 15 / 25 on A and 12 / 8 / 10 on B (KO/TKO, submission, decision) at MXN $20. Counts include the ticket(s) shown. A 10% fee applies only to settled pools; each winning return is rounded down to the centavo. Gross amounts include any returned stake and are not fixed odds. The draw flow shows sample statuses, not actual money movement.</p></details>
+</main><script>
+'use strict';
+const basePrice=5000, extraPrice=2000;
+const outcomes={draw:null,nc:null,tko:['A','tko'],decision:['A','decision'],submission:['B','submission']};
+const baseCounts={A:70,B:30};
+const methods={tko:'KO/TKO',submission:'Submission',decision:'Decision'};
+const extraCounts={'A-tko':30,'A-submission':15,'A-decision':25,'B-tko':12,'B-submission':8,'B-decision':10};
+const money=cents=>new Intl.NumberFormat('en-MX',{style:'currency',currency:'MXN',currencyDisplay:'narrowSymbol'}).format(cents/100);
+let result='draw', step='review';
+function settle(selection,winner,counts,price){
+ if(!winner||!counts[winner])return {label:'Full refund',cents:price};
+ if(winner!==selection)return {label:'Lost',cents:0};
+ const sold=Object.values(counts).reduce((a,b)=>a+b,0);
+ return {label:'Won',cents:Math.floor(Math.floor(sold*price*90/100)/counts[winner])};
+}
+function render(){
+ const official=outcomes[result], pick=document.querySelector('#pick').value;
+ const base=settle('A',official?.[0],baseCounts,basePrice);
+ const extra=settle('A-'+pick,official?.join('-'),extraCounts,extraPrice);
+ document.querySelector('#comparison').innerHTML=[false,true].map(add=>{
+ const total=base.cents+(add?extra.cents:0), stake=basePrice+(add?extraPrice:0);
+ return `<article data-option="${add?'plus':'base'}"><header><p class="label">${add?'02 / Optional extra':'01 / Base'}</p><h2>${add?'Winner + extra':'Winner only'}</h2><p class="small muted">${add?'Fighter A + A by '+methods[pick]:'Fighter A'}</p></header><p class="result" data-total="${total}">${money(total)}</p><p class="small muted">${official?'Gross return':'Total refund due'} · MXN</p><dl><div><dt>Stake paid</dt><dd>${money(stake)}</dd></div><div><dt>Winner ticket</dt><dd>${base.label} · ${money(base.cents)}</dd></div><div><dt>Method ticket</dt><dd>${add?`${extra.label} · ${money(extra.cents)}`:'Not added'}</dd></div></dl></article>`;
+ }).join('');
+ const isDraw=result==='draw';document.querySelector('#flow').hidden=!isDraw;
+ if(isDraw){
+ const copy={review:['Empate oficial · Revisar liquidación','Admin confirms the source and sees a full refund for verified tickets in both pools. Fee: $0.00 MXN.'],pending:['Empate oficial · Reembolso pendiente','My purchases shows $50.00 MXN due for the winner ticket and $20.00 MXN due if the extra was bought. No payment has been sent yet.'],sent:['Empate oficial · Reembolsado','Show only after the transfer is confirmed. The receipt lists $50.00 MXN back for base only or $70.00 MXN back with the extra.']};
+ document.querySelector('#flow-panel').innerHTML=`<p><strong>${copy[step][0]}</strong></p><p class="small muted">${copy[step][1]}</p>`;
+ }
+}
+function bind(id,key,onSelect){const root=document.querySelector(id);root.addEventListener('click',event=>{const button=event.target.closest(`button[data-${key}]`);if(!button)return;for(const b of root.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b===button));onSelect(button.dataset[key]);render()});}
+bind('#results','result',value=>{result=value;if(value==='draw'){step='review';for(const b of document.querySelectorAll('#steps button'))b.setAttribute('aria-pressed',String(b.dataset.step===step));}});
+bind('#steps','step',value=>{step=value});document.querySelector('#pick').addEventListener('change',render);render();
+</script></body></html>

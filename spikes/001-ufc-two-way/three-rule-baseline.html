@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UFC Fight Pool Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#12100e;--surface:#241f19;--ink:#f4ede2;--muted:#c6b9a8;--line:#594838;--gold:#ffb347}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Avenir Next,Avenir,sans-serif}main{max-width:1080px;margin:auto;padding:22px clamp(14px,4vw,40px) 28px}header{border-bottom:1px solid var(--line);padding-bottom:16px}.kicker,.eyebrow,legend{font:700 12px/1.4 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}h1{font-size:clamp(30px,5vw,54px);letter-spacing:-.055em;line-height:1.05;margin:6px 0 8px}p{margin:0}.muted,.detail{color:var(--muted)}.controls{display:flex;flex-wrap:wrap;gap:12px 28px;padding:18px 0}fieldset{border:0;margin:0;padding:0;min-width:0}legend{padding:0;margin-bottom:7px}.choices{display:flex;flex-wrap:wrap;gap:6px}button,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);min-height:44px;border-radius:5px;padding:5px 10px}button{cursor:pointer}button[aria-pressed=true]{color:var(--bg);background:var(--gold);border-color:var(--gold);font-weight:700}:focus-visible{outline:2px solid var(--gold);outline-offset:3px}.headline{border-bottom:1px solid var(--line);padding-bottom:10px}.headline h2{font-size:21px;letter-spacing:-.02em;margin:0}.headline p{font-size:14px}.row{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.row.recommended{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);padding-inline:9px}.eyebrow{font-size:10px}.row h3{font-size:19px;letter-spacing:-.025em;margin:3px 0 2px}.detail{font-size:13px}.amount{font-weight:750;font-size:23px;line-height:1.2;font-variant-numeric:tabular-nums}.track{background:#3a342c;height:6px;margin:6px 0;border-radius:10px}.bar{height:100%;background:var(--gold);border-radius:10px}.policy{color:var(--muted);font-size:14px;padding-top:14px}.policy p+p{margin-top:6px}a{color:var(--gold)}@media(max-width:540px){.row{grid-template-columns:1fr 1fr;gap:6px 12px}.row>div:first-child{grid-column:1/-1}.row>div:last-child{align-self:start}.amount{font-size:20px}}@media print{body{background:white;color:#111}.muted,.detail,.policy{color:#333}.row.recommended,button,select{background:white;color:#111}.kicker,.eyebrow,legend,a{color:#674000}}
+</style></head><body><main>
+<header><p class="kicker">New Raffles · UFC rules lab / 01</p><h1>Same fight. Three pool rules.</h1><p class="muted">Simulated tickets · $50 MXN each · 10% fee on settled pools · No fixed odds</p></header>
+<div class="controls" aria-label="Simulation controls">
+<fieldset><legend>Official result</legend><div class="choices" id="results"><button type="button" data-result="ko" aria-pressed="true">A by TKO</button><button type="button" data-result="sub" aria-pressed="false">B by submission</button><button type="button" data-result="dec" aria-pressed="false">A by decision</button><button type="button" data-result="draw" aria-pressed="false">Draw</button><button type="button" data-result="void" aria-pressed="false">No contest</button></div></fieldset>
+<fieldset><legend><label for="preset">Ticket mix</label></legend><select id="preset"><option value="base">70% on fighter A</option><option value="nodraw">No draw tickets</option><option value="heavy">98% on fighter A</option><option value="nosub">No B-by-submission tickets</option></select></fieldset>
+</div>
+<section aria-labelledby="compare" aria-live="polite">
+<div class="headline"><h2 id="compare">Gross return per eligible ticket</h2><p class="muted">Includes the $50 stake. A losing ticket returns $0. Bars use the same scale within each scenario.</p></div>
+<div id="board"></div>
+</section>
+<div class="policy"><p><strong>Proposed settlement:</strong> For the two-fighter pool, a technical decision pays the official winner and a technical draw refunds both sides. In the separate method pool, group technical decisions with decision and technical submissions with submission; refund the method pool on a draw or disqualification. No contest, cancellation, fighter replacement, or an unbacked winning selection → full market refund, no fee.</p><p>The method pool uses its own sample ticket mix; no stakes are shared between markets. A heavily backed winner can get back less than $50 under a fee on the whole pot. <a href="https://sportsbook.draftkings.com/help/sport-rules/mma">MMA settlement reference [1]</a> (comparison only; these are proposed house rules).</p></div>
+</main><script>
+'use strict';
+const price=5000, feePercent=10;
+const mixes={base:{ab:[70,28,2],method:[30,15,25,12,8,10]},nodraw:{ab:[70,30,0],method:[30,15,25,12,8,10]},heavy:{ab:[98,1,1],method:[55,18,25,1,1,0]},nosub:{ab:[70,28,2],method:[30,15,25,17,0,13]}};
+const outcomes={ko:{i:0,m:0},sub:{i:1,m:4},dec:{i:0,m:2},draw:{i:2,m:-1},void:{i:-1,m:-1}};
+const configs=[['01 / BASELINE','Three-way winner','A · B · Draw'],['02 / TEST FIRST','Two-way winner','A · B · Draw refunds'],['03 / LATER','Winner + method','A/B × KO/TKO, SUB, DEC']];
+const fmt=new Intl.NumberFormat('en-MX',{style:'currency',currency:'MXN',currencyDisplay:'narrowSymbol'});
+const money=c=>fmt.format(c/100);
+function settle(counts,i){
+ const sold=counts.reduce((a,b)=>a+b,0),pool=sold*price,winners=counts[i]??0,refund=!winners,eligible=refund?sold:winners;
+ const each=refund?price:Math.floor(Math.floor(pool*(100-feePercent)/100)/winners);
+ return {sold,pool,eligible,each,refund,reason:i<0?'Result triggers refund':refund?'No winning tickets':`${winners} winning tickets`,retained:pool-eligible*each};
+}
+let result='ko';
+const controls=document.querySelector('#results'), select=document.querySelector('#preset');
+function render(){
+ const {ab,method}=mixes[select.value],{i,m}=outcomes[result];
+ const rows=[settle(ab,i),settle(ab.slice(0,2),i===2?-1:i),settle(method,m)];
+ const max=Math.max(price,...rows.map(x=>x.each));
+ document.querySelector('#board').innerHTML=rows.map((r,j)=>`<article class="row ${j===1?'recommended':''}" data-model="${j}"><div><div class="eyebrow">${configs[j][0]}</div><h3>${configs[j][1]}</h3><p class="detail">${configs[j][2]}</p></div><div><p class="amount">${money(r.each)}</p><div class="track" aria-hidden="true"><div class="bar" style="width:${100*r.each/max}%"></div></div><p class="detail">${r.refund?'Refund per ticket':'Per winning ticket'}${!r.refund && r.each<price?' · below stake':''}</p></div><div class="detail"><p>${r.eligible} of ${r.sold} tickets ${r.refund?'refunded':'paid'}</p><p>${money(r.pool)} pool · ${money(r.retained)} retained</p><p>${r.reason}</p></div></article>`).join('');
+}
+controls.addEventListener('click',event=>{const btn=event.target.closest('button');if(!btn)return;result=btn.dataset.result;for(const b of controls.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b===btn));render()});
+select.addEventListener('change',render);render();
+</script></body></html>
