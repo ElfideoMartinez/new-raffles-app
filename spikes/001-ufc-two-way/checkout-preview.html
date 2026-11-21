@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Ganador + método | New Raffles · Demo UFC</title>
+<style>
+:root{color-scheme:dark;--gold:#ffb347;--base:#12100e;--panel:#241f19;--line:#675746;--cream:#f4ede2;--quiet:#c9baa9}*{box-sizing:border-box}body{margin:0;background:var(--base);color:var(--cream);font:16px/1.45 Avenir Next,Avenir,sans-serif}main{max-width:760px;margin:auto;padding:clamp(14px,4vw,30px)}h1,h2,p{margin:0}h1{font-size:clamp(30px,6vw,46px);line-height:1.05;letter-spacing:-.045em;margin:6px 0 8px}h2{font-size:18px;margin-bottom:6px}.tag{color:var(--gold);font:700 12px/1.4 ui-monospace,monospace;letter-spacing:.075em;text-transform:uppercase}.muted{color:var(--quiet);font-size:14px}header{margin-bottom:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:clamp(12px,3vw,20px);margin-bottom:12px}.picks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.methods{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}button{cursor:pointer;min-height:44px;background:var(--base);border:1px solid var(--line);border-radius:7px;color:var(--cream);padding:8px 12px;font:inherit;font-weight:650}button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button[aria-pressed=true],.primary{background:var(--gold);color:var(--base);border-color:var(--gold)}button:disabled{cursor:not-allowed;opacity:.55}button:disabled.primary{background:var(--panel);color:var(--quiet);border-color:var(--line)}.total{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0;font-variant-numeric:tabular-nums}.total strong{font-size:22px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.wide{width:100%}ul{list-style:none;padding:0;margin:10px 0}li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}li span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}[hidden]{display:none!important}#flow-note{margin-top:5px}
+</style></head><body><main>
+<header><p class="tag">New Raffles / Demo UFC · Sin dinero real</p><h1>Ganador + método</h1><p class="muted">Si hay empate oficial, se devuelve el importe de cada boleto, sin comisión.</p></header>
+<div id="builder">
+<section class="panel" aria-labelledby="winner-heading"><p class="tag">01 / Boleto ganador</p><h2 id="winner-heading">¿Quién gana? · $50 MXN</h2><div class="picks" id="fighters"><button type="button" data-fighter="0" aria-pressed="false" aria-label="Elegir Alex Rivera">Alex Rivera</button><button type="button" data-fighter="1" aria-pressed="false" aria-label="Elegir Nico Santos">Nico Santos</button></div></section>
+<section class="panel" aria-labelledby="extra-heading"><p class="tag">02 / Boleto opcional</p><h2 id="extra-heading">¿Cómo gana?</h2><p class="muted" id="method-copy">Elige al ganador para agregar el método.</p><div class="actions"><button type="button" id="toggle" aria-expanded="false" aria-controls="methods" disabled>Agregar método · +$20</button></div><div class="methods" id="methods" role="group" aria-label="Método de victoria" hidden><button type="button" data-method="0" aria-pressed="false">KO/TKO</button><button type="button" data-method="1" aria-pressed="false">Sumisión</button><button type="button" data-method="2" aria-pressed="false">Decisión</button></div></section>
+<section class="panel" aria-label="Total de la selección"><div class="total" aria-live="polite"><span id="count">Sin boletos</span><strong id="total">$0.00 MXN</strong></div><button class="primary wide" type="button" id="add" disabled>Agregar al carrito</button></section>
+</div>
+<section class="panel" id="cart" hidden><p class="tag">Carrito de prueba</p><h2 id="cart-title" tabindex="-1">Tus boletos</h2><ul id="cart-lines"></ul><div class="total"><span>Total de prueba</span><strong id="cart-total"></strong></div><p class="muted">No se cobrará nada. Cada boleto se liquida por separado.</p><div class="actions"><button type="button" id="edit">Editar selección</button><button type="button" id="draw" class="primary">Simular empate oficial</button></div></section>
+<section class="panel" id="refund" hidden><p class="tag">Mis compras · Simulación</p><h2 id="refund-title" tabindex="-1">Empate oficial</h2><p id="refund-status" aria-live="polite"></p><p class="muted" id="flow-note"></p><ul id="refund-lines"></ul><div class="total"><span>Reembolso sin comisión</span><strong id="refund-total"></strong></div><div class="actions"><button type="button" class="primary" id="confirm">Simular transferencia confirmada</button><button type="button" id="reset">Volver a probar</button></div></section>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const names=['Alex Rivera','Nico Santos'], methods=['KO/TKO','Sumisión','Decisión'];
+const base=5000, extra=2000;
+const formatter=new Intl.NumberFormat('en-MX',{style:'currency',currency:'MXN',currencyDisplay:'narrowSymbol'});
+const money=cents=>formatter.format(cents/100)+' MXN';
+let fighter=null, method=null, extraOpen=false, lines=[];
+function render(){
+ const hasWinner=fighter!==null, hasMethod=method!==null;
+ for(const b of $('fighters').querySelectorAll('button'))b.setAttribute('aria-pressed',String(fighter===Number(b.dataset.fighter)));
+ for(const b of $('methods').querySelectorAll('button'))b.setAttribute('aria-pressed',String(method===Number(b.dataset.method)));
+ $('toggle').disabled=!hasWinner;
+ $('toggle').textContent=extraOpen?'Quitar método':'Agregar método · +$20';
+ $('toggle').setAttribute('aria-expanded',String(extraOpen));
+ $('methods').hidden=!extraOpen;
+ $('method-copy').textContent=hasWinner?`Boleto separado: ${names[fighter]} debe ganar por el método elegido.`:'Elige al ganador para agregar el método.';
+ $('total').textContent=money((hasWinner?base:0)+(hasMethod?extra:0));
+ $('count').textContent=hasMethod?'2 boletos':hasWinner?'1 boleto':'Sin boletos';
+ $('add').disabled=!hasWinner||(extraOpen&&!hasMethod);
+}
+function show(id,focus){for(const view of ['builder','cart','refund'])$(view).hidden=view!==id;$(focus).focus();}
+function orderRows(id,total){
+ $(id).replaceChildren(...lines.map(({title,price})=>{const item=document.createElement('li'),label=document.createElement('span'),amount=document.createElement('span');label.textContent=title;amount.textContent=money(price);item.append(label,amount);return item}));
+ $(total).textContent=money(lines.reduce((sum,line)=>sum+line.price,0));
+}
+$('fighters').addEventListener('click',event=>{const b=event.target.closest('button[data-fighter]');if(!b)return;const next=Number(b.dataset.fighter);if(fighter!==next){fighter=next;method=null;extraOpen=false;render()}});
+$('toggle').addEventListener('click',()=>{extraOpen=!extraOpen;method=null;render()});
+$('methods').addEventListener('click',event=>{const b=event.target.closest('button[data-method]');if(!b||!extraOpen)return;method=Number(b.dataset.method);render()});
+$('add').addEventListener('click',()=>{if($('add').disabled)return;lines=[{title:`Ganador · ${names[fighter]}`,price:base}];if(method!==null)lines.push({title:`Método · ${names[fighter]} por ${methods[method]}`,price:extra});orderRows('cart-lines','cart-total');show('cart','cart-title')});
+$('edit').addEventListener('click',()=>show('builder','add'));
+$('draw').addEventListener('click',()=>{orderRows('refund-lines','refund-total');$('refund-status').textContent='Reembolso pendiente';$('flow-note').textContent='Importe por devolver. Aún no se ha enviado la transferencia.';$('confirm').hidden=false;show('refund','refund-title')});
+$('confirm').addEventListener('click',()=>{$('refund-status').textContent='Reembolsado';$('flow-note').textContent='La transferencia se ha confirmado en esta simulación.';$('confirm').hidden=true;$('refund-title').focus()});
+$('reset').addEventListener('click',()=>{fighter=null;method=null;extraOpen=false;lines=[];render();show('builder','fighters');$('fighters').querySelector('button').focus()});
+render();
+</script></body></html>

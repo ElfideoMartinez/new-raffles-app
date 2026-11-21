@@ -6,6 +6,10 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { realtimeDB } from "@/app/firebaseconfig";
 import { ref, onValue } from "firebase/database";
 import { isBetClosed } from "@/app/utils/betStatus";
+import { formatPrice } from "@/app/utils/format";
+
+const methods = { KO_TKO: "KO/TKO", SUBMISSION: "Sumisión", DECISION: "Decisión" } as const;
+type Method = keyof typeof methods;
 
 interface BetRealtimeData {
   oddsTie: any;
@@ -26,6 +30,7 @@ interface BetRealtimeData {
     b: string;
   };
   tieBets: number;
+  ufcRules?: { version: 1; methodPriceCents: number };
   title: string;
   // Written by settleBet() when an admin settles the match.
   settled?: boolean;
@@ -97,8 +102,7 @@ function WinnerBanner({
 
 const BetPageClient = ({ betId }: { betId: string | null }) => {
   const router = useRouter();
-  const { updateBet } = useTicketStore();
-  const userCartBets = useTicketStore((state) => state.getBetsFromCart);
+  const updateBetSelection = useTicketStore((state) => state.updateBetSelection);
   const userTicketsBets = useTicketStore((state) => state.getTicketInfoByBetId);
 
   const [loadStatus, setLoadStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
@@ -134,6 +138,11 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   const [tieTickets, setTieTickets] = useState(0);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [selectedLetterTeam, setSelectedLetterTeam] = useState("");
+  const [method, setMethod] = useState<Method | null>(null);
+  const pilot = realtimeBetData.ufcRules?.version === 1;
+  const methodCents = realtimeBetData.ufcRules?.methodPriceCents ?? 0;
+  const methodAvailable = pilot && Number.isSafeInteger(methodCents) && methodCents > 0;
+  const methodPrice = methodCents / 100;
 
   // Computed values using useMemo for performance
   const favorite = useMemo(() => {
@@ -249,7 +258,8 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
   // Optimized ticket update function
   const updateTickets = useCallback(
     (team: "A" | "B" | "C", action: number) => {
-      if (closed) return;
+      if (closed || (pilot && team === "C")) return;
+      if (team !== selectedLetterTeam || (action < 0 && (team === "A" ? ticketsTeamA : ticketsTeamB) <= 1)) setMethod(null);
       // Reset other teams when selecting a new one
       if (action > 0) {
         if (team !== "A") setTicketsTeamA(0);
@@ -281,13 +291,13 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
           break;
       }
     },
-    [closed, realtimeBetData.teams]
+    [closed, pilot, realtimeBetData.teams, selectedLetterTeam, ticketsTeamA, ticketsTeamB]
   );
 
   const addToCart = useCallback(() => {
-    if (closed || totalTickets === 0 || priceUnusable) return;
+    if (closed || totalTickets === 0 || priceUnusable || (pilot && selectedLetterTeam === "C")) return;
 
-    updateBet({
+    const baseLine = {
       betId: betId as string,
       betName: realtimeBetData.title,
       team: selectedTeam,
@@ -295,7 +305,14 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
       ticketNumbers: totalTickets,
       totalPrice: totalPrice,
       image: realtimeBetData.image || undefined,
-    });
+    };
+    updateBetSelection(baseLine, methodAvailable && method ? {
+      ...baseLine,
+      team: `${selectedTeam} por ${methods[method]}`,
+      method,
+      ticketNumbers: 1,
+      totalPrice: methodPrice,
+    } : undefined);
 
     router.push("/user/cart");
   }, [
@@ -306,9 +323,12 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
     selectedLetterTeam,
     totalTickets,
     totalPrice,
-    updateBet,
+    updateBetSelection,
     realtimeBetData.image,
-    userCartBets,
+    pilot,
+    method,
+    methodAvailable,
+    methodPrice,
     priceUnusable,
     router,
   ]);
@@ -468,8 +488,8 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               disabled={closed || ticketsTeamB > 0 || tieTickets > 0}
             />
 
-            {/* Tie */}
-            <TeamCard
+            {/* Legacy draw selection */}
+            {!pilot && <TeamCard
               teamKey='C'
               teamName='Empate'
               color='bg-ink-500 hover:bg-ink-700'
@@ -477,7 +497,7 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               tickets={tieTickets}
               stakeShare={stakeSharePercent("C")}
               disabled={closed || ticketsTeamA > 0 || ticketsTeamB > 0}
-            />
+            />}
 
             {/* Team B */}
             <TeamCard
@@ -491,7 +511,21 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
             />
           </div>
 
-          <p hidden={closed} className="mx-auto mt-4 max-w-3xl text-center text-sm text-ink-500">
+          {pilot && !closed && <p className="mt-4 text-center text-sm text-ink-700">Si hay empate oficial, ambos boletos se reembolsan completos, sin comisión.</p>}
+          {methodAvailable && !closed && totalTickets > 0 && selectedLetterTeam !== "C" && (
+            <section className="my-4 w-full max-w-xl rounded-card border border-ink-300 bg-surface p-4" aria-labelledby="method-extra">
+              <h2 id="method-extra" className="font-bold">Agrega un boleto de método · {formatPrice(methodPrice)}</h2>
+              <p className="mt-1 text-sm text-ink-700">Opcional. {selectedTeam} debe ganar por el método elegido. Se liquida por separado.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(Object.keys(methods) as Method[]).map((option) => (
+                  <button key={option} type="button" aria-pressed={method === option} onClick={() => setMethod(method === option ? null : option)} className={`min-h-11 rounded-pill border border-ink-300 px-4 ${method === option ? "bg-brand-600 text-on-brand" : "bg-surface text-ink-900"}`}>{methods[option]}</button>
+                ))}
+                {method && <button type="button" onClick={() => setMethod(null)} className="min-h-11 px-2 underline">Quitar método</button>}
+              </div>
+            </section>
+          )}
+
+          <p hidden={closed || pilot} className="mx-auto mt-4 max-w-3xl text-center text-sm text-ink-500">
             Las ganancias estimadas pueden cambiar según las apuestas que se reciban antes del cierre.
           </p>
 
@@ -504,15 +538,15 @@ const BetPageClient = ({ betId }: { betId: string | null }) => {
               <div className="min-w-0 flex-1" aria-live="polite" aria-atomic="true">
                 <div className="flex items-baseline justify-between gap-3 sm:justify-start sm:gap-6">
                   <p className="text-lg font-extrabold text-ink-900">
-                    Total: ${totalPrice}
+                    Total: {formatPrice(totalPrice + (methodAvailable && method ? methodPrice : 0))}
                   </p>
                   <p className="font-semibold text-ink-700">
-                    {totalTickets} {totalTickets === 1 ? "boleto" : "boletos"}
+                    {totalTickets} {totalTickets === 1 ? "boleto" : "boletos"}{pilot ? " de ganador" : ""}{methodAvailable && method ? " + 1 de método" : ""}
                   </p>
                 </div>
-                <p className="mt-0.5 text-sm text-ink-600">
+                {!pilot && <p className="mt-0.5 text-sm text-ink-600">
                   Pago potencial estimado: <span className="font-bold">~${potentialWinnings.toFixed(2)}</span>
-                </p>
+                </p>}
                 {priceUnusable && (
                   <p className="mt-1 text-sm font-semibold text-danger-700" role="status">
                     Esta apuesta no está disponible por ahora.

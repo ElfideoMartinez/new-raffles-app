@@ -1,11 +1,13 @@
 import * as functionsV1 from "firebase-functions/v1";
 import * as functions from "firebase-functions";
 import crypto from "crypto";
+import { isDeepStrictEqual } from "node:util";
 import * as admin from "firebase-admin";
 import { getDatabase } from "firebase-admin/database";
 import { getRemoteConfig } from "firebase-admin/remote-config";
 import type express from "express";
 import { buildNotificationPayload } from "./notifications";
+import { settleUfcMarket, UfcMethod, UfcRules, UfcOfficialResult, UfcSettlementInput, UfcObligation } from "./ufcSettlement";
 import {
   DEFAULT_TAKE_RATE,
   distributableCents,
@@ -37,7 +39,7 @@ const remoteConfig = getRemoteConfig();
 // for the one-time remediation.
 async function assertAdmin(
   authorizationHeader: string | undefined
-): Promise<void> {
+): Promise<admin.auth.DecodedIdToken> {
   const header = authorizationHeader || "";
   const [scheme, token] = header.split(" ");
   if (scheme !== "Bearer" || !token) {
@@ -63,6 +65,7 @@ async function assertAdmin(
       "Administrator privileges are required."
     );
   }
+  return decoded;
 }
 
 /** Append an audit entry for a successful admin mutation (best effort). */
@@ -181,11 +184,13 @@ async function summarizeAndPruneMulticast(
 async function rejectUnlessAdmin(
   req: functionsV1.https.Request,
   res: express.Response,
-  methods = "GET, POST, OPTIONS"
+  methods = "GET, POST, OPTIONS",
+  onAuthorized?: (uid: string) => void,
 ): Promise<boolean> {
   if (applyCors(req, res, methods)) return true;
   try {
-    await assertAdmin(req.headers.authorization);
+    const { uid } = await assertAdmin(req.headers.authorization);
+    onAuthorized?.(uid);
     return false;
   } catch (err) {
     const denied =
@@ -1175,6 +1180,11 @@ export const checkTransfer = functions.https.onRequest(async (req, res) => {
     raffles = body.raffles;
     bets = body.bets;
 
+    if (await containsNonLegacyBetLines(bets)) {
+      res.status(409).json({ status: 409, message: "Usa el checkout actual para las apuestas UFC." });
+      return;
+    }
+
     const {
       name,
       phone,
@@ -1327,6 +1337,107 @@ interface TransferBetLine {
   letterTeam: string;
   ticketNumbers: number;
   totalPrice: number;
+  method?: UfcMethod;
+  ufcRules?: UfcRules;
+}
+
+function parseUfcRules(value: unknown): UfcRules | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const { version, methodPriceCents } = value as Record<string, unknown>;
+  return version === 1 && typeof methodPriceCents === "number" &&
+    Number.isSafeInteger(methodPriceCents) && methodPriceCents > 0
+    ? { version, methodPriceCents }
+    : null;
+}
+
+const validTransferBetId = (id: string) => /^[A-Za-z0-9_-]{1,128}$/.test(id);
+const betCutoff = (date: unknown) => typeof date === "string" ? Date.parse(date) : NaN;
+
+// Default-denied to every client by firestore.rules. Never infer pilot trust
+// from salesBets (which allows client creates), RTDB counters, or request data.
+const pilotMarkets = () => db.collection("ufcPilotMarkets");
+const pilotOrders = () => db.collection("ufcPilotOrders");
+const MAX_PILOT_ORDERS = 100; // Bound one-market reads/writes for atomic settlement.
+const isFeeBps = (n: unknown): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < 10000;
+const isPositiveCents = (n: unknown): n is number => typeof n === "number" && Number.isSafeInteger(n) && n > 0;
+const isOfficialUfcEventUrl = (value: unknown): value is string => typeof value === "string" &&
+  /^https:\/\/www\.ufc\.com\/event\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) && value.length <= 200;
+
+interface PilotTerms {
+  ufcRules: UfcRules;
+  cutoffMs: number;
+  basePriceCents: number;
+  officialSourceUrl: string;
+  frozenFeeBps: number;
+  teams: { a: string; b: string };
+}
+
+function readPilotTeams(value: unknown): PilotTerms["teams"] | null {
+  const { a, b } = (value ?? {}) as Record<string, unknown>;
+  return typeof a === "string" && typeof b === "string" && a.trim() && b.trim() && a.trim() !== b.trim()
+    ? { a, b } : null;
+}
+
+function readPilotTerms(bet: Record<string, unknown>): PilotTerms | null {
+  const ufcRules = parseUfcRules(bet.ufcRules);
+  const cutoffMs = betCutoff(bet.date);
+  const price = transferPrice(bet.pricePerTicket);
+  const basePriceCents = price === null ? 0 : toCents(price);
+  const { frozenFeeBps, officialSourceUrl } = bet;
+  const teams = readPilotTeams(bet.teams);
+  if (!ufcRules || !teams || !Number.isSafeInteger(cutoffMs) || !isPositiveCents(basePriceCents) ||
+      !isFeeBps(frozenFeeBps) || !isOfficialUfcEventUrl(officialSourceUrl)) return null;
+  return { ufcRules, cutoffMs, basePriceCents, officialSourceUrl, frozenFeeBps, teams };
+}
+
+function readPilotMarket(snap: admin.firestore.DocumentSnapshot) {
+  const { ufcRules, cutoffMs, basePriceCents, officialSourceUrl, frozenFeeBps, teams: rawTeams,
+    orderCount, reviewedCount, settlement } = snap.data() ?? {};
+  const rules = parseUfcRules(ufcRules);
+  const teams = readPilotTeams(rawTeams);
+  if (!rules || !teams || !Number.isSafeInteger(cutoffMs) || !isPositiveCents(basePriceCents) ||
+      !isOfficialUfcEventUrl(officialSourceUrl) || !isFeeBps(frozenFeeBps) ||
+      !Number.isInteger(orderCount) || orderCount < 0 || orderCount > MAX_PILOT_ORDERS ||
+      !Number.isInteger(reviewedCount) || reviewedCount < 0 || reviewedCount > orderCount) {
+    throw transferConflict("UFC market has no valid frozen terms or ledger; reconcile manually.");
+  }
+  const terms: PilotTerms = { ufcRules: rules, cutoffMs, basePriceCents, officialSourceUrl, frozenFeeBps, teams };
+  return { terms, orderCount: orderCount as number, reviewedCount: reviewedCount as number, settlement };
+}
+
+async function readTransferBetCopies(betId: string) {
+  const [firestore, realtime] = await Promise.all([
+    db.collection("bets").doc(betId).get(),
+    rtdb.ref(`bets/${betId}`).once("value"),
+  ]);
+  const value: unknown = realtime.val();
+  return {
+    firestoreBet: firestore.data() as Record<string, unknown> | undefined,
+    liveBet: value && typeof value === "object" && !Array.isArray(value)
+      ? value as Record<string, unknown>
+      : undefined,
+  };
+}
+
+function hasUfcLineMarker(entry: Record<string, unknown>): boolean {
+  return entry.method !== undefined || entry.ufcRules !== undefined;
+}
+
+async function containsNonLegacyBetLines(lines: unknown): Promise<boolean> {
+  if (!Array.isArray(lines)) return false;
+  const ids = new Set<string>();
+  for (const line of lines) {
+    const entry = (line ?? {}) as Record<string, unknown>;
+    if (hasUfcLineMarker(entry)) return true;
+    const id = typeof entry.betId === "string" ? entry.betId.trim() : "";
+    if (validTransferBetId(id)) ids.add(id);
+  }
+  for (const id of ids) {
+    const { firestoreBet, liveBet } = await readTransferBetCopies(id);
+    if (firestoreBet?.ufcRules !== undefined || liveBet?.ufcRules !== undefined ||
+        (await pilotMarkets().doc(id).get()).exists) return true;
+  }
+  return false;
 }
 
 function transferPrice(value: unknown): number | null {
@@ -1507,10 +1618,13 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
 
     // ----- bets: same rule, price read from the bet document -----
     const betLines: TransferBetLine[] = [];
+    const betDataById = new Map<string, Record<string, unknown>>();
+    const pilotTermsById = new Map<string, PilotTerms>();
+    let pilotTotalCents = 0;
     for (const entry of rawBets) {
       const item = (entry ?? {}) as Record<string, unknown>;
       const betId = typeof item.betId === "string" ? item.betId.trim() : "";
-      if (!/^[A-Za-z0-9_-]{1,128}$/.test(betId)) {
+      if (!validTransferBetId(betId)) {
         throw transferBadRequest("Identificador de apuesta inválido.");
       }
 
@@ -1525,34 +1639,58 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
         throw transferBadRequest("Cantidad de boletos de apuesta inválida.");
       }
 
-      let betDoc = await db.collection("bets").doc(betId).get();
-      let betData: Record<string, unknown> | undefined = betDoc.exists
-        ? (betDoc.data() as Record<string, unknown>)
-        : undefined;
+      let betData = betDataById.get(betId);
       if (!betData) {
-        // Bets created through `createBet` live in RTDB under the public id.
-        const snapshot = await rtdb.ref(`bets/${betId}`).once("value");
-        const value = snapshot.val();
-        if (value && typeof value === "object") {
-          betData = value as Record<string, unknown>;
+        const { firestoreBet, liveBet } = await readTransferBetCopies(betId);
+        // Public pilot markets use RTDB; keep the legacy Firestore-first price.
+        if (liveBet && liveBet.ufcRules === undefined && firestoreBet?.ufcRules !== undefined) {
+          throw transferConflict("No pudimos validar las reglas de la apuesta UFC.");
         }
-      }
-      if (!betData) {
-        throw transferBadRequest("Una de las apuestas ya no está disponible.");
+        betData = liveBet?.ufcRules !== undefined ? liveBet : firestoreBet ?? liveBet;
+        if (!betData) {
+          throw transferBadRequest("Una de las apuestas ya no está disponible.");
+        }
+        betDataById.set(betId, betData);
       }
 
-      // Server-side bet cutoff (backlog item 5): once the event date has
-      // passed, no new transfer sales may include this bet. UI greys the bet
-      // via `isFinished`, but the server must enforce the close time itself.
-      const eventDate =
-        typeof betData.date === "string" ? Date.parse(betData.date) : NaN;
-      if (Number.isFinite(eventDate) && eventDate <= Date.now()) {
+      const ufcRules = parseUfcRules(betData.ufcRules);
+      if (betData.ufcRules !== undefined && !ufcRules) {
+        throw transferConflict("No pudimos validar las reglas de la apuesta UFC.");
+      }
+      if (ufcRules && letterTeam === "C") {
+        throw transferBadRequest("Selecciona un peleador para la apuesta UFC.");
+      }
+      const method = item.method;
+      if (method !== undefined && (!ufcRules ||
+          (method !== "KO_TKO" && method !== "SUBMISSION" && method !== "DECISION"))) {
+        throw transferBadRequest("Selecciona un método válido para la apuesta UFC.");
+      }
+
+      const cutoff = betCutoff(betData.date);
+      if (ufcRules && (!Number.isFinite(cutoff) || betData.isFinished === true || betData.settled === true)) {
+        throw transferConflict("Esta apuesta UFC no está disponible.");
+      }
+      if (Number.isFinite(cutoff) && cutoff <= Date.now()) {
         throw transferConflict("Esta apuesta ya cerró.");
       }
+      const pilotTerms = ufcRules ? readPilotTerms(betData) : null;
+      if (ufcRules && !pilotTerms) throw transferConflict("Esta apuesta UFC no tiene condiciones congeladas.");
+      if (pilotTerms) pilotTermsById.set(betId, pilotTerms);
 
       const pricePerTicket = transferPrice(betData.pricePerTicket);
       if (pricePerTicket === null) {
         throw transferConflict("No pudimos validar el precio de la apuesta.");
+      }
+      let totalPrice = pricePerTicket * tickets;
+      if (pilotTerms) {
+        const priceCents = method !== undefined ? pilotTerms.ufcRules.methodPriceCents : pilotTerms.basePriceCents;
+        const lineCents = priceCents * tickets;
+        if (priceCents <= 0 || !Number.isSafeInteger(lineCents) ||
+            !Number.isSafeInteger(pilotTotalCents + lineCents)) {
+          throw transferConflict("No pudimos validar el precio de la apuesta UFC.");
+        }
+        pilotTotalCents += lineCents;
+        totalPrice = lineCents / 100;
       }
 
       const teams = (betData.teams ?? {}) as Record<string, unknown>;
@@ -1569,8 +1707,18 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
         team: typeof teamName === "string" ? teamName : "",
         letterTeam,
         ticketNumbers: tickets,
-        totalPrice: pricePerTicket * tickets,
+        totalPrice,
+        ...(ufcRules ? { ufcRules } : {}),
+        ...(method !== undefined ? { method } : {}),
       });
+    }
+
+    const winnerPicks = new Set(betLines
+      .filter((line) => line.ufcRules && line.method === undefined)
+      .map((line) => `${line.betId}:${line.letterTeam}`));
+    if (betLines.some((line) => line.method !== undefined &&
+        !winnerPicks.has(`${line.betId}:${line.letterTeam}`))) {
+      throw transferBadRequest("Agrega el boleto ganador para el mismo peleador antes de elegir un método.");
     }
 
     const ticketCount = raffleLines.reduce(
@@ -1581,11 +1729,21 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
       (total, line) => total + line.raffleTotalPrice,
       0
     );
-    const totalBetsPrice = betLines.reduce(
-      (total, line) => total + line.totalPrice,
+    const totalBetsPrice = pilotTotalCents / 100 + betLines.reduce(
+      (total, line) => total + (line.ufcRules ? 0 : line.totalPrice),
       0
     );
-    const totalSalePrice = totalRafflePrice + totalBetsPrice;
+    const pilotOrder = pilotTermsById.size > 0;
+    if (pilotOrder && betLines.some((line) => !line.ufcRules)) {
+      throw transferBadRequest("Compra las apuestas UFC y las apuestas anteriores por separado.");
+    }
+    const expectedCents = raffleLines.reduce((cents, line) =>
+      cents + toCents(line.pricePerTicket) * line.ticketNumbers.length, pilotTotalCents);
+    if (pilotOrder && (!isPositiveCents(expectedCents) || raffleLines.some((line) =>
+      line.pricePerTicket !== toCents(line.pricePerTicket) / 100))) {
+      throw transferConflict("El total no puede expresarse en centavos.");
+    }
+    const totalSalePrice = pilotOrder ? expectedCents / 100 : totalRafflePrice + totalBetsPrice;
 
     // Small transfers are auto-confirmed (same rule the old handler applied);
     // anything larger waits for an admin, and the client cannot influence it.
@@ -1625,13 +1783,31 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
       .doc(`transfer_${paymentConceptKey}`);
     const verified = autoConfirm;
 
-    let duplicate = false;
-    await db.runTransaction(async (transaction) => {
-      const existing = await transaction.get(saleRef);
-      if (existing.exists) {
-        duplicate = true;
-        return;
+    const pilotOrderRef = pilotOrders().doc(salesBetsRef.id);
+    const duplicate = await db.runTransaction(async (transaction) => {
+      const [existing, existingBetSale, existingPilotOrder] = await Promise.all([
+        transaction.get(saleRef),
+        transaction.get(salesBetsRef),
+        transaction.get(pilotOrderRef),
+      ]);
+      if (pilotOrder && !existingPilotOrder.exists && (existing.exists || existingBetSale.exists)) {
+        throw transferConflict("La clave de pago ya está en uso.");
       }
+      if (existing.exists || existingBetSale.exists || existingPilotOrder.exists) return true;
+
+      // Even if both public markers disappear, a pilot ID cannot fall back to
+      // legacy checkout. All admissions serialize on these same market docs.
+      const markets = await Promise.all([...betDataById.keys()].map(async (id) => {
+        const ref = pilotMarkets().doc(id);
+        const snap = await transaction.get(ref);
+        const terms = pilotTermsById.get(id);
+        if (!terms && !snap.exists) return null;
+        const market = readPilotMarket(snap);
+        if (!isDeepStrictEqual(terms, market.terms) || market.settlement || market.orderCount >= MAX_PILOT_ORDERS) {
+          throw transferConflict("Esta apuesta UFC no está disponible.");
+        }
+        return { ref, ...market };
+      }));
 
       if (ticketRefs.length > 0) {
         const ticketSnaps = await transaction.getAll(...ticketRefs);
@@ -1645,13 +1821,16 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
             );
           }
         }
-        // Tickets are only marked sold when this sale is auto-confirmed; for
-        // larger transfers an admin confirms, exactly as the UI promises.
-        if (autoConfirm) {
-          ticketSnaps.forEach((snap) =>
-            transaction.update(snap.ref, { sold: true })
-          );
-        }
+      }
+
+      // Recheck on each transaction attempt after reads, before any writes.
+      const now = Date.now();
+      if ([...pilotTermsById.values()].some(({ cutoffMs }) => cutoffMs <= now)) {
+        throw transferConflict("Esta apuesta ya cerró.");
+      }
+      // Larger transfers wait for an admin to mark their raffle tickets sold.
+      if (autoConfirm) {
+        ticketRefs.forEach((ref) => transaction.update(ref, { sold: true }));
       }
 
       if (raffleLines.length > 0) {
@@ -1686,9 +1865,20 @@ export const createTransferSale = functions.https.onRequest(async (req, res) => 
           totalBetsPrice,
           totalSalePrice,
           verified: false, // bets are always confirmed by an admin
+          ...(pilotOrder ? { ufcPaymentStatus: "PENDING" } : {}),
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
       }
+      if (pilotOrder) {
+        transaction.set(pilotOrderRef, {
+          marketIds: [...pilotTermsById.keys()], bets: betLines, expectedCents, status: "PENDING",
+          admittedAtMs: now, createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        for (const market of markets) {
+          if (market) transaction.update(market.ref, { orderCount: market.orderCount + 1 });
+        }
+      }
+      return false;
     });
 
     // Best effort: tell the admins a transfer is waiting for confirmation.
@@ -2015,6 +2205,19 @@ export const updateBet = functions.https.onRequest(async (req, res) => {
     // B4: reject patches that would make a bet unusable (non-positive or
     // non-numeric price, or empty team names).
     const bet = data.bet || {};
+    // Opt-in happens only at creation, never by retrofitting a live pool.
+    if (Object.keys(bet).some((key) => /^(ufcRules|frozenFeeBps|officialSourceUrl)(?:[/.]|$)/.test(key))) {
+      res.status(400).json({ status: 400, message: "ufcRules can only be set when creating a bet" });
+      return;
+    }
+    if (typeof data.idBet !== "string" || !validTransferBetId(data.idBet)) {
+      res.status(400).json({ status: 400, message: "Invalid betId" });
+      return;
+    }
+    if (await containsNonLegacyBetLines([{ betId: data.idBet }])) {
+      res.status(409).json({ status: 409, message: "UFC pilot markets cannot be edited." });
+      return;
+    }
     if (bet.pricePerTicket !== undefined) {
       const price = Number(bet.pricePerTicket);
       if (!Number.isFinite(price) || price <= 0) {
@@ -2078,6 +2281,15 @@ export const deleteBet = functions.https.onRequest(async (req, res) => {
   try {
     console.log("Deleting bet...");
     const data = req.body;
+
+    if (typeof data.idBet !== "string" || !validTransferBetId(data.idBet)) {
+      res.status(400).json({ status: 400, message: "Invalid betId" });
+      return;
+    }
+    if (await containsNonLegacyBetLines([{ betId: data.idBet }])) {
+      res.status(409).json({ status: 409, message: "UFC pilot markets cannot be deleted." });
+      return;
+    }
 
     await db.collection("bets").doc(data.idBet).delete();
 
@@ -2185,6 +2397,11 @@ export const confirmRejectBetSale = functions.https.onRequest(
         return;
       }
       const sale = saleSnap.data() as Record<string, unknown>;
+      const rawLines = Array.isArray(sale.bets) ? sale.bets : [];
+      if ((await pilotOrders().doc(saleRef.id).get()).exists || await containsNonLegacyBetLines(rawLines)) {
+        res.status(409).json({ status: 409, message: "Las ventas UFC no se pueden procesar con el flujo anterior." });
+        return;
+      }
       const currentlyVerified = sale.verified === true;
 
       // Idempotency guard (M7/M8): a sale is applied exactly once per state
@@ -2206,7 +2423,6 @@ export const confirmRejectBetSale = functions.https.onRequest(
       }
 
       // Extract validated deltas from the persisted document only.
-      const rawLines = Array.isArray(sale.bets) ? sale.bets : [];
       const deltas = new Map<
         string,
         { team: "A" | "B" | "C"; tickets: number }
@@ -2482,6 +2698,204 @@ async function notifyBetSettlement(
   }
 }
 
+function pilotAdminPost(
+  handler: (body: Record<string, unknown>, uid: string) => Promise<Record<string, unknown>>,
+) {
+  return functions.https.onRequest(async (req, res) => {
+    let uid = "";
+    if (await rejectUnlessAdmin(req, res, "POST, OPTIONS", (id) => { uid = id; })) return;
+    if (req.method !== "POST") {
+      res.status(405).json({ status: 405, message: "Only POST requests" });
+      return;
+    }
+    try {
+      res.status(200).json({ status: 200, ...await handler(req.body ?? {}, uid) });
+    } catch (err) {
+      if (err instanceof functions.https.HttpsError) {
+        const status = err.code === "invalid-argument" ? 400 : err.code === "not-found" ? 404 : 409;
+        res.status(status).json({ status, message: err.message });
+        return;
+      }
+      console.error("UFC pilot operation failed:", err);
+      res.status(500).json({ status: 500, message: "UFC pilot operation failed" });
+    }
+  });
+}
+
+/** Manual reconciliation. The admin must check actual bank evidence, not the uploaded screenshot. */
+export const verifyUfcPilotOrder = pilotAdminPost(async (body, uid) => {
+  const { orderId, action, receivedCents, bankReference, noFundsOutstanding } = body;
+  if (typeof orderId !== "string" || !/^transfer_\d{16}$/.test(orderId) ||
+      (action !== "verify" && action !== "reject")) {
+    throw transferBadRequest("Expected a pilot order ID and a verify or reject action.");
+  }
+  const reason = typeof body.reason === "string" ? body.reason.trim() : "";
+  if (action === "verify" && (!isPositiveCents(receivedCents) || typeof bankReference !== "string" ||
+      !/^[A-Z0-9][A-Z0-9_-]{5,119}$/.test(bankReference))) {
+    throw transferBadRequest("Expected the full received amount and a canonical bank reference.");
+  }
+  if (action === "reject" && (noFundsOutstanding !== true || !reason || reason.length > 500)) {
+    throw transferBadRequest("Rejection requires a reason and confirmation that no funds are outstanding.");
+  }
+  const orderRef = pilotOrders().doc(orderId);
+  const saleRef = db.collection("salesBets").doc(orderId);
+  const targetStatus = action === "verify" ? "VERIFIED" : "REJECTED";
+  const evidence = action === "verify" ? { bankReference, receivedCents } : { noFundsOutstanding, reason };
+  const paymentRef = action === "verify" && typeof bankReference === "string"
+    ? db.collection("ufcPilotBankReferences").doc(crypto.createHash("sha256").update(bankReference).digest("hex")) : null;
+
+  return db.runTransaction(async (tx) => {
+    const [orderSnap, saleSnap] = await Promise.all([tx.get(orderRef), tx.get(saleRef)]);
+    const order = orderSnap.data();
+    if (!order) throw new functions.https.HttpsError("not-found", "Trusted pilot order not found.");
+    if (order.status !== "PENDING") {
+      if (order.status === targetStatus && isDeepStrictEqual(order.review?.evidence, evidence)) return { duplicate: true };
+      throw transferConflict("Pilot order already reviewed; manual escalation required.");
+    }
+    if (!saleSnap.exists || saleSnap.get("verified") !== false || !isDeepStrictEqual(saleSnap.get("bets"), order.bets)) {
+      throw transferConflict("Sale does not match the trusted pilot order.");
+    }
+    if (action === "verify" && receivedCents !== order.expectedCents) {
+      throw transferConflict("Bank amount does not match the complete checkout total.");
+    }
+    const marketIds = order.marketIds as string[];
+    if (!Array.isArray(marketIds) || marketIds.length === 0 || marketIds.length > MAX_TRANSFER_LINE_ITEMS ||
+        new Set(marketIds).size !== marketIds.length) throw transferConflict("Invalid trusted order markets.");
+    const markets = await tx.getAll(...marketIds.map((id) => pilotMarkets().doc(id)));
+    if (paymentRef && (await tx.get(paymentRef)).exists) throw transferConflict("Bank reference is already in use.");
+    const now = Date.now();
+    for (const snap of markets) {
+      const market = readPilotMarket(snap);
+      if (market.settlement || market.reviewedCount >= market.orderCount ||
+          (action === "verify" && now >= market.terms.cutoffMs)) {
+        throw transferConflict("The verification window is closed or the ledger is inconsistent.");
+      }
+      tx.update(snap.ref, { reviewedCount: market.reviewedCount + 1 });
+    }
+    const reviewedAt = admin.firestore.FieldValue.serverTimestamp();
+    if (paymentRef) tx.set(paymentRef, { orderId, reviewedAt });
+    tx.update(orderRef, { status: targetStatus, review: { evidence, uid, reviewedAt, reviewedAtMs: now } });
+    tx.update(saleRef, { verified: action === "verify", ufcPaymentStatus: targetStatus });
+    return { duplicate: false };
+  });
+});
+
+function parseOfficialUfcResult(value: unknown): UfcOfficialResult {
+  const { kind, side, method } = (value ?? {}) as Record<string, unknown>;
+  if (kind === "DRAW" || kind === "VOID") return { kind };
+  if (kind === "WINNER" && (side === "A" || side === "B") &&
+      (method === "KO_TKO" || method === "SUBMISSION" || method === "DECISION" ||
+       method === "TECHNICAL_DECISION" || method === "TECHNICAL_SUBMISSION" || method === "DQ")) {
+    return { kind, side, method };
+  }
+  throw transferBadRequest("Expected a normalized official UFC result.");
+}
+
+/** Records obligations only; this endpoint has no payment-rail integration. */
+export const settleUfcPilotMarket = pilotAdminPost(async (body, uid) => {
+  const { betId, officialSourceUrl } = body;
+  if (typeof betId !== "string" || !validTransferBetId(betId) || !isOfficialUfcEventUrl(officialSourceUrl)) {
+    throw transferBadRequest("Expected a pilot market ID and an official UFC event URL.");
+  }
+  const result = parseOfficialUfcResult(body.result);
+  const marketRef = pilotMarkets().doc(betId);
+  const outcome = await db.runTransaction(async (tx) => {
+    const { terms, settlement, orderCount, reviewedCount } = readPilotMarket(await tx.get(marketRef));
+    if (terms.officialSourceUrl !== officialSourceUrl) throw transferConflict("Source does not match the pinned event.");
+    if (settlement) {
+      if (!isDeepStrictEqual(settlement.result, result)) throw transferConflict("Market already settled with a different result.");
+      return { alreadySettled: true, pools: settlement.pools };
+    }
+    if (Date.now() < terms.cutoffMs) throw transferConflict("Market has not reached its cutoff.");
+    if (reviewedCount !== orderCount) throw transferConflict("Resolve pending bank payments before settlement.");
+
+    // Every admission and review also updates marketRef, so a transaction
+    // retry cannot omit a just-admitted or just-verified order.
+    const { docs } = await tx.get(pilotOrders().where("marketIds", "array-contains", betId).limit(MAX_PILOT_ORDERS + 1));
+    if (docs.length !== orderCount) throw transferConflict("Pilot order ledger is inconsistent.");
+    const verifiedOrders = docs.filter((snap) => {
+      if (snap.get("status") === "REJECTED" && snap.get("review")?.evidence?.noFundsOutstanding === true) return false;
+      const review = snap.get("review");
+      if (snap.get("status") !== "VERIFIED" || !Number.isSafeInteger(review?.reviewedAtMs) ||
+          !Number.isSafeInteger(snap.get("admittedAtMs")) || review.reviewedAtMs < snap.get("admittedAtMs") ||
+          review.reviewedAtMs >= terms.cutoffMs || review.evidence?.receivedCents !== snap.get("expectedCents")) {
+        throw transferConflict("Missing trusted verification before cutoff.");
+      }
+      return true;
+    });
+    const saleRefs = verifiedOrders.map((order) => db.collection("salesBets").doc(order.id));
+    const sales = saleRefs.length ? await tx.getAll(...saleRefs) : [];
+    const salesById = new Map(sales.map((snapshot) => [snapshot.ref.id, snapshot]));
+    const baseEntries: UfcSettlementInput["baseEntries"][number][] = [];
+    const methodEntries: UfcSettlementInput["methodEntries"][number][] = [];
+    for (const order of verifiedOrders) {
+      const sale = salesById.get(order.id);
+      const bets = order.get("bets") as TransferBetLine[];
+      if (!sale?.exists || sale.get("verified") !== true || !isDeepStrictEqual(sale.get("bets"), bets)) {
+        throw transferConflict("Verified sale no longer matches the trusted order.");
+      }
+      bets.forEach((line, index) => {
+        if (line.betId !== betId) return;
+        const { letterTeam: side, method, ticketNumbers: quantity } = line;
+        const price = method === undefined ? terms.basePriceCents : terms.ufcRules.methodPriceCents;
+        if ((side !== "A" && side !== "B") || !Number.isInteger(quantity) || quantity < 1 || quantity > 1000 ||
+            !isPositiveCents(price * quantity) || line.totalPrice !== price * quantity / 100 ||
+            !isDeepStrictEqual(line.ufcRules, terms.ufcRules)) {
+          throw transferConflict("Trusted order line does not match frozen market terms.");
+        }
+        const id = `${order.id}:${index}`;
+        if (method === undefined) baseEntries.push({ id, pick: { side }, quantity });
+        else methodEntries.push({ id, pick: { side, method }, quantity });
+      });
+    }
+
+    const { base, method } = settleUfcMarket({ ...terms, result, baseEntries, methodEntries });
+    const group = ({ obligations, ...summary }: typeof base, pool: "base" | "method") => {
+      for (const { id, kind, amountCents } of obligations) {
+        const [orderId, index] = id.split(":");
+        const lines = byOrder.get(orderId) ?? [];
+        lines.push({ lineIndex: Number(index), pool, kind, amountCents,
+          transferStatus: amountCents > 0 ? "PENDING" : "NOT_REQUIRED" });
+        byOrder.set(orderId, lines);
+      }
+      return summary;
+    };
+    type LineObligation = Omit<UfcObligation, "id"> & { lineIndex: number; pool: "base" | "method";
+      transferStatus: "PENDING" | "NOT_REQUIRED" | "CONFIRMED" };
+    const byOrder = new Map<string, LineObligation[]>();
+    const pools = { base: group(base, "base"), method: group(method, "method") };
+    const settledAt = admin.firestore.FieldValue.serverTimestamp();
+    for (const order of verifiedOrders) {
+      const sale = salesById.get(order.id)!;
+      const lines = byOrder.get(order.id)?.sort((a, b) => a.lineIndex - b.lineIndex);
+      if (!lines?.length) throw transferConflict("Order contains no matching market lines.");
+      const entry = { result, officialSourceUrl, settledAt, lines };
+      tx.update(pilotOrders().doc(order.id), { settlements: { ...order.get("settlements"), [betId]: entry } });
+      tx.update(sale.ref, { ufcSettlements: { ...sale.get("ufcSettlements"), [betId]: entry } });
+    }
+    tx.update(marketRef, { settlement: { result, officialSourceUrl, settledAt, uid, pools } });
+    tx.set(db.collection("bets").doc(betId), { settled: true, isFinished: true, ufcResult: result }, { merge: true });
+    return { alreadySettled: false, pools };
+  });
+
+  // RTDB is a storefront projection, not part of the financial transaction.
+  // Retrying the same result repairs this projection without rewriting money owed.
+  let storefrontSynced = false;
+  try {
+    const projection = await rtdb.ref(`bets/${betId}`).transaction((bet) => {
+      if (bet === null) return null; // RTDB can start with an uncached null.
+      if (bet.ufcRules?.version !== 1 || (bet.settled === true && bet.isFinished === true &&
+          isDeepStrictEqual(bet.ufcResult, result))) return undefined;
+      return { ...bet, isFinished: true, settled: true, ufcResult: result };
+    });
+    const bet = projection.snapshot.val();
+    storefrontSynced = bet?.settled === true && bet?.isFinished === true && isDeepStrictEqual(bet.ufcResult, result);
+  } catch (err) {
+    console.warn("UFC pilot settled but storefront projection failed:", err);
+  }
+  return { ...outcome, storefrontSynced };
+});
+
 export const settleBet = functions.https.onRequest(async (req, res) => {
   if (await rejectUnlessAdmin(req, res, "POST, OPTIONS")) return;
   if (req.method === "OPTIONS") {
@@ -2512,8 +2926,6 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
       return;
     }
 
-    const takeRate = await readTakeRate();
-
     // Load the bet (RTDB is the live source for admin-created bets; Firestore
     // mirrors it). Settlement state lives on both.
     const rtdbRef = rtdb.ref(`bets/${betId}`);
@@ -2523,8 +2935,16 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
     const firestoreBetRef = firestoreId
       ? db.collection("bets").doc(firestoreId)
       : null;
-    const firestoreBetSnap = firestoreBetRef ? await firestoreBetRef.get() : null;
+    const [firestoreBetSnap, sameIdBet, pilotMarket] = await Promise.all([
+      firestoreBetRef?.get(), db.collection("bets").doc(betId).get(), pilotMarkets().doc(betId).get(),
+    ]);
     const firestoreBet = firestoreBetSnap?.data() as Record<string, unknown> | undefined;
+
+    if (rtdbBet?.ufcRules !== undefined || firestoreBet?.ufcRules !== undefined ||
+        sameIdBet.get("ufcRules") !== undefined || pilotMarket.exists) {
+      res.status(409).json({ status: 409, message: "La liquidación anterior no admite apuestas UFC." });
+      return;
+    }
 
     if (!rtdbBet && !firestoreBet) {
       res.status(404).json({ status: 404, message: "Bet not found" });
@@ -2532,6 +2952,7 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
     }
 
     const sourceBet = rtdbBet ?? firestoreBet!;
+
     // Idempotency: never settle twice.
     if (sourceBet.settled === true) {
       res.status(200).json({
@@ -2555,6 +2976,7 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
     const salesSnapshot = await db.collection("salesBets").get();
     const salesByOutcome: BetSaleLine[] = [];
     const ticketsByOutcome = { A: 0, B: 0, C: 0 };
+    let foundUfcLine = false;
     salesSnapshot.forEach((doc) => {
       if (doc.get("verified") !== true) return;
       const rawLines = doc.get("bets");
@@ -2566,6 +2988,10 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
       for (const line of rawLines) {
         const entry = (line ?? {}) as Record<string, unknown>;
         if (entry.betId !== betId) continue;
+        if (hasUfcLineMarker(entry)) {
+          foundUfcLine = true;
+          continue;
+        }
         const team = lineOutcome(line);
         if (!team) continue;
         const tickets = Number(entry.ticketNumbers);
@@ -2583,6 +3009,12 @@ export const settleBet = functions.https.onRequest(async (req, res) => {
       }
     });
 
+    if (foundUfcLine) {
+      res.status(409).json({ status: 409, message: "La liquidación anterior no admite apuestas UFC." });
+      return;
+    }
+
+    const takeRate = await readTakeRate();
     const totalTickets = ticketsByOutcome.A + ticketsByOutcome.B + ticketsByOutcome.C;
     const pool = poolCents(totalTickets, pricePerTicket);
     const distributable = distributableCents(pool, takeRate);
@@ -2749,6 +3181,13 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       return;
     }
 
+    const pilotTerms = data.ufcRules !== undefined ? readPilotTerms(data) : null;
+    if (data.ufcRules !== undefined && (!pilotTerms || pilotTerms.cutoffMs <= Date.now() ||
+        price !== pilotTerms.basePriceCents / 100)) {
+      res.status(400).json({ status: 400, message: "Invalid UFC rules, price, future cutoff, frozen fee or official event URL" });
+      return;
+    }
+
     // Bets created from the gathered card carry a stable sourceKey (the matchup
     // id). Enforce uniqueness server-side so a double submit (or two admins)
     // can never create duplicate bets for the same matchup, and persist it for
@@ -2785,6 +3224,8 @@ export const createBet = functions.https.onRequest(async (req, res) => {
       image: data.image || "",
       date: data.date,
       pricePerTicket: price,
+      ...(pilotTerms ? { ufcRules: pilotTerms.ufcRules, frozenFeeBps: pilotTerms.frozenFeeBps,
+        officialSourceUrl: pilotTerms.officialSourceUrl } : {}),
       teams: data.teams, // { a: string, b: string }
       oddsTeamA: data.oddsTeamA || "1.0",
       oddsTeamB: data.oddsTeamB || "1.0",
@@ -2807,7 +3248,16 @@ export const createBet = functions.https.onRequest(async (req, res) => {
     };
 
     // Add bet to Firestore collection (for backward compatibility and queries)
-    const firestoreDocRef = await db.collection("bets").add(betData);
+    const firestoreDocRef = pilotTerms ? db.collection("bets").doc(betId) : await db.collection("bets").add(betData);
+    if (pilotTerms) {
+      await db.runTransaction(async (transaction) => {
+        const ref = pilotMarkets().doc(betId);
+        const [existing, mirror] = await Promise.all([transaction.get(ref), transaction.get(firestoreDocRef)]);
+        if (existing.exists || mirror.exists) throw transferConflict("Bet ID already in use.");
+        transaction.set(ref, { ...pilotTerms, orderCount: 0, reviewedCount: 0 });
+        transaction.set(firestoreDocRef, betData);
+      });
+    }
     console.log("Bet added to Firestore with ID:", firestoreDocRef.id);
 
     // Add bet to Realtime Database (for real-time updates)
@@ -2966,6 +3416,8 @@ export const getMyPurchases = functions.https.onRequest(async (req, res) => {
         payout: doc.get("payout") ?? null,
         payoutStatus: doc.get("payoutStatus") ?? null,
         settlements: doc.get("settlements") ?? null,
+        ...(doc.get("ufcPaymentStatus") ? { ufcPaymentStatus: doc.get("ufcPaymentStatus") } : {}),
+        ...(doc.get("ufcSettlements") ? { ufcSettlements: doc.get("ufcSettlements") } : {}),
         bets: doc.get("bets") ?? [],
       });
     });

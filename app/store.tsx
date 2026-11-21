@@ -16,6 +16,7 @@ interface IUserCartBets {
   letterTeam: string;
   ticketNumbers: number;
   totalPrice: number;
+  method?: "KO_TKO" | "SUBMISSION" | "DECISION";
   clientReturns?: number;
   image?: string;
 }
@@ -70,26 +71,11 @@ interface TicketState {
   clearSelectedTickets: () => void;
   getTicketsInCartByRaffleId: (raffleId: string) => number[];
   setPaymentMethod: (method: string) => void;
-  userCartBets: Array<{
-    betId: string;
-    betName: string;
-    team: string;
-    letterTeam: string;
-    ticketNumbers: number;
-    totalPrice: number;
-    image?: string;
-  }>;
+  userCartBets: IUserCartBets[];
   updateBet: (newBet: IUserCartBets) => void;
-  getBetsFromCart: () => Array<{
-    betId: string;
-    betName: string;
-    team: string;
-    letterTeam: string;
-    ticketNumbers: number;
-    totalPrice: number;
-    image?: string;
-  }>;
-  removeBetById: (betId: string) => void;
+  getBetsFromCart: () => IUserCartBets[];
+  updateBetSelection: (base: IUserCartBets, extra?: IUserCartBets) => void;
+  removeBetById: (betId: string, market?: "method") => void;
   clearCartBets: () => void;
   getTicketInfoByBetId: (betId: string) => {
     ticketNumbers: number;
@@ -243,6 +229,14 @@ const useTicketStore = create<TicketState>()(
       },
       setPaymentMethod: (method) => set({ paymentMethod: method }),
 
+      updateBetSelection: (base, extra) => set((state) => ({
+        userCartBets: [
+          ...state.userCartBets.filter((line) => line.betId !== base.betId),
+          base,
+          ...(extra ? [extra] : []),
+        ],
+      })),
+
       updateBet: (newBet) => {
         const currentBets = get().userCartBets;
         const existingIndex = currentBets.findIndex(
@@ -269,9 +263,9 @@ const useTicketStore = create<TicketState>()(
 
       getBetsFromCart: () => get().userCartBets,
 
-      removeBetById: (betId) => {
+      removeBetById: (betId, market) => {
         set((state) => ({
-          userCartBets: state.userCartBets.filter((bet) => bet.betId !== betId),
+          userCartBets: state.userCartBets.filter((bet) => bet.betId !== betId || (market === "method" && !bet.method)),
         }));
       },
 
@@ -279,7 +273,7 @@ const useTicketStore = create<TicketState>()(
 
       getTicketInfoByBetId: (betId: string) => {
         const bets = get().getBetsFromCart();
-        const bet = bets.find((b) => b.betId === betId);
+        const bet = bets.find((b) => b.betId === betId && !b.method);
         if (bet) {
           return {
             ticketNumbers: bet.ticketNumbers,

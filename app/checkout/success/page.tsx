@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // Route the buyer came from before checkout (set by the cart page).
 // Falls back to the list view.
@@ -49,6 +49,7 @@ const SuccessPage = () => {
   const [isHydrated, setIsHydrated] = useState(false);
   const [ticketCount, setTicketCount] = useState(0);
   const [returnRoute, setReturnRoute] = useState(HOME_FALLBACK);
+  const returnRouteRef = useRef<string | null>(null);
 
   useEffect(() => {
     // Ticket state is owned by the server: transfer sales are confirmed by an
@@ -61,7 +62,14 @@ const SuccessPage = () => {
     cleanBets();
     cleanSelected();
     setIsHydrated(true);
-    setReturnRoute(readCheckoutOrigin());
+    // Read the return route once, before removing the key. React's dev-mode
+    // StrictMode unmount/remount re-runs this effect, and a second read after
+    // removeItem would see null and fall back to HOME_FALLBACK. Keep the
+    // captured value in a ref so the re-run can't lose it.
+    if (returnRouteRef.current === null) {
+      returnRouteRef.current = readCheckoutOrigin();
+    }
+    setReturnRoute(returnRouteRef.current || HOME_FALLBACK);
     try { sessionStorage.removeItem("checkoutOrigin"); } catch { /* private mode */ }
   }, []);
 

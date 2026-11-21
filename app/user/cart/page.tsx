@@ -116,7 +116,7 @@ const UserCartPage = () => {
       </ul>
       <div className="flex w-full flex-col gap-2 px-2 py-2">
         {userCartBets.map((bet) => (
-          <div key={bet.betId} className="flex items-center justify-between gap-3 rounded-card border border-ink-100 bg-surface p-3">
+          <div key={`${bet.betId}:${bet.method ?? "winner"}`} className="flex items-center justify-between gap-3 rounded-card border border-ink-100 bg-surface p-3">
             <div className="flex min-w-0 items-center gap-3">
               {bet.image ? (
                 // eslint-disable-next-line @next/next/no-img-element -- persisted bets may use arbitrary remote image hosts
@@ -126,14 +126,14 @@ const UserCartPage = () => {
               )}
               <div className="min-w-0 break-words">
                 <p className="font-semibold">Apuesta: {bet.betName}</p>
-                <p>Equipo: {bet.team}</p>
+                <p>{bet.method ? "Método" : "Equipo"}: {bet.team}</p>
                 <p>Boletos: {bet.ticketNumbers}</p>
                 <p>Precio de boleto: {formatPrice(bet.totalPrice/bet.ticketNumbers)}</p>
                 <p>Precio total: {formatPrice(bet.totalPrice)}</p>
               </div>
             </div>
             <button
-              onClick={() => removeBet(bet.betId)}
+              onClick={() => removeBet(bet.betId, bet.method ? "method" : undefined)}
               className='flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-danger-700'
               aria-label="Borrar apuesta"
             >
